@@ -5,7 +5,7 @@ jdk:
 #master 브랜치에 push되었을 때만 수행
 branches:
  only:
-  - master
+  - feature
 
 #Travis CI 서버의 Home path  
 cache:
