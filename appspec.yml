@@ -1,0 +1,6 @@
+#AWS Code Deploy 설정
+version: 0.0 # code deploy 버전, 0.0이외의 버전을 사용하면 오류 발생
+os: linux
+files:
+  - source:  / # s3 버킷에서 복사할 파일의 위치
+    destination: /home/ec2-user/app/travis/build/ # zip파일을 복사해 압출을 풀 위치
