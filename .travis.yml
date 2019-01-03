@@ -25,6 +25,12 @@ notifications:
     recipients:
       - sencom1028@gmail.com
 
+#배포 이전 수행 작업 정의
+before_deploy:
+  - zip -r lua-skill-server * #lua-skill-server 이름으로 압축
+  - mkdir -p deploy #deploy dir생성
+  - mv lua-skill-server.zip deploy/lua-skill-server.zip #압축파일을 deploy dir하위로 이동
+
 #배포 설정
 deploy:
   - provider: s3
