@@ -8,6 +8,7 @@ branches:
   - master
 
 #Travis CI 서버의 Home path  
+
 cache:
   directories:
     - '$HOME/.m2/repository'
@@ -23,3 +24,26 @@ notifications:
   email:
     recipients:
       - sencom1028@gmail.com
+
+#배포 이전 수행 작업 정의
+before_deploy:
+  - zip -r lua-skill-server * #lua-skill-server 이름으로 압축
+  - mkdir -p deploy #deploy dir생성
+  - mv lua-skill-server.zip deploy/lua-skill-server.zip #압축파일을 deploy dir하위로 이동
+
+#배포 설정
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY # Travis repo settings에 설정된 값
+    secret_access_key: $AWS_SECRET_KEY # Travis repo settings에 설정된 값
+    bucket: lua-skill-server-deploy # S3 버킷
+    region: ap-northeast-2 # region
+    skip_cleanup: true
+    acl: public_read
+    local_dir: deploy # before_deploy에서 생성한 디렉토리, 해당 디렉토리 내용들만 S3로 전송
+    wait-until-deployed: true
+    on:
+      repo: /AlteraLab/SecretaryLua #Github 주소
+      branch: master
+
+      
