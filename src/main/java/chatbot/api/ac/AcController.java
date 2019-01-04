@@ -6,11 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import chatbot.api.ac.utils.AcConstants;
 import chatbot.api.common.RequestDto;
 import chatbot.api.common.ResponseDto;
 import chatbot.api.common.services.DeviceCommonServiceImpl;
-import chatbot.api.common.utils.CommonConstants;
 import lombok.AllArgsConstructor;
 
 @RestController

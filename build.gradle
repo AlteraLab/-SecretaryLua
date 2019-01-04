@@ -1,22 +1,48 @@
+buildscript {
+	ext {
+		buildVersion = "0.0.1-SNAPSHOT"
+		springBootVersion = '2.1.1.RELEASE'
+	}
+	repositories {
+		maven { url "http://repo.maven.apache.org/maven2" }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
 apply plugin: 'java'
-apply plugin: 'eclipse-wtp'
-apply plugin: 'war'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+jar {
+	baseName = "lua-skill-server"
+	version = "${buildVersion}"
+	manifest {
+		attributes 'Title': 'lua-skill-server',
+			'Version': 1.0,
+			'Main-Class': 'chatbot.api.LuaChatbotApplication'
+	}
+	from {
+		configurations.compile.collect {
+			it.isDirectory() ? it : zipTree(it)
+		}
+	}
+}
 
 group = 'kr.or.ikeeper'
 version = '0.0.1-SNAPSHOT'
-
-description = """lua_chatbot"""
+description = """lua-skill-server"""
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
 }
 
-
-
 repositories {
-        
      maven { url "http://repo.maven.apache.org/maven2" }
 }
 dependencies {
