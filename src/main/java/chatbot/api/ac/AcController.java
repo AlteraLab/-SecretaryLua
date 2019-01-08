@@ -1,21 +1,22 @@
 package chatbot.api.ac;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import chatbot.api.common.RequestDto;
 import chatbot.api.common.ResponseDto;
 import chatbot.api.common.services.DeviceCommonServiceImpl;
 import lombok.AllArgsConstructor;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
 
 @RestController
 @AllArgsConstructor
 public class AcController {
 
-	DeviceCommonServiceImpl deviceCommonService;
+	private DeviceCommonServiceImpl deviceCommonService;
+
+	private Environment env;
 
 	@PostMapping(value = "/module/ac/{command}/v1")
 	public ResponseDto message(@PathVariable String command, @RequestBody RequestDto requestDto) {
@@ -44,5 +45,10 @@ public class AcController {
 		*/
 
 		return ResponseDto.builder().msg(msg).status(HttpStatus.OK).data(null).build();
+	}
+
+	@GetMapping("/profile")
+	public String getProfile(){
+		return Arrays.stream(env.getActiveProfiles()).findFirst().orElse("");
 	}
 }
