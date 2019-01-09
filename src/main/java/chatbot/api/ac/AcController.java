@@ -109,6 +109,11 @@ public class AcController {
 
 		return ResponseDto.builder().msg(msg).status(HttpStatus.OK).data(null).build();
 	}
+
+	@GetMapping("/profile")
+	public String getProfile(){
+		return Arrays.stream(env.getActiveProfiles()).findFirst().orElse("");
+	}
 }
 
 
@@ -131,10 +136,3 @@ public class AcController {
 			msg = CommonConstants.DEVICE_NOT_EXIST;
 		}
 		*/
-
-
-	@GetMapping("/profile")
-	public String getProfile(){
-		return Arrays.stream(env.getActiveProfiles()).findFirst().orElse("");
-	}
-}
