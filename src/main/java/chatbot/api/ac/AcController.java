@@ -14,16 +14,23 @@ import chatbot.api.ac.utils.AcConstants;
 import chatbot.api.common.RequestDto;
 import chatbot.api.common.ResponseDto;
 import chatbot.api.common.services.DeviceCommonServiceImpl;
-import chatbot.api.common.utils.CommonConstants;
 import lombok.AllArgsConstructor;
 import org.springframework.web.client.RestTemplate;
 
 import static chatbot.api.ac.utils.AcConstants.*;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
 
 @RestController
 @AllArgsConstructor
 public class AcController {
-	DeviceCommonServiceImpl deviceCommonService;
+
+	private DeviceCommonServiceImpl deviceCommonService;
+
+	private Environment env;
 
 
 	@PostMapping(value = "/module/ac/{command}/v1")
@@ -124,3 +131,10 @@ public class AcController {
 			msg = CommonConstants.DEVICE_NOT_EXIST;
 		}
 		*/
+
+
+	@GetMapping("/profile")
+	public String getProfile(){
+		return Arrays.stream(env.getActiveProfiles()).findFirst().orElse("");
+	}
+}
