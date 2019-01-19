@@ -10,3 +10,10 @@ public class KakaoUser {
 	private String type;
 	private Object properties;
 }
+/*
+"user": {
+	"id": "266742",
+	"type": "accountId",
+	"properties": {}
+}
+ */

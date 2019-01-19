@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class Intent {
-	private String id;
-	private String name;
+	private String id;    // "id": "j0zya4e7fi648hkvunoqlsep",
+	private String name;  // "name": "블록 이름"
 }

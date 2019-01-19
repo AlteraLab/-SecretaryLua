@@ -13,6 +13,8 @@ public class RequestDto {
 }
 
 /*
+
+
 {
 	  "intent": {
 	    "id": "2ogu4breptvy31iky34shchg",
@@ -47,4 +49,6 @@ public class RequestDto {
 	    "detailParams": {}
 	  }
 	}
+
+
 */
