@@ -8,12 +8,15 @@ import lombok.NoArgsConstructor;
 public class KakaoUser {
 	private String id;
 	private String type;
-	private Object properties;
+	private Properties properties;
 }
 /*
 "user": {
 	"id": "266742",
 	"type": "accountId",
-	"properties": {}
+	"properties": {
+        "plusfriendUserKey": "<플러스 친구 사용자 id>",
+        "appUserId": "<app user id>"
+    }
 }
  */
