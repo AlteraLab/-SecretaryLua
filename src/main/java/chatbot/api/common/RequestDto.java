@@ -34,7 +34,10 @@ public class RequestDto {
 	    "user": {
 	      "id": "667652",
 	      "type": "accountId",
-	      "properties": {}
+	      "properties": {
+	      	"plusfriendUserKey": "<플러스 친구 사용자 id>",
+	      	"appUserId": "<app user id>"
+	      }
 	    }
 	  },
 	  "bot": {
