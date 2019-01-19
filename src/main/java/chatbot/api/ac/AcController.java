@@ -34,23 +34,23 @@ public class AcController {
 
 
 	@PostMapping(value = "/module/ac/{command}/v1")
-	public ResponseDto message(@PathVariable String command, @RequestBody RequestDto requestDto) {
+	public ResponseDto AcMessage(@PathVariable String command, @RequestBody RequestDto requestDto) {
 		String kakaoUserId = requestDto.getUserRequest().getUser().getId();
 		String utterance = requestDto.getUserRequest().getUtterance();       // 발화 내용 얻는 코드
+		String kakaoUserType = requestDto.getUserRequest().getUser().getType();
 		String msg = null;
-
-		System.out.println("commanded:" + kakaoUserId);
- 		System.out.println("utterance : " + utterance);
 
 		// 추후 추상화 예정
 
 		// 사용자 아이디가 무엇인지에 따라서 DB에서 ip 주소를 긇어오는 코드 필요하나...
 		// 지금은 데이터 송수신이 제대로 동작하는지 확인하는것이 목적이기 때문에
 		// 일단은 고정 ip, Iot hub url
+
 		String url = "http://203.250.32.29:3000/";
 		String responseByHub;                                 // 허브로부터 응답받을 json 형식의 string
 		RestTemplate restTemplate = new RestTemplate();       // 부트 코드 내에서 다른 REST API 호출하는 객체
 		long dataByHub = 0;                                   // json 으로 받은 데이터중 id 값이 "data" 의 value를 저장할 변수
+
 
 		// iot hub로 restful api 호출하는 코드 작성, {"data":4,"test":"hello"} json string 형태로 데이터를 받아옴
 		responseByHub = restTemplate.postForObject(url, null, String.class);
@@ -70,39 +70,31 @@ public class AcController {
 		if (command.equals("on")) {
 			switch (data) {
 				case 4:  // 4 : 켜기 성공
-					System.out.println("켜기 성공");
-					msg = AC_ON_SUCCESS;
+					System.out.println("켜기 성공");           msg = AC_ON_SUCCESS;
 					break;
 				case 3:  // 3 : 등록된 모듈이 없어요
-					System.out.println("등록된 모듈이 없어요");
-					msg = AC_NONE_REGISTERED;
+					System.out.println("등록된 모듈이 없어요"); msg = AC_NONE_REGISTERED;
 					break;
 				case 2:  // 2 : 이미 켜져있어요
-					System.out.println("이미 켜져있어요!");
-					msg = AC_ALREADY_ON;
+					System.out.println("이미 켜져있어요!");     msg = AC_ALREADY_ON;
 					break;
 				default:
-					System.out.println("켜기 실패");
-					msg = AC_ON_FAIL;
+					System.out.println("켜기 실패");           msg = AC_ON_FAIL;
 					break;
 			}
 		} else if (command.equals("off")) {
 			switch (data) {
 				case 5:  // 4 : 끄기 성공
-					System.out.println("끄기 성공");
-					msg = AC_OFF_SUCCESS;
+					System.out.println("끄기 성공");           msg = AC_OFF_SUCCESS;
 					break;
 				case 3:  // 3 : 등록된 모듈이 없어요
-					System.out.println("등록된 모듈이 없어요");
-					msg = AC_NONE_REGISTERED;
+					System.out.println("등록된 모듈이 없어요"); msg = AC_NONE_REGISTERED;
 					break;
 				case 1:  // 1 : 이미 꺼져있어요
-					System.out.println("이미 꺼져있어요!");
-					msg = AC_ALREADY_OFF;
+					System.out.println("이미 꺼져있어요!");     msg = AC_ALREADY_OFF;
 					break;
 				default:
-					System.out.println("끄기 실패");
-					msg = AC_OFF_FAIL;
+					System.out.println("끄기 실패");           msg = AC_OFF_FAIL;
 					break;
 			}
 		}
@@ -110,8 +102,9 @@ public class AcController {
 		return ResponseDto.builder().msg(msg).status(HttpStatus.OK).data(null).build();
 	}
 
+
 	@GetMapping("/profile")
-	public String getProfile(){
+	public String getProfile() {
 		return Arrays.stream(env.getActiveProfiles()).findFirst().orElse("");
 	}
 }
