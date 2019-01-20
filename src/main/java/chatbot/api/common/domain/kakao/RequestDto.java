@@ -1,4 +1,4 @@
-package chatbot.api.common;
+package chatbot.api.common.domain.kakao;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +13,8 @@ public class RequestDto {
 }
 
 /*
+
+
 {
 	  "intent": {
 	    "id": "2ogu4breptvy31iky34shchg",
@@ -32,7 +34,10 @@ public class RequestDto {
 	    "user": {
 	      "id": "667652",
 	      "type": "accountId",
-	      "properties": {}
+	      "properties": {
+	      	"plusfriendUserKey": "<플러스 친구 사용자 id>",
+	      	"appUserId": "<app user id>"
+	      }
 	    }
 	  },
 	  "bot": {
@@ -47,4 +52,6 @@ public class RequestDto {
 	    "detailParams": {}
 	  }
 	}
+
+
 */

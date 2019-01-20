@@ -50,5 +50,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
     compile group: 'org.projectlombok', name: 'lombok', version:'1.18.4'
     compile group: 'org.json', name: 'json', version:'20180813'
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version:'2.1.1.RELEASE'
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

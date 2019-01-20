@@ -1,4 +1,4 @@
-package chatbot.api.common;
+package chatbot.api.common.domain;
 
 import org.springframework.http.HttpStatus;
 
@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ResponseDto {
+	// return type to chatbot
 	private String msg;
 	private HttpStatus status;
 	private Object data;
