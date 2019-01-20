@@ -1,4 +1,4 @@
-package chatbot.api.common;
+package chatbot.api.common.domain.kakao;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 public class KakaoUser {
 	private String id;
 	private String type;
-	private Object properties;
+	private Properties properties;
 }
