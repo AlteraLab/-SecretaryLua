@@ -1,4 +1,4 @@
-package chatbot.api.common;
+package chatbot.api.common.domain;
 
 import java.time.LocalDateTime;
 

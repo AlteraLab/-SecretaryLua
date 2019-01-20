@@ -1,7 +1,7 @@
 package chatbot.api.ac;
 
-import chatbot.api.common.RequestDto;
-import chatbot.api.common.ResponseDto;
+import chatbot.api.common.domain.kakao.RequestDto;
+import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.common.services.DeviceCommonServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.core.env.Environment;
@@ -23,6 +23,7 @@ public class AcController {
 		String kakaoUserId = requestDto.getUserRequest().getUser().getId();
 		String msg = null;
 		System.out.println("commanded:" + kakaoUserId);
+		System.out.println("botUserProperties:" + requestDto.getUserRequest().getUser().getProperties().getAppUserId());
 
 		/*
 		if (deviceCommonService.isExist(kakaoUserId)) { // 해당 사용자에게 등록된 장비가 존재하는지

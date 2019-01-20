@@ -1,5 +1,7 @@
-package chatbot.api.common;
+package chatbot.api.common.domain.kakao;
 
+import chatbot.api.common.domain.kakao.Block;
+import chatbot.api.common.domain.kakao.KakaoUser;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
