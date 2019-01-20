@@ -1,4 +1,4 @@
-package chatbot.api.common;
+package chatbot.api.common.domain.kakao;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

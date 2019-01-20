@@ -6,7 +6,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import chatbot.api.common.OrderDto;
+import chatbot.api.common.domain.OrderDto;
 
 @Service
 public class RequestToModuleServiceImpl {

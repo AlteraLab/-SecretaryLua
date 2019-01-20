@@ -4,15 +4,6 @@ import com.sun.org.apache.bcel.internal.generic.SWITCH;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
-import chatbot.api.ac.utils.AcConstants;
-import chatbot.api.common.RequestDto;
-import chatbot.api.common.ResponseDto;
 import chatbot.api.common.services.DeviceCommonServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.web.client.RestTemplate;
