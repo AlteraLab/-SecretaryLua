@@ -1,9 +1,12 @@
 package chatbot.api;
 
+import chatbot.api.common.config.AppProperties;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
+@EnableConfigurationProperties(AppProperties.class)
 public class LuaChatbotApplication {
 
 	public static final String APP_LOCATIONS = "spring.config.location=" +

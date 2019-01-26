@@ -1,5 +1,6 @@
 package chatbot.api.common.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
@@ -10,12 +11,9 @@ import chatbot.api.common.domain.OrderDto;
 
 @Service
 public class RequestToModuleServiceImpl {
-	
-	private final RestTemplate restTemplate;
-	
-	public RequestToModuleServiceImpl(RestTemplateBuilder restTemplateBuilder) {
-		restTemplate=restTemplateBuilder.build();
-	}
+
+	@Autowired
+	private RestTemplate restTemplate;
 	
 	public OrderDto request(String orderUrl, MultiValueMap<String, Object> map) {
 		UriComponentsBuilder builder =UriComponentsBuilder.fromHttpUrl(orderUrl);

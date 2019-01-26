@@ -1,20 +1,30 @@
 package chatbot.api.ac;
 
+<<<<<<< Updated upstream
 import chatbot.api.common.domain.kakao.RequestDto;
 import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.common.services.DeviceCommonServiceImpl;
 import lombok.AllArgsConstructor;
+=======
+import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.common.domain.kakao.RequestDto;
+import lombok.AllArgsConstructor;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+>>>>>>> Stashed changes
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+
+import static chatbot.api.ac.utils.AcConstants.*;
 
 @RestController
 @AllArgsConstructor
 public class AcController {
-
-	private DeviceCommonServiceImpl deviceCommonService;
 
 	private Environment env;
 
