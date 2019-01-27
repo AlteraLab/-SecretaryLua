@@ -30,12 +30,14 @@ spring:
             clientSecret: wbnnz6CY9uvFlZxfzUA0o6UYjuhoyTL7
             redirectUriTemplate: "{baseUrl}/oauth2/callback/{registrationId}"
             authorizationGrantType: authorization_code
+            clientAuthenticationMethod: POST
 
         provider:
           kakao:
             authorizationUri: https://kauth.kakao.com/oauth/authorize
             tokenUri: https://kauth.kakao.com/oauth/token
             userInfoUri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
 
 app:
   auth:

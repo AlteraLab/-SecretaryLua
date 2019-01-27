@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public class CookieUtils {
 
+    //쿠키 정보 조회
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
 
@@ -24,6 +25,8 @@ public class CookieUtils {
         return Optional.empty();
     }
 
+
+    //쿠키 저장
     public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
@@ -32,6 +35,7 @@ public class CookieUtils {
         response.addCookie(cookie);
     }
 
+    //쿠키 제거
     public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null && cookies.length > 0) {
@@ -46,11 +50,13 @@ public class CookieUtils {
         }
     }
 
+    //직렬화
     public static String serialize(Object object) {
         return Base64.getUrlEncoder()
                 .encodeToString(SerializationUtils.serialize(object));
     }
 
+    //역직렬화
     public static <T> T deserialize(Cookie cookie, Class<T> cls) {
         return cls.cast(SerializationUtils.deserialize(
                 Base64.getUrlDecoder().decode(cookie.getValue())));
