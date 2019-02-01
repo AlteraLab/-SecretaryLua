@@ -7,7 +7,44 @@ spring:
 spring:
   profiles: develop # 개발환경
 
+  datasource:
+    url: jdbc:mariadb://192.168.99.101:3306/lua
+    username: root
+    password: 1234
+    driver-class-name: org.mariadb.jdbc.Driver
+    dbcp2:
+      validation-query: SELECT 1
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            clientId: 83471680d720ccbf5f678b8841136546
+            clientSecret: wbnnz6CY9uvFlZxfzUA0o6UYjuhoyTL7
+            redirectUriTemplate: "{baseUrl}/oauth2/callback/{registrationId}"
+            authorizationGrantType: authorization_code
+            clientAuthenticationMethod: POST
+
+        provider:
+          kakao:
+            authorizationUri: https://kauth.kakao.com/oauth/authorize
+            tokenUri: https://kauth.kakao.com/oauth/token
+            userInfoUri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+app:
+  auth:
+    tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
+    tokenExpirationMsec: 864000000
+  oauth2:
+    authorizedRedirectUris:
+      - http://localhost:3000/oauth2/redirect
+
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath:chatbot.api.mappers/**/*.xml #*Mapper.xml이 위치한 경로
 #spring.profiles.include: develop-db
 
 server:
-  port: 8080
+  port: 8083

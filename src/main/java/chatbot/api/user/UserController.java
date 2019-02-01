@@ -1,93 +1,55 @@
 package chatbot.api.user;
 
 
-import chatbot.api.common.RequestDto;
-import chatbot.api.common.ResponseDto;
-import chatbot.api.user.domain.LoginRequestDto;
-import chatbot.api.user.domain.LoginResponseDto;
-import chatbot.api.user.utils.UserConstants;
+import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.user.domain.UserInfoDto;
+import chatbot.api.common.security.UserPrincipal;
+import chatbot.api.mappers.UserMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import sun.misc.Request;
-
-/*
-service
-1. response BotUserKey
-2. response msg_enroll_guide
-3. response msg_enroll_result
- */
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@AllArgsConstructor
 public class UserController {
 
-    // lua response botUserKey service
-    @PostMapping(value = "/user/key")
-    public ResponseDto getBotUserKey(@RequestBody RequestDto requestDto) {
-        String msg = requestDto.getUserRequest().getUser().getId();
-        return ResponseDto.builder().msg(msg).status(HttpStatus.OK).data(null).build();
-    }
+    private UserMapper userMapper;
 
-    // lua response ENROLL_GUIDE
-    @PostMapping(value = "/user/enroll/guide")
-    public ResponseDto getGuideMsg(@RequestBody RequestDto requestDto) {
-        return ResponseDto.builder().msg(UserConstants.GUIDE_ENROLL).status(HttpStatus.OK).data(null).build();
-    }
+    /*@PostMapping(value = "/kakaotest/{auth_code}")
+    public KakaoUserInfoDto kakaoAuth(@PathVariable("auth_code") String authCode) {
+        System.out.println(authCode);
 
-    // test
-    // lua response ENROLL_RESULT
-    @PostMapping(value = "/user/enroll/result")
-    public ResponseDto getEnrollResult(@RequestBody RequestDto requestDto) {
-        String kakaoUserId = requestDto.getUserRequest().getUser().getId();
-        String utterance = requestDto.getUserRequest().getUtterance();
+        //authorization code를 통하여 카카오 사용자 토큰 발급
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://kauth.kakao.com/oauth/token");
 
-        String userIp = null;
-        String userPassword = utterance;
+        MultiValueMap<String, String> parts = new LinkedMultiValueMap<>();
+        parts.add("grant_type", "authorization_code");
+        parts.add("client_id", "83471680d720ccbf5f678b8841136546");
+        parts.add("redirect_uri", "http://localhost:3000/");
+        parts.add("code", authCode);
 
-        int firstIndexForIp = userPassword.indexOf(" ");
-        int lastIndexForIp = userPassword.indexOf(",");
-        int firstIndexForPw = lastIndexForIp + 7;
-        int lastIndexForPw = userPassword.length();
+        KakaoAuthCodeInfo res = restTemplate.postForObject(builder.toUriString(), parts, KakaoAuthCodeInfo.class);
+        System.out.println("accessToken: "+ res.getAccessToken());
 
-        userIp = userPassword.substring(firstIndexForIp, lastIndexForIp);
-        userPassword = userPassword.substring(firstIndexForPw, lastIndexForPw);
+        //사용자 정보 요청
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.set("Authorization","Bearer"+" "+res.getAccessToken());
+        builder = UriComponentsBuilder.fromHttpUrl("https://kapi.kakao.com/v2/user/me");
+        HttpEntity<String> entity = new HttpEntity<>("parameters",headers);
+        KakaoUserInfoDto kakaoUserInfo = restTemplate.postForObject(builder.toUriString(), entity, KakaoUserInfoDto.class);
+        System.out.println("id: "+ kakaoUserInfo.getId());
 
-        System.out.println(userIp + " " + userPassword);
+        return kakaoUserInfo;
+    }*/
 
-        return ResponseDto.builder().msg(UserConstants.CREATE_USER_SUCCESS).status(HttpStatus.OK).data(null).build();
-    }
-
-    // oauth2 인증시, 호출되는 API
-    @PostMapping(value = "/user/login")
-    public LoginResponseDto enrollUser(@RequestBody LoginRequestDto loginRequestDto) {
-        // 값 확인
-        System.out.println("beforeIp  : " + loginRequestDto.getBeforeIp());
-        System.out.println("currentIp : " + loginRequestDto.getCurrentIp());
-        System.out.println("port      : " + loginRequestDto.getPort());
-
-        // 만약, 모든 출력이 정상적으로 되었다면.., db 모델링 이후 코드 작성
-        /*
-        if(이번에 넘어온 beforeIp != null)
-        {
-            if(db에 저장되어진 currentIp컬럼 값들 중에, 이번에 넘어온 beforeIp와 동일한 것이 있다면)
-            {
-                1. db에 저장되어진 currentIp를 beforeIp 컬럼 영역으로 업데이트
-                2. 이번에 넘어온 currentIp값을 db의 currentIp 컬럼 영역으로 업데이트
-                3. port도 업데이트
-            }
-        }
-        else
-        {
-            1. currentIp 값을 db에 업데이터
-            2. port도 업데이트
-        }
-        // 중첩된 코드 : 모듈화해서 적용하기
-
-        허브 서버에 보낼 LoginResponseDto에 어떤 값 실어서 보낼지 이야기하기
-         */
-
-
-        return LoginResponseDto.builder().test(null).build();
+    @GetMapping(value = "/user")
+    public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
+        return ResponseDto.builder()
+                .msg("userInfoDto information")
+                .status(HttpStatus.OK)
+                .data(userInfoDto)
+                .build();
     }
 }

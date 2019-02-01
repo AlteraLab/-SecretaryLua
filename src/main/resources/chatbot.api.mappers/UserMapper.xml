@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.UserMapper">
+    <select id="getUser" resultMap="UserInfoDto" parameterType="Long">
+        SELECT * FROM users WHERE user_id = #{userId}
+    </select>
+
+    <select id="getUserByProviderId" resultMap="UserInfoDto" parameterType="String">
+        SELECT * FROM users WHERE provider_id = #{providerId}
+    </select>
+
+    <insert id="save" parameterMap="UserInfoDto">
+        INSERT INTO users
+        (
+            user_id,
+            provider_id,
+            name,
+            email,
+            profile_img
+        )
+        VALUES
+        (
+            NEXTVAL(user_sequence),
+            #{providerId},
+            #{name},
+            #{email},
+            #{profileImage}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE users
+        SET name=#{name}, email=#{email}, profile_img=#{profileImage}
+        WHERE user_id=#{userId}
+    </update>
+
+    <resultMap id="UserInfoDto" type="chatbot.api.user.domain.UserInfoDto">
+        <result property="userId" column="user_id"/>
+        <result property="providerId" column="provider_id"/>
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="profileImage" column="profile_img"/>
+    </resultMap>
+
+    <parameterMap id="UserInfoDto" type="chatbot.api.user.domain.UserInfoDto">
+        <parameter property="userId"/>
+        <parameter property="providerId"/>
+        <parameter property="name"/>
+        <parameter property="email"/>
+        <parameter property="profileImage"/>
+    </parameterMap>
+</mapper>
