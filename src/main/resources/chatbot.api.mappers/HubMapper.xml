@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.HubMapper">
+    <select id="getUserHub" resultMap="HubInfoDto" parameterType="Long">
+        SELECT *
+        FROM hub, (SELECT hub_id FROM user_hub WHERE user_id=#{userId}) AS owner
+        where hub.hub_id = owner.hub_id
+    </select>
+
+    <insert id="save"
+            parameterMap="HubInfoDto">
+        <selectKey keyProperty="hubId" resultType="Long" order="BEFORE">
+            select NEXTVAL(hub_sequence)
+        </selectKey>
+        INSERT INTO hub
+        (
+            hub_id,
+            external_ip,
+            external_port,
+            internal_ip,
+            internal_port
+        )
+        VALUES
+        (
+            #{hubId},
+            #{externalIp},
+            #{externalPort},
+            #{internalIp},
+            #{internalPort}
+        )
+    </insert>
+
+    <resultMap id="HubInfoDto" type="chatbot.api.hub.domain.HubInfoDto">
+        <result property="hubId" column="hub_id"/>
+        <result property="externalIp" column="external_ip"/>
+        <result property="externalPort" column="external_port"/>
+        <result property="internalIp" column="internal_ip"/>
+        <result property="internalPort" column="internal_port"/>
+    </resultMap>
+
+    <parameterMap id="HubInfoDto" type="chatbot.api.hub.domain.HubInfoDto">
+        <parameter property="hubId"/>
+        <parameter property="externalIp"/>
+        <parameter property="externalPort"/>
+        <parameter property="internalIp"/>
+        <parameter property="internalPort"/>
+    </parameterMap>
+
+</mapper>

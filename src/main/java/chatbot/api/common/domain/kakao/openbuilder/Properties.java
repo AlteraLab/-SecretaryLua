@@ -1,4 +1,4 @@
-package chatbot.api.common.domain.kakao;
+package chatbot.api.common.domain.kakao.openbuilder;
 
 import lombok.Data;
 
