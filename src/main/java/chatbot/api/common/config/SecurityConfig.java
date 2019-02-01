@@ -2,7 +2,7 @@ package chatbot.api.common.config;
 
 import chatbot.api.common.security.CustomUserDetailsService;
 import chatbot.api.common.security.oauth2.*;
-import chatbot.api.common.security.oauth2.jwt.TokenAuthenticationFilter;
+import chatbot.api.common.security.oauth2.jwt.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +20,7 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCo
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -43,9 +43,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -73,26 +70,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 
             .authorizeRequests()
-//                .antMatchers("/",
-//                    "/error",
-//                    "/favicon.ico",
-//                    "/**/*.png",
-//                    "/**/*.gif",
-//                    "/**/*.svg",
-//                    "/**/*.jpg",
-//                    "/**/*.html",
-//                    "/**/*.css",
-//                    "/**/*.js")
-//                    .permitAll()
-//
-//                //허용하는 url 설정
-//                .antMatchers("/auth/**", "/oauth2/**")
-//                    .permitAll()
-//                //이외의 url은 인증 요청
-//                .anyRequest()
-//                    .authenticated()
-                .anyRequest()
+                //허용하는 url 설정
+                .antMatchers("/auth/**", "/oauth2/**")
                     .permitAll()
+                //허용하는 url 이외의 url은 인증 요청
+                .anyRequest()
+                    .authenticated()
                 .and()
 
             .oauth2Login()//외부 서버에 대한 인증 요청을 트리거하기 위해 사용하는 엔드포인트
@@ -107,13 +90,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .accessTokenResponseClient(accessTokenResponseClient) //authorization_code를 access_token으로 교환
                     .and()
                 .userInfoEndpoint() //access_token을 통해 사용자 정보를 획득
-                    //.customUserType(KakaoUserInfoDto.class, "kakao")
                     .userService(customOAuth2UserService)
                     .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler) //작업이 성공 시에 호출
                 .failureHandler(oAuth2AuthenticationFailureHandler); //작업이 실패 시에 호출
-        // Add our custom Token based authentication filter
-        //http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        //JWT 인증 필터
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -128,13 +111,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public TokenAuthenticationFilter tokenAuthenticationFilter() {
-        return new TokenAuthenticationFilter();
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter();
     }
 
     @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
-        return new CustomOAuth2UserService(restTemplate);
+        return new CustomOAuth2UserService();
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package chatbot.api.common.utils;
+package chatbot.api.common.constants;
 
 import lombok.NoArgsConstructor;
 

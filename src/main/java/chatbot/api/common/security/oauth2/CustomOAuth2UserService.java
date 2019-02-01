@@ -1,35 +1,31 @@
 package chatbot.api.common.security.oauth2;
 
-import chatbot.api.common.security.UserRepository;
-import net.minidev.json.writer.CompessorMapper;
+import chatbot.api.user.domain.UserInfoDto;
+import chatbot.api.common.security.UserPrincipal;
+import chatbot.api.mappers.UserMapper;
+import chatbot.api.common.domain.kakao.developers.KakaoUserInfoDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequestEntityConverter;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 
 //oauth2 provider로 부터 access Token을 얻은 이후 호출
 @Service
@@ -44,25 +40,21 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private static final ParameterizedTypeReference<Map<String, Object>> PARAMETERIZED_RESPONSE_TYPE =
             new ParameterizedTypeReference<Map<String, Object>>() {};
 
-
-    @Autowired
-    private UserRepository userRepository;
-
     private RestOperations restOperations;
 
     private Converter<OAuth2UserRequest, RequestEntity<?>> requestEntityConverter = new OAuth2UserRequestEntityConverter();
 
-    //생성자를 통한 DI
-    public CustomOAuth2UserService(RestTemplate restTemplate){
+    @Autowired
+    private UserMapper userMapper;
+
+    public CustomOAuth2UserService(){
+        RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
         this.restOperations = restTemplate;
     }
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        //Assert.notNull(userRequest, "userRequest cannot be null");
-
-        System.out.println("test");
 
         //provider의 tokenUri 검사
         if (!StringUtils.hasText(userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri())) {
@@ -92,6 +84,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         System.out.println(request.getHeaders());
 
         ResponseEntity<Map<String, Object>> response;
+
         try {
             //https://kapi.kakao.com/v2/user/me로 Authorization헤더 포함하여 사용자 정보 요청
             response = this.restOperations.exchange(request, PARAMETERIZED_RESPONSE_TYPE);
@@ -117,8 +110,51 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         Map<String, Object> userAttributes = response.getBody();//response body에 사용자 정보들 위치
 
-        Set<GrantedAuthority> authorities = Collections.singleton(new OAuth2UserAuthority(userAttributes));
+        //map을 KakaoUserInfoDto로 변환
+        final ObjectMapper mapper = new ObjectMapper(); // jackson's objectmapper
+        KakaoUserInfoDto kakaoUserInfo = mapper.convertValue(userAttributes, KakaoUserInfoDto.class);
 
-        return new DefaultOAuth2User(authorities, userAttributes, userNameAttributeName);
+        System.out.println("kakao nick: "+kakaoUserInfo.getProperties().getNickname()); //??으로 출력됨, 해결 필요
+
+        return processOAuth2User(kakaoUserInfo);
+
+        /*Set<GrantedAuthority> authorities = Collections.singleton(new OAuth2UserAuthority(userAttributes));
+
+
+        return new DefaultOAuth2User(authorities, userAttributes, userNameAttributeName);*/
     }
+
+    private OAuth2User processOAuth2User(KakaoUserInfoDto kakaoUserInfo) {
+        Optional<UserInfoDto> userOptional = userMapper.getUserByProviderId(kakaoUserInfo.getId());
+        UserInfoDto userInfoDto;
+        if(userOptional.isPresent()) { //사용자 정보 업데이트
+            userInfoDto = userOptional.get();
+            userInfoDto =updateExistingUser(userInfoDto, kakaoUserInfo);
+        } else { //등록이 안된 경우 새로 등록
+            userInfoDto =registerNewUser(kakaoUserInfo);
+        }
+
+        return UserPrincipal.create(userInfoDto);
+    }
+
+    //새로운 사용자 등록
+    private UserInfoDto registerNewUser(KakaoUserInfoDto kakaoUserInfo) {
+        UserInfoDto userInfoDto = new UserInfoDto();
+        userInfoDto.setProviderId(kakaoUserInfo.getId());
+        //userInfoDto.setName(kakaoUserInfo.getProperties().getNickname());
+        userInfoDto.setEmail(kakaoUserInfo.getKakaoAccount().getEmail());
+        userInfoDto.setProfileImage(kakaoUserInfo.getProperties().getProfileImage());
+        userMapper.save(userInfoDto);
+        return userInfoDto;
+    }
+
+    //기존 사용자 정보 업데이트
+    private UserInfoDto updateExistingUser(UserInfoDto existingUserInfoDto, KakaoUserInfoDto kakaoUserInfo) {
+        //existingUserInfoDto.setName(kakaoUserInfo.getProperties().getNickname());
+        existingUserInfoDto.setProfileImage(kakaoUserInfo.getProperties().getProfileImage());
+        existingUserInfoDto.setEmail(kakaoUserInfo.getKakaoAccount().getEmail());
+        userMapper.update(existingUserInfoDto);
+        return existingUserInfoDto;
+    }
+
 }

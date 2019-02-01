@@ -1,4 +1,4 @@
-package chatbot.api.user.domain;
+package chatbot.api.common.domain.kakao.developers;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

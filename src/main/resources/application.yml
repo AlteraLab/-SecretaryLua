@@ -7,12 +7,6 @@ spring:
 spring:
   profiles: develop # 개발환경
 
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-    database: mysql
-
   datasource:
     url: jdbc:mariadb://192.168.99.101:3306/lua
     username: root
@@ -47,6 +41,9 @@ app:
     authorizedRedirectUris:
       - http://localhost:3000/oauth2/redirect
 
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath:chatbot.api.mappers/**/*.xml #*Mapper.xml이 위치한 경로
 #spring.profiles.include: develop-db
 
 server:

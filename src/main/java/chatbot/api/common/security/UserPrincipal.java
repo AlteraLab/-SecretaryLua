@@ -1,20 +1,19 @@
 package chatbot.api.common.security;
 
 
-import lombok.AllArgsConstructor;
-
+import chatbot.api.user.domain.UserInfoDto;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Builder
-public class UserPrincipal implements UserDetails {
+@Data
+public class UserPrincipal implements UserDetails, OAuth2User {
 
     private Long id;
 
@@ -22,15 +21,16 @@ public class UserPrincipal implements UserDetails {
 
     //private Collection<? extends GrantedAuthority> authorities;
 
-    public static UserPrincipal create(User user) {
-        /*List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
+    //사용자 정보로부터 UserPrincipal 생성
+    public static UserPrincipal create(UserInfoDto userInfoDto) {
+        /*List<GrantedAuthority> authorities = userInfoDto.getRoles().stream().map(role ->
                 new SimpleGrantedAuthority(role.getName().name())
         ).collect(Collectors.toList());*/
 
         return UserPrincipal
                 .builder()
-                .id(user.getId())
-                .username(user.getUsername())
+                .id(userInfoDto.getUserId())
+                .username(userInfoDto.getName())
                 //.authorities(authorities)
                 .build();
     }
@@ -42,33 +42,42 @@ public class UserPrincipal implements UserDetails {
     }
 
     @Override
+    public Map<String, Object> getAttributes() {
+        return null;
+    }
+
+    @Override
     public String getPassword() {
         return null;
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return this.username;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 
+    @Override
+    public String getName() {
+        return String.valueOf(id);
+    }
 }

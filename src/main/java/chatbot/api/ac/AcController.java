@@ -1,7 +1,7 @@
 package chatbot.api.ac;
 
 import chatbot.api.common.domain.ResponseDto;
-import chatbot.api.common.domain.kakao.RequestDto;
+import chatbot.api.common.domain.kakao.openbuilder.RequestDto;
 import lombok.AllArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;

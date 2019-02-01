@@ -1,17 +1,24 @@
 package chatbot.api.common.security.oauth2.jwt;
-import chatbot.api.common.config.AppProperties;
+
 import chatbot.api.common.security.UserPrincipal;
+import io.jsonwebtoken.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.security.SignatureException;
 import java.util.Date;
 
-//토큰 공급자 정의
+/*
+토큰 공급자 정의
+JJWT를 사용하고 있으나 추후에 JOSE+JWT로 교체하여야
+*/
 @Service
 public class TokenProvider {
 
-    /*private AppProperties appProperties;
+    private Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
+    private AppProperties appProperties;
 
     public TokenProvider(AppProperties appProperties) {
         this.appProperties = appProperties;
@@ -24,7 +31,7 @@ public class TokenProvider {
         Date expiryDate = new Date(now.getTime() + appProperties.getAuth().getTokenExpirationMsec());
 
         return Jwts.builder()
-                .setSubject(Long.toString(userPrincipal.getId()))
+                .setSubject(userPrincipal.getId().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, appProperties.getAuth().getTokenSecret())
@@ -44,8 +51,6 @@ public class TokenProvider {
         try {
             Jwts.parser().setSigningKey(appProperties.getAuth().getTokenSecret()).parseClaimsJws(authToken);
             return true;
-        } catch (SignatureException ex) {
-            logger.error("Invalid JWT signature");
         } catch (MalformedJwtException ex) {
             logger.error("Invalid JWT token");
         } catch (ExpiredJwtException ex) {
@@ -56,5 +61,5 @@ public class TokenProvider {
             logger.error("JWT claims string is empty.");
         }
         return false;
-    }*/
+    }
 }

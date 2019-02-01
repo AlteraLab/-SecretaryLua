@@ -1,17 +1,14 @@
 package chatbot.api.user;
 
 
-import chatbot.api.user.domain.KakaoAuthCodeInfo;
-import chatbot.api.user.domain.KakaoUserInfoDto;
+import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.user.domain.UserInfoDto;
+import chatbot.api.common.security.UserPrincipal;
+import chatbot.api.mappers.UserMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.websocket.server.PathParam;
 
 /*
 service
@@ -24,56 +21,9 @@ service
 @AllArgsConstructor
 public class UserController {
 
-    private RestTemplate restTemplate;
+    private UserMapper userMapper;
 
-    /*
-    // lua response botUserKey service
-    @PostMapping(value = "/user/key")
-    public ResponseDto getBotUserKey(@RequestBody RequestDto requestDto) {
-        String msg = requestDto.getUserRequest().getUser().getId();
-        return ResponseDto.builder().msg(msg).status(HttpStatus.OK).data(null).build();
-    }
-
-    // lua response ENROLL_GUIDE
-    @PostMapping(value = "/user/enroll/guide")
-    public ResponseDto getGuideMsg(@RequestBody RequestDto requestDto) {
-        return ResponseDto.builder().msg(UserConstants.GUIDE_ENROLL).status(HttpStatus.OK).data(null).build();
-    }
-
-    // test
-    // lua response ENROLL_RESULT
-    @PostMapping(value = "/user/enroll/result")
-    public ResponseDto getEnrollResult(@RequestBody RequestDto requestDto) {
-        String kakaoUserId = requestDto.getUserRequest().getUser().getId();
-        String utterance = requestDto.getUserRequest().getUtterance();
-
-        String userIp = null;
-        String userPassword = utterance;
-
-        int firstIndexForIp = userPassword.indexOf(" ");
-        int lastIndexForIp = userPassword.indexOf(",");
-        int firstIndexForPw = lastIndexForIp + 7;
-        int lastIndexForPw = userPassword.length();
-
-        userIp = userPassword.substring(firstIndexForIp, lastIndexForIp);
-        userPassword = userPassword.substring(firstIndexForPw, lastIndexForPw);
-
-        System.out.println(userIp + " " + userPassword);
-
-        return ResponseDto.builder().msg(UserConstants.CREATE_USER_SUCCESS).status(HttpStatus.OK).data(null).build();
-    }
-
-    // oauth2 인증시, 호출되는 API
-    @PostMapping(value = "/user/login")
-    public LoginResponseDto enrollUser(@RequestBody LoginRequestDto loginRequestDto) {
-        // 값 확인
-        System.out.println("beforeIp  : " + loginRequestDto.getBeforeIp());
-        System.out.println("currentIp : " + loginRequestDto.getCurrentIp());
-        System.out.println("port      : " + loginRequestDto.getPort());
-        return LoginResponseDto.builder().test(null).build();
-    }*/
-
-    @PostMapping(value = "/kakaotest/{auth_code}")
+    /*@PostMapping(value = "/kakaotest/{auth_code}")
     public KakaoUserInfoDto kakaoAuth(@PathVariable("auth_code") String authCode) {
         System.out.println(authCode);
 
@@ -98,10 +48,15 @@ public class UserController {
         System.out.println("id: "+ kakaoUserInfo.getId());
 
         return kakaoUserInfo;
-    }
+    }*/
 
-    @GetMapping(value = "/kakaoauth")
-    public void kakaoAuthoriaztion(@PathParam("code") String authCode) {
-        System.out.println(authCode);
+    @GetMapping(value = "/user")
+    public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
+        return ResponseDto.builder()
+                .msg("userInfoDto information")
+                .status(HttpStatus.OK)
+                .data(userInfoDto)
+                .build();
     }
 }
