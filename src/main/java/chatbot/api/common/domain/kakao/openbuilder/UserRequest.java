@@ -13,3 +13,27 @@ public class UserRequest {
 	private String lang;
 	private KakaoUser user;
 }
+/*
+"userRequest": {
+	"timezone": "Asia/Seoul",
+
+	"params": {
+		"ignoreMe": "true"
+	},
+
+	"block": {
+		"id": "j0zya4e7fi648hkvunoqlsep",
+		"name": "블록 이름"
+	},
+
+	"utterance": "발화 내용",
+
+	"lang": null,
+
+	"user": {
+		"id": "266742",
+		"type": "accountId",
+		"properties": {}
+	}
+}
+*/

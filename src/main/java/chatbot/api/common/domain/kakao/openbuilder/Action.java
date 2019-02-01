@@ -12,3 +12,12 @@ public class Action {
 	private String id;
 	private Object detailParams;
 }
+/*
+action": {
+	"name": "co2gpryko8",
+	"clientExtra": null,
+	"params": {},
+	"id": "s7g0ac2qew6uj034b8b67ae0",
+	"detailParams": {}
+}
+*/

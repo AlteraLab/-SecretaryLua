@@ -10,13 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-/*
-service
-1. response BotUserKey
-2. response msg_enroll_guide
-3. response msg_enroll_result
- */
-
 @RestController
 @AllArgsConstructor
 public class UserController {
