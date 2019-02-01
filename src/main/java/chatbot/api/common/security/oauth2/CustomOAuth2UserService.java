@@ -142,6 +142,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         UserInfoDto userInfoDto = new UserInfoDto();
         userInfoDto.setProviderId(kakaoUserInfo.getId());
         //userInfoDto.setName(kakaoUserInfo.getProperties().getNickname());
+        userInfoDto.setName("test");
         userInfoDto.setEmail(kakaoUserInfo.getKakaoAccount().getEmail());
         userInfoDto.setProfileImage(kakaoUserInfo.getProperties().getProfileImage());
         userMapper.save(userInfoDto);
@@ -151,6 +152,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     //기존 사용자 정보 업데이트
     private UserInfoDto updateExistingUser(UserInfoDto existingUserInfoDto, KakaoUserInfoDto kakaoUserInfo) {
         //existingUserInfoDto.setName(kakaoUserInfo.getProperties().getNickname());
+        existingUserInfoDto.setName("test");
         existingUserInfoDto.setProfileImage(kakaoUserInfo.getProperties().getProfileImage());
         existingUserInfoDto.setEmail(kakaoUserInfo.getKakaoAccount().getEmail());
         userMapper.update(existingUserInfoDto);

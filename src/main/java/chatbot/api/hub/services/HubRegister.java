@@ -18,9 +18,13 @@ public class HubRegister {
     private UserHubMapper userHubMapper;
 
     @Transactional
-    public void register(HubInfoDto hub, UserHubDto role) throws Exception{
+    public void register(HubInfoDto hub, UserHubDto role) throws Exception{ //트랜잭션 처리해야
         hubMapper.save(hub);
         role.setHubId(hub.getHubId());
+
+        System.out.println("hub: "+role.getHubId());
+        System.out.println("user: "+role.getUserId());
+
         userHubMapper.save(role);
     }
 }
