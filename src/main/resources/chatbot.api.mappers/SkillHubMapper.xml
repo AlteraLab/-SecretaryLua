@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.SkillHubMapper">
+    <insert id="save" useGeneratedKeys="true" keyProperty="hubSeq" parameterMap="SkillHubInfoDto">
+        INSERT INTO hub
+        (
+        hub_sequence,
+        hub_name,
+        current_ip,
+        before_ip,
+        port_number,
+        connection_module_num,
+        admin_sequence,
+        command_execution_statement
+        )
+        VALUES
+        (
+        #{hubSeq},
+        #{hubName},
+        #{currentIp},
+        #{beforeIp},
+        #{port},
+        #{connectionModuleNum},
+        #{adminSeq},
+        #{commandExecutionStat}
+        )
+    </insert>
+
+    <select id="getHubSeq" resultMap="SkillHubInfoDto" parameterType="chatbot.api.skillHub.domain.SkillHubInfoDto">
+        SELECT * FROM hub where current_ip = #{currentIp}
+    </select>
+
+    <resultMap id="SkillHubInfoDto" type="chatbot.api.skillHub.domain.SkillHubInfoDto">
+        <result property="hubSeq" column="hub_sequence"/>
+        <result property="adminSeq" column="admin_sequence"/>
+        <result property="hubName" column="hub_name"/>
+        <result property="currentIp" column="current_ip"/>
+        <result property="beforeIp" column="before_ip"/>
+        <result property="port" column="port_number"/>
+        <result property="connectionModuleNum" column="connection_module_num"/>
+        <result property="commandExecutionStat" column="command_execution_statement"/>
+    </resultMap>
+
+    <parameterMap id="SkillHubInfoDto" type="chatbot.api.skillHub.domain.SkillHubInfoDto">
+        <parameter property="hubSeq"/>
+        <parameter property="adminSeq"/>
+        <parameter property="hubName"/>
+        <parameter property="currentIp"/>
+        <parameter property="beforeIp"/>
+        <parameter property="port"/>
+        <parameter property="connectionModuleNum"/>
+        <parameter property="commandExecutionStat"/>
+    </parameterMap>
+
+</mapper>
