@@ -12,9 +12,19 @@ public interface UserMapper {
 
     Optional<UserInfoDto> getUser(Long id);
 
+
     Optional<UserInfoDto> getUserByProviderId(String providerId);
+
+
+    UserInfoDto getUserByUserId(Long userId);
+
+
+    UserInfoDto getUserByEmail(String email);
+
 
     void save(UserInfoDto user);
 
+
     void update(UserInfoDto user);
+
 }

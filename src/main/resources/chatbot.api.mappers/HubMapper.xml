@@ -1,52 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="chatbot.api.mappers.HubMapper">
-    <select id="getUserHub" resultMap="HubInfoDto" parameterType="Long">
-        SELECT *
-        FROM hub, (SELECT hub_id FROM user_hub WHERE user_id=#{userId}) AS owner
-        where hub.hub_id = owner.hub_id
-    </select>
 
-    <insert id="save"
-            parameterMap="HubInfoDto">
-        <selectKey keyProperty="hubId" resultType="Long" order="BEFORE">
-            select NEXTVAL(hub_sequence)
-        </selectKey>
+
+
+    <!-- hub 레코드 추가, useGeneratedKeys를 사용하면 데이터를 저장할때 keyproperty 컬럼 값이 초기화된 값을 알 수 있다. -->
+    <insert id="save" useGeneratedKeys="true" keyProperty="hubSeq" parameterMap="HubInfoDto">
         INSERT INTO hub
         (
-            hub_id,
-            external_ip,
-            external_port,
-            internal_ip,
-            internal_port
+        hub_sequence,
+        hub_name,
+        external_ip,
+        external_port,
+        internal_ip,
+        internal_port,
+        admin_sequence,
+        before_ip,
+        last_used_time
+        <!--
+        connection_module_num,
+        command_execution_statement,
+            -->
         )
         VALUES
         (
-            #{hubId},
-            #{externalIp},
-            #{externalPort},
-            #{internalIp},
-            #{internalPort}
+        #{hubSeq},
+        #{hubName},
+        #{externalIp},
+        #{externalPort},
+        #{internalIp},
+        #{internalPort},
+        #{adminSeq},
+        #{beforeIp},
+        #{lastUsedTime}
+        <!--
+        #{connectionModuleNum},
+        #{commandExecutionStat}
+            -->
         )
     </insert>
 
-    <resultMap id="HubInfoDto" type="chatbot.api.hub.domain.HubInfoDto">
-        <result property="hubId" column="hub_id"/>
+
+
+    <!-- 특정 유저가 사용할 수 있는 모든 허브 검색 -->
+    <select id="getUserHub" resultMap="HubInfoDto" parameterType="Long">
+        SELECT *
+        FROM hub, (SELECT hub_id FROM hub_user WHERE admin_sequence = #{adminSeq}) AS owner
+        where hub.hub_sequence = owner.hub_sequence
+    </select>
+
+
+
+    <!-- 해당 adminId와 일치하는 레코드들을 모두 검색 -->
+    <select id="getHubInfoByAdminId" resultType="chatbot.api.skillHub.domain.HubTableVo" parameterType="chatbot.api.skillHub.domain.HubInfoDto">
+        SELECT * FROM hub WHERE admin_sequence = #{adminId}
+    </select>
+
+
+
+    <!-- hubSeq에 대한 hubInfo를  (사용자 추가할 때 쓰임) -->
+    <select id="getHubInfo" resultMap="HubInfoDto" parameterType="chatbot.api.skillHub.domain.HubInfoDto">
+        SELECT * FROM hub WHERE hub_sequence = #{hubSeq}
+    </select>
+
+
+
+    <!-- delete hub record -->
+    <delete id="deleteHub" parameterType="Long">
+        DELETE FROM hub WHERE hub_sequence = #{hubSeq}
+    </delete>
+
+
+
+    <!-- implicit delete hub schedule -->
+    <delete id="implicitDeleteHub" parameterType="date">
+        DELETE r, h
+        FROM hub_user AS r INNER JOIN hub AS h
+        ON h.hub_sequence = r.hub_sequence
+        WHERE h.last_used_time <![CDATA[ < ]]> #{expireDate}
+    </delete>
+
+
+
+    <!-- ################################################################################### -->
+
+
+
+    <resultMap id="HubInfoDto" type="chatbot.api.skillHub.domain.HubInfoDto">
+        <result property="hubSeq" column="hub_sequence"/>
+        <result property="adminSeq" column="admin_sequence"/>
+        <result property="hubName" column="hub_name"/>
         <result property="externalIp" column="external_ip"/>
         <result property="externalPort" column="external_port"/>
         <result property="internalIp" column="internal_ip"/>
         <result property="internalPort" column="internal_port"/>
+        <result property="beforeIp" column="before_ip"/>
+        <result property="lastUsedTime" column="last_used_time"/>
+<!--        <result property="connectionModuleNum" column="connection_module_num"/>
+        <result property="commandExecutionStat" column="command_execution_statement"/>-->
     </resultMap>
 
-    <parameterMap id="HubInfoDto" type="chatbot.api.hub.domain.HubInfoDto">
-        <parameter property="hubId"/>
+
+
+    <parameterMap id="HubInfoDto" type="chatbot.api.skillHub.domain.HubInfoDto">
+        <parameter property="hubSeq"/>
+        <parameter property="adminSeq"/>
+        <parameter property="hubName"/>
         <parameter property="externalIp"/>
         <parameter property="externalPort"/>
         <parameter property="internalIp"/>
         <parameter property="internalPort"/>
+        <parameter property="beforeIp"/>
+        <parameter property="lastUsedTime"/>
+<!--        <parameter property="connectionModuleNum"/>
+        <parameter property="commandExecutionStat"/>-->
     </parameterMap>
 
 </mapper>
