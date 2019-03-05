@@ -34,7 +34,7 @@ public class AcController {
 		// 지금은 데이터 송수신이 제대로 동작하는지 확인하는것이 목적이기 때문에
 		// 일단은 고정 ip, Iot hub url
 
-		String url = "http://203.250.32.29:3000/";
+	/*	String url = "http://203.250.32.29:3000/";
 		String responseByHub;                                 // 허브로부터 응답받을 json 형식의 string
 		RestTemplate restTemplate = new RestTemplate();       // 부트 코드 내에서 다른 REST API 호출하는 객체
 		long dataByHub = 0;                                   // json 으로 받은 데이터중 id 값이 "data" 의 value를 저장할 변수
@@ -86,7 +86,7 @@ public class AcController {
 					break;
 			}
 		}
-
+*/
 		return ResponseDto.builder().msg(msg).status(HttpStatus.OK).data(null).build();
 	}
 

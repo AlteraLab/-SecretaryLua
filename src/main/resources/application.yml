@@ -7,10 +7,17 @@ spring:
 spring:
   profiles: develop # 개발환경
 
+#  datasource:
+#    url: jdbc:mariadb://192.168.99.101:3306/lua
+#    username: root
+#    password: 1234
+#    driver-class-name: org.mariadb.jdbc.Driver
+#    dbcp2:
+#      validation-query: SELECT 1
   datasource:
-    url: jdbc:mariadb://192.168.99.101:3306/lua
+    url: jdbc:mariadb://192.168.99.100:3307/skill_server
     username: root
-    password: 1234
+    password: tkddnjs234
     driver-class-name: org.mariadb.jdbc.Driver
     dbcp2:
       validation-query: SELECT 1
