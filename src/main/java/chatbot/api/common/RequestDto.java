@@ -9,7 +9,11 @@ public class RequestDto {
 	private Intent intent;
 	private UserRequest userRequest;
 	private ChatBot bot;
-	private Action action;
+	private Action action;  // 구현해줘야 할듯
+
+	// 지울 수도 있음
+//	private Contexts contexts;
+
 }
 
 /*
@@ -40,11 +44,12 @@ public class RequestDto {
 	      }
 	    }
 	  },
+	  "contexts": [],                                     /////
 	  "bot": {
 	    "id": "5c1373ff05aaa7796a7c85fa",
 	    "name": "봇 이름"
-	  },
 	  "action": {
+	  },
 	    "name": "d543apevuo",
 	    "clientExtra": null,
 	    "params": {},

@@ -35,8 +35,10 @@ group = 'kr.or.ikeeper'
 version = '0.0.4'
 description = """lua-skill-server"""
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+//sourceCompatibility = 1.8
+//targetCompatibility = 1.8
+sourceCompatibility = '11'
+targetCompatibility = '11'
 
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'

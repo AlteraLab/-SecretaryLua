@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 public class Action {
 	private String name;
 	private Object clientExtra;
-	private Object params;
+	private Object params;                // 구현해줘야 할듯
 	private String id;
-	private Object detailParams;
+	private Object detailParams;          // 구현해줘야 할듯
 }
 /*
 action": {
