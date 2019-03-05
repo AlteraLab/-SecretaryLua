@@ -1,9 +1,8 @@
 package chatbot.api.test;
 
-import chatbot.api.common.RequestDto;
 import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.common.domain.kakao.openbuilder.RequestDto;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

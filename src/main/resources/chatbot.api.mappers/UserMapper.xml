@@ -80,7 +80,6 @@
     </resultMap>
 
 
-
     <parameterMap id="UserInfoDto" type="chatbot.api.user.domain.UserInfoDto">
         <parameter property="userId"/>
         <parameter property="providerId"/>

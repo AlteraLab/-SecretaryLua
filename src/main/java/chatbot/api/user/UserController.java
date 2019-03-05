@@ -6,6 +6,7 @@ import chatbot.api.user.domain.UserInfoDto;
 import chatbot.api.common.security.UserPrincipal;
 import chatbot.api.mappers.UserMapper;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
+
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -72,6 +73,7 @@ public class UserController {
                 .build();
 
         return responseDto;
+
     }
 }
 

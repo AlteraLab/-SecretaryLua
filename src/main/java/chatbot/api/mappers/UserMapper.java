@@ -26,5 +26,4 @@ public interface UserMapper {
 
 
     void update(UserInfoDto user);
-
 }

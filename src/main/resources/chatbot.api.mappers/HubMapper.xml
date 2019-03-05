@@ -99,8 +99,6 @@
         <result property="internalPort" column="internal_port"/>
         <result property="beforeIp" column="before_ip"/>
         <result property="lastUsedTime" column="last_used_time"/>
-<!--        <result property="connectionModuleNum" column="connection_module_num"/>
-        <result property="commandExecutionStat" column="command_execution_statement"/>-->
     </resultMap>
 
 
@@ -115,8 +113,6 @@
         <parameter property="internalPort"/>
         <parameter property="beforeIp"/>
         <parameter property="lastUsedTime"/>
-<!--        <parameter property="connectionModuleNum"/>
-        <parameter property="commandExecutionStat"/>-->
     </parameterMap>
 
 </mapper>
