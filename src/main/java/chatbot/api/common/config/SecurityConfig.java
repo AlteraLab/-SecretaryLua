@@ -3,6 +3,8 @@ package chatbot.api.common.config;
 import chatbot.api.common.security.CustomUserDetailsService;
 import chatbot.api.common.security.oauth2.*;
 import chatbot.api.common.security.oauth2.jwt.JwtAuthenticationFilter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -71,7 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             .authorizeRequests()
                 //허용하는 url 설정
-                .antMatchers("/auth/**", "/oauth2/**", "/hubInfo/**", "/hubUser", "/hub/**", "/userToken", "/test/**", "/module/ac/{command}/v1")
+                .antMatchers("/auth/**", "/oauth2/**", "/hubInfo/**", "/hubUser", "/hub/**", "/userToken", "/test/**", "/module/ac/{command}/v1", "/**")
                     .permitAll()
                 //허용하는 url 이외의 url은 인증 요청
                 .anyRequest()

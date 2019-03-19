@@ -11,6 +11,12 @@ buildscript {
 	}
 }
 
+// spring rest docs
+plugins {
+//	id "org.asciidoctor.convert" version "1.5.9.2" // (1) 이거 버전때문에 문서가 안나온다고??
+	id "org.asciidoctor.convert" version "1.5.3" // (1)
+}
+
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
@@ -44,6 +50,17 @@ tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
 }
 
+// spring rest docs
+asciidoctor {
+	dependsOn test // (2)
+}
+bootJar {
+	dependsOn asciidoctor
+	from ("${asciidoctor.outputDir}/html5") {    // (3)
+		into 'static/docs'                       // (4)
+	}
+}
+
 repositories {
      mavenCentral()
 }
@@ -71,5 +88,5 @@ dependencies {
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.batch:spring-batch-test')
-
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'   //  (5)
 }

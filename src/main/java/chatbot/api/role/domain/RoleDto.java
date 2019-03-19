@@ -1,4 +1,4 @@
-package chatbot.api.skillHub.domain;
+package chatbot.api.role.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class HubUserInfoDto {
+public class RoleDto {
 
     private Long hubSeq;
 

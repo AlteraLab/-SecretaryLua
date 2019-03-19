@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import static chatbot.api.user.utils.UserConstants.*;
+
 @RestController
 @AllArgsConstructor
 public class UserController {
@@ -43,12 +45,12 @@ public class UserController {
 
         // 유저를 검색하지 못하면  -> hub에게 "not valid token" 메시지 전송
         if(userInfoDto == null) return ResponseDto.builder()
-                                        .msg("fail : not valid token")
+                                        .msg(FAIL_MSG_TOKEN)
                                         .status(HttpStatus.INTERNAL_SERVER_ERROR)
                                         .build();
         // 유저를 검색한다면      -> hub에게 "valid token" 메시지 전송
         else                    return ResponseDto.builder()
-                                        .msg("success : valid token")
+                                        .msg(SUCCESS_MSG_TOKEN)
                                         .status(HttpStatus.OK)
                                         .build();
     }
@@ -61,13 +63,13 @@ public class UserController {
 
         UserInfoDto user = userMapper.getUserByEmail(email);
         if(user == null) return ResponseDto.builder()
-                                    .msg("fail : 해당 이메일로 가입된 유저는 없습니다.")
+                                    .msg(FAIL_MSG_SELECT_BY_EMAIL)
                                     .status(HttpStatus.OK)
                                     .data(null)
                                     .build();
 
         ResponseDto responseDto = ResponseDto.builder()
-                .msg("success : " + email + " 이메일을 사용하는 유저 아이디는 " + user.getUserId().toString() + " 입니다.")
+                .msg(SUCCESS_MSG_SELECT_BY_EMAIL)
                 .data(user.getUserId())
                 .status(HttpStatus.OK)
                 .build();

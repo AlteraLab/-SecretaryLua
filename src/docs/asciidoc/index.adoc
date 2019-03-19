@@ -1,0 +1,9 @@
+== post
+
+include::{snippets}/explicit-delete-hub/http-request.adoc[]
+
+include::{snippets}/explicit-delete-hub/http-response.adoc[]
+
+include::{snippets}/explicit-delete-hub/request-body.adoc[]
+
+include::{snippets}/explicit-delete-hub/response-body.adoc[]
