@@ -3,12 +3,12 @@
         PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="chatbot.api.mappers.HubUserMapper">
+<mapper namespace="chatbot.api.mappers.RoleMapper">
 
 
 
     <!-- hubUser 레코드 추가 -->
-    <insert id="save" parameterMap="HubUserInfoDto">
+    <insert id="save" parameterMap="RoleInfoDto">
         INSERT INTO hub_user
         (
         hub_sequence,
@@ -26,14 +26,14 @@
 
 
     <!-- 레코드 검색 : (userSeq, hubSeq) -->
-    <select id="getHubUserInfo" resultMap="HubUserInfoDto" parameterType="map">
+    <select id="getRoleInfo" resultMap="RoleInfoDto" parameterType="map">
         SELECT * FROM hub_user WHERE user_sequence = #{userSeq} AND hub_sequence = #{hubSeq}
     </select>
 
 
 
     <!-- delete hubuser record -->
-    <delete id="deleteHubUser" parameterType="chatbot.api.skillHub.domain.HubUserInfoDto">
+    <delete id="deleteRole" parameterType="chatbot.api.role.domain.RoleDto">
         DELETE FROM hub_user WHERE hub_sequence = #{hubSeq}
     </delete>
 
@@ -42,7 +42,7 @@
 
 
 
-    <resultMap id="HubUserInfoDto" type="chatbot.api.skillHub.domain.HubUserInfoDto">
+    <resultMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDto">
         <result property="hubSeq" column="hub_sequence"/>
         <result property="userSeq" column="user_sequence"/>
         <result property="role" column="role"/>
@@ -50,7 +50,7 @@
 
 
 
-    <parameterMap id="HubUserInfoDto" type="chatbot.api.skillHub.domain.HubUserInfoDto">
+    <parameterMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDto">
         <parameter property="hubSeq"/>
         <parameter property="userSeq"/>
         <parameter property="role"/>

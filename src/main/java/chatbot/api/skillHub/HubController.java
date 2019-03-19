@@ -1,5 +1,6 @@
 package chatbot.api.skillHub;
 
+import chatbot.api.role.domain.RoleDto;
 import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.common.security.UserPrincipal;
 import chatbot.api.mappers.HubMapper;
@@ -7,9 +8,8 @@ import chatbot.api.skillHub.domain.*;
 import chatbot.api.skillHub.services.HubDeleter;
 import chatbot.api.skillHub.services.HubGetter;
 import chatbot.api.skillHub.services.HubRegister;
-import chatbot.api.skillHub.services.HubUserRegister;
-import chatbot.api.user.domain.UserRegisterVo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,30 +19,31 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+import static chatbot.api.skillHub.utils.HubConstants.*;
+
 @RestController
+@AllArgsConstructor
+@NoArgsConstructor
 public class HubController {
 
-    @Autowired
+    //@Autowired
     private HubRegister hubRegister;
 
-    @Autowired
+    //@Autowired
     private HubDeleter hubDeleter;
 
-    @Autowired
+    //@Autowired
     private HubGetter hubGetter;
 
-    @Autowired
+    //@Autowired
     private HubMapper hubMapper;
 
-    @Autowired
-    private HubUserRegister hubUserRegister;
-
-    @Autowired
+    //@Autowired
     private RestTemplate deleteIpInHub;
 
 
 
-    // 특정 유저가 컨트롤할 수 있는 허브 모두 조회하는 메소드
+    // 특정 유저가 컨트롤 할 수 있는 허브 모두 조회하는 메소드
     @GetMapping("/hub")
     public ResponseDto getSpecificUserHub(@AuthenticationPrincipal UserPrincipal userPrincipal){
 
@@ -57,7 +58,7 @@ public class HubController {
 
 
 
-    // get hubInfo<Long == hubSeq, String == hubName> by adminId
+    // get hubInfo<Long == hubSeq, String == hubName> by adminId, 수정 필요할듯...
     // 사용자가 허브 조회를 누르면 hubSeq와 hubName을 화면에 뿌려주는 메소드
     @GetMapping("/hubInfo/SeqAndName")
     public ResponseDto getHubsSeqAndNameByAdminId(@AuthenticationPrincipal UserPrincipal userPrincipal) {
@@ -66,7 +67,7 @@ public class HubController {
         List<HubTableVo> hubInfoList = hubGetter.getHubsInfoByadminId(userPrincipal.getId());
         if(hubInfoList == null) {
             return ResponseDto.builder()
-                    .msg("fail : 당신이 admin으로 등록된 허브가 없습니다.")
+                    .msg(FAIL_MSG_NO_HUB_REGISTED_AS_ADMIN)
                     .status(HttpStatus.OK)
                     .data(null)
                     .build();
@@ -81,7 +82,7 @@ public class HubController {
         // return <Long == hubSeqs, String == hubNames>
         // react app 에서는 hubsSeqAndName을 파싱해서 화면에 뿌려주는 코드 작성 필요
         return ResponseDto.builder()
-                .msg("get success : getHubsInfo")
+                .msg(SUCCESS_MSG_GET_HUBS_SEQ_AND_NAME)
                 .status(HttpStatus.OK)
                 .data(hubsSeqAndName)
                 .build();
@@ -93,10 +94,20 @@ public class HubController {
     @DeleteMapping("/hub/{hubSeq}")
     public ResponseDto deleteHub(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                  @PathVariable(value = "hubSeq") Long hubSeq) {
+/*
+        return ResponseDto.builder()
+                .data(null)
+                .msg(SUCCESS_MSG_EXPLICIT_DEL)
+                .status(HttpStatus.OK)
+                .build();
+*/
 
+
+        ////////////////////////////////////////////////
         Long adminSeq = userPrincipal.getId();
 
-        HubUserInfoDto role = new HubUserInfoDto().builder()
+
+        RoleDto role = new RoleDto().builder()
                 .hubSeq(hubSeq)
                 .userSeq(adminSeq)
                 .build();
@@ -105,16 +116,17 @@ public class HubController {
                 .status(HttpStatus.ACCEPTED)
                 .build();
 
-        // 관리자 체크
+
         HubInfoDto hub = hubMapper.getHubInfo(hubSeq);
 
+
         if(hub == null) {
-            responseDto.setMsg("delete fail : 존재하지 않는 허브 입니다.");
+            responseDto.setMsg(FAIL_MSG_DELETE_HUB_BECAUSE_NO_EXIST);
             return responseDto;
         }
 
         if(!adminSeq.equals(hub.getAdminSeq())) {
-            responseDto.setMsg("delete fail : 허브는 존재하지만, 당신은 해당 허브의 관리자가 아닙니다.");
+            responseDto.setMsg(FAIL_MSG_DELETE_HUB_BECAUSE_NO_ADMIN);
             return responseDto;
         }
 
@@ -123,7 +135,7 @@ public class HubController {
         ResponseEntity<String> resultAboutDelIp = deleteIpInHub.exchange(url, HttpMethod.DELETE, null, String.class);
 
         if(resultAboutDelIp.equals("fail")) {
-            responseDto.setMsg("delete fail : 허브 서버에서 ip를 말소 시키는데 실패했습니다. 나중에 다시 시도해주십시요");
+            responseDto.setMsg(FAIL_MSG_DELETE_HUB_BECAUSE_FAIL_RESTTEMPLATE);
             responseDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             return responseDto;
         }
@@ -134,11 +146,11 @@ public class HubController {
 
 
     // 관리자가 새로운 그룹 유저를 추가해주기 위해 호출하는 메소드
-    @PostMapping("/hubUser")
-    public ResponseDto addRoll(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                               @RequestBody UserRegisterVo userRegisterVo) {
+//    @PostMapping("/hubUser")
+//    public ResponseDto addRole(@AuthenticationPrincipal UserPrincipal userPrincipal,
+//                               @RequestBody UserRegisterVo userRegisterVo) {
 
-        return hubUserRegister.register(userRegisterVo, userPrincipal.getId());  // (hubId / email / adminId)
+//        return roleRegister.register(userRegisterVo, userPrincipal.getId());  // (hubId / email / adminId)
 
         /* 이코드를 위의 return 문으로 수정, 혹시 위의 코드가 에러가 발생할까봐 남겨뒀음
         try {
@@ -148,7 +160,7 @@ public class HubController {
         } finally {
             return responseDto;
         }*/
-    }
+//    }
 
 
 
@@ -169,9 +181,9 @@ public class HubController {
                 .build();
 
         // not yet set hubSeq
-        HubUserInfoDto role = HubUserInfoDto.builder()
+        RoleDto role = RoleDto.builder()
                 .userSeq(userPrincipal.getId())    // userPrincipal.getId();
-                .role("ROLE_ADMIN")
+                .role(ROLE_ADMIN)
                 .build();
 
 //        정상적으로 저장시 허브 서버에 "success"를 전송한다.

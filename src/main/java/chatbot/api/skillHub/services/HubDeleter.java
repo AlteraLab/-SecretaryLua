@@ -2,30 +2,31 @@ package chatbot.api.skillHub.services;
 
 import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.mappers.HubMapper;
-import chatbot.api.mappers.HubUserMapper;
-import chatbot.api.skillHub.domain.HubUserInfoDto;
+import chatbot.api.mappers.RoleMapper;
+import chatbot.api.role.domain.RoleDto;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static chatbot.api.skillHub.utils.HubConstants.*;
+
 @Service
 @Slf4j
+@AllArgsConstructor
 public class HubDeleter {
 
-    @Autowired
+    //@Autowired
     private HubMapper hubMapper;
 
-    @Autowired
-    private HubUserMapper hubUserMapper;
+    //@Autowired
+    private RoleMapper roleMapper;
 
 
 
     @Transactional
-    public ResponseDto explicitDeleter(HubUserInfoDto role) {
+    public ResponseDto explicitDeleter(RoleDto role) {
 
         ResponseDto responseDto = new ResponseDto().builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -34,18 +35,18 @@ public class HubDeleter {
 
         try {
             // skillHubUserMapper.deleterHubUser
-            responseDto.setMsg("delete fail : hub_user 테이블의 레코드를 삭제하는데 실패");
-            hubUserMapper.deleteHubUser(role);
+            responseDto.setMsg(FAIL_MSG_EXPLICIT_DEL_AT_QUERY_ABOUT_ROLL);
+            roleMapper.deleteRole(role);
 
             // skillHubMapper.deleterUser
-            responseDto.setMsg("delete fail : hub 테이블의 레코드를 삭제하는데 실패");
+            responseDto.setMsg(FAIL_MSG_EXPLICIT_DEL_AT_QUERY_ABOUT_HUB);
             hubMapper.deleteHub(role.getHubSeq());
 
-            responseDto.setMsg("delete success : hub and role");
+            responseDto.setMsg(SUCCESS_MSG_EXPLICIT_DEL);
             responseDto.setStatus(HttpStatus.OK);
 
         } catch (Exception e) {
-            log.debug("deleter를 발생하는 와중에 exception 발생");
+            log.debug(EXCEPTION_MSG_DURING_DELETER);
             e.printStackTrace();
 
         } finally {

@@ -2,36 +2,36 @@ package chatbot.api.skillHub.services;
 
 import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.mappers.HubMapper;
-import chatbot.api.mappers.HubUserMapper;
+import chatbot.api.mappers.RoleMapper;
 import chatbot.api.mappers.UserMapper;
 import chatbot.api.skillHub.domain.HubInfoDto;
-import chatbot.api.skillHub.domain.HubUserInfoDto;
+import chatbot.api.role.domain.RoleDto;
 import chatbot.api.user.domain.UserInfoDto;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static chatbot.api.role.utils.RoleConstants.EXCEPTION_MSG_DURING_REGISTER;
+import static chatbot.api.role.utils.RoleConstants.FAIL_MSG_REGIST_ROLE_INTO_ROLE_TABLE;
+import static chatbot.api.skillHub.utils.HubConstants.*;
+
 @Slf4j
 @Service
+@AllArgsConstructor
 public class HubRegister {
 
-    @Autowired
     private HubMapper hubMapper;
 
-    @Autowired
-    private HubUserMapper hubUserMapper;
+    private RoleMapper roleMapper;
 
-    @Autowired
     private UserMapper userMapper;
 
 
 
     @Transactional
-    public ResponseDto register(HubInfoDto hub, HubUserInfoDto role) {
+    public ResponseDto register(HubInfoDto hub, RoleDto role) {
 
 
         ResponseDto responseDto = new ResponseDto().builder()
@@ -42,29 +42,29 @@ public class HubRegister {
             // 관리자로 등록하려는 사용자의 id는 users 테이블에 있는 데이터인가?
             UserInfoDto user = userMapper.getUserByUserId(role.getUserSeq());
             if(user == null) {
-                responseDto.setMsg("fail : 유저 테이블에 유저가 없음");
+                responseDto.setMsg(FAIL_MSG_NO_EXIST_USER_FROM_TABLE);
                 responseDto.setStatus(HttpStatus.ACCEPTED);
 
                 return responseDto;
             }
 
             // hub 저장
-            responseDto.setMsg("fail : 허브 정보를 저장하는데 실패 했습니다.");
+            responseDto.setMsg(FAIL_MSG_REGIST_HUB_INTO_HUB_TABLE);
             hubMapper.save(hub);
 
             // role 객체의 hubSeq 멤버를 set
             role.setHubSeq(hub.getHubSeq());
 
             // role 저장
-            responseDto.setMsg("fail : role을 저장하는데 실패했습니다.");
-            hubUserMapper.save(role);
+            responseDto.setMsg(FAIL_MSG_REGIST_ROLE_INTO_ROLE_TABLE);
+            roleMapper.save(role);
 
-            responseDto.setMsg("success : 등록");
+            responseDto.setMsg(SUCCESS_MSG_REGIST_INTO_HUB_AND_ROLL);
             responseDto.setStatus(HttpStatus.CREATED);
             responseDto.setData(role);
 
         } catch (Exception e) {
-            log.info("hub, roll을 등록하는 과정에서 exception이 발생했습니다.");
+            log.info(EXCEPTION_MSG_DURING_REGISTER);
             e.printStackTrace();
 
         } finally {
