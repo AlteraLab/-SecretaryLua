@@ -8,7 +8,7 @@
 
 
     <!-- hub 레코드 추가, useGeneratedKeys를 사용하면 데이터를 저장할때 keyproperty 컬럼 값이 초기화된 값을 알 수 있다. -->
-    <insert id="save" useGeneratedKeys="true" keyProperty="hubSeq" parameterMap="HubInfoDto">
+    <insert id="save" useGeneratedKeys="true" keyProperty="hubSeq" parameterType="chatbot.api.skillHub.domain.HubInfoDto">
         INSERT INTO hub
         (
         hub_sequence,
@@ -19,11 +19,10 @@
         internal_port,
         admin_sequence,
         before_ip,
-        last_used_time
-        <!--
-        connection_module_num,
-        command_execution_statement,
-            -->
+        last_used_time,
+        created_at,
+        updated_at,
+        state
         )
         VALUES
         (
@@ -35,11 +34,10 @@
         #{internalPort},
         #{adminSeq},
         #{beforeIp},
-        #{lastUsedTime}
-        <!--
-        #{connectionModuleNum},
-        #{commandExecutionStat}
-            -->
+        #{lastUsedTime},
+        #{createdAt},
+        #{updatedAt},
+        #{state}
         )
     </insert>
 
@@ -62,7 +60,7 @@
 
 
     <!-- hubSeq에 대한 hubInfo를  (사용자 추가할 때 쓰임) -->
-    <select id="getHubInfo" resultMap="HubInfoDto" parameterType="chatbot.api.skillHub.domain.HubInfoDto">
+    <select id="getHubInfo" resultMap="HubInfoDto" parameterType="Long">
         SELECT * FROM hub WHERE hub_sequence = #{hubSeq}
     </select>
 
@@ -75,14 +73,28 @@
 
 
 
-    <!-- implicit delete hub schedule -->
+    <!--
+    implicit delete hub schedule
     <delete id="implicitDeleteHub" parameterType="date">
         DELETE r, h
         FROM hub_user AS r INNER JOIN hub AS h
         ON h.hub_sequence = r.hub_sequence
         WHERE h.last_used_time <![CDATA[ < ]]> #{expireDate}
     </delete>
+    -->
 
+
+
+    <!-- editHub -->
+    <update id="editHubAboutIpAndPort" parameterType="hashmap">
+		UPDATE hub
+		SET
+		external_ip = #{exIp},
+		internal_ip = #{inIp},
+		external_port = #{exPort},
+		internal_port = #{inPort}
+		WHERE hub_sequence = #{hubSeq}
+	</update>
 
 
     <!-- ################################################################################### -->
@@ -99,10 +111,13 @@
         <result property="internalPort" column="internal_port"/>
         <result property="beforeIp" column="before_ip"/>
         <result property="lastUsedTime" column="last_used_time"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="state" column="state"/>
     </resultMap>
 
 
-
+<!--
     <parameterMap id="HubInfoDto" type="chatbot.api.skillHub.domain.HubInfoDto">
         <parameter property="hubSeq"/>
         <parameter property="adminSeq"/>
@@ -113,6 +128,6 @@
         <parameter property="internalPort"/>
         <parameter property="beforeIp"/>
         <parameter property="lastUsedTime"/>
-    </parameterMap>
+    </parameterMap>-->
 
 </mapper>

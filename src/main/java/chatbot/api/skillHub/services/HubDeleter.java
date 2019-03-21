@@ -24,7 +24,7 @@ public class HubDeleter {
     private RoleMapper roleMapper;
 
 
-
+    // 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블으 모듈들도 제거해주는 코드 작성
     @Transactional
     public ResponseDto explicitDeleter(RoleDto role) {
 
@@ -34,6 +34,10 @@ public class HubDeleter {
 
 
         try {
+
+            // 허브에 종속된 모듈 제거 메서드 실행
+            // ...
+
             // skillHubUserMapper.deleterHubUser
             responseDto.setMsg(FAIL_MSG_EXPLICIT_DEL_AT_QUERY_ABOUT_ROLL);
             roleMapper.deleteRole(role);

@@ -6,6 +6,7 @@ import chatbot.api.mappers.RoleMapper;
 import chatbot.api.mappers.UserMapper;
 import chatbot.api.skillHub.domain.HubInfoDto;
 import chatbot.api.role.domain.RoleDto;
+import chatbot.api.user.domain.UserInfoDto;
 import chatbot.api.user.domain.UserRegisterVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import static chatbot.api.role.utils.RoleConstants.*;
 import static chatbot.api.skillHub.utils.HubConstants.*;
+import static chatbot.api.user.utils.UserConstants.FAIL_MSG_SELECT_BY_EMAIL;
 
 
 @Slf4j
@@ -48,28 +50,33 @@ public class RoleRegister {
             responseDto.setMsg(FAIL_MSG_NO_ADMIN);
             if(adminId != hub.getAdminSeq()) return responseDto;
 
+            // userSeq를 가져오는 코드를 추가해야 할 듯
+            responseDto.setMsg(FAIL_MSG_SELECT_BY_EMAIL);
+            UserInfoDto user = userMapper.getUserByEmail(userRegisterVo.getEmail());
+            if(user == null)                 return responseDto;
+
             responseDto.setMsg(FAIL_MSG_ALREADY_ROLE_USER);
-            RoleDto hubUser = roleMapper.getRoleInfo(userRegisterVo.getHubId(), userRegisterVo.getUserId());
-            if(hubUser != null)              return responseDto;
+            RoleDto role = roleMapper.getRoleInfo(userRegisterVo.getHubId(), user.getUserId());
+            if(role != null)                 return responseDto;
 
 
             // finish check list
 
 
             // init
-            hubUser = new RoleDto().builder()
+            role = new RoleDto().builder()
                     .hubSeq(userRegisterVo.getHubId())
-                    .userSeq(userRegisterVo.getUserId())
+                    .userSeq(user.getUserId())
                     .role(ROLE_USER)
                     .build();
 
 
             responseDto.setMsg(FAIL_MSG_REGIST_ROLE_INTO_ROLE_TABLE);
-            roleMapper.save(hubUser);
+            roleMapper.save(role);
 
             responseDto.setMsg(SUCCESS_MSG_ADD_ROLL_USER);
             responseDto.setStatus(HttpStatus.CREATED);
-            responseDto.setData(hubUser);
+            responseDto.setData(role);
 
         } catch (Exception e) {
             log.info(EXCEPTION_MSG_DURING_REGISTER);

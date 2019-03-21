@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 import static chatbot.api.user.utils.UserConstants.*;
 
 @RestController
@@ -22,10 +24,29 @@ public class UserController {
 
 
 
-    @GetMapping(value = "/user")
-    public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    @GetMapping(value = "/user/{userId}")
+    public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                          @PathVariable("userId") Long userId) {
 
-        UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
+        //UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
+        /*
+        해줘야할 것들
+        1. 유저 디비 createdAt / updatedAt 추가 후, 기존 기능들 정상적으로 수행되는지 확인
+        2. 사용자가 사용할 수 있는 허브들에 대해서 hub + role 조인해서 데이터들 모두 메모리로 가져오기
+        3. list 사용해서 데이터들 압축해서 client app 으로 반환
+         */
+
+        // 1. 유저 디비 createdAt / updatedAt 추가 후, 기존 기능들 정상적으로 수행되는지 확인
+        UserInfoDto userInfoDto = userMapper.getUser(userId).get();  // 실험용
+
+        System.out.println(userInfoDto);
+
+        // 2. 사용자가 사용할 수 있는 허브들에 대해서 hub + role 조인해서 데이터들 모두 메모리로 가져오기
+        // 조인 방법 :
+
+        // 3.
+
+
 
         return ResponseDto.builder()
                 .msg("userInfoDto information")
@@ -41,7 +62,8 @@ public class UserController {
     @GetMapping("/userToken")
     public ResponseDto checkValidToken(@AuthenticationPrincipal UserPrincipal UserPrincipal) {
 
-        UserInfoDto userInfoDto = userMapper.getUserByUserId(UserPrincipal.getId());
+        //UserInfoDto userInfoDto = userMapper.getUserByUserId(UserPrincipal.getId());
+        UserInfoDto userInfoDto = userMapper.getUserByUserId(new Long(5));
 
         // 유저를 검색하지 못하면  -> hub에게 "not valid token" 메시지 전송
         if(userInfoDto == null) return ResponseDto.builder()
@@ -64,13 +86,16 @@ public class UserController {
         UserInfoDto user = userMapper.getUserByEmail(email);
         if(user == null) return ResponseDto.builder()
                                     .msg(FAIL_MSG_SELECT_BY_EMAIL)
-                                    .status(HttpStatus.OK)
+                                    .status(HttpStatus.NO_CONTENT)
                                     .data(null)
                                     .build();
+                                    // NO_CONTENT : 요청에 대해서 보내줄 수 있는 콘텐츠가 없지만, 헤더는 의미있을 수 있다.
+
 
         ResponseDto responseDto = ResponseDto.builder()
                 .msg(SUCCESS_MSG_SELECT_BY_EMAIL)
-                .data(user.getUserId())
+                //.data(user.getUserId())        교준이 문서 대로라면 사라져야함.
+                .data(null)
                 .status(HttpStatus.OK)
                 .build();
 

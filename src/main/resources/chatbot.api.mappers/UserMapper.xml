@@ -67,6 +67,14 @@
 
 
 
+    <!-- 처음 메인 페이지로 접속 했을때, 유저가 사용 가능한 허브 목록들 모두 select -->
+    <select id="implicitDeleteHub" parameterType="date">
+        SELECT *
+        FROM hub_user AS r INNER JOIN hub AS h
+        ON h.hub_sequence = r.hub_sequence
+        WHERE h.last_used_time <![CDATA[ < ]]> #{expireDate}
+    </select>
+
     <!-- ################################################################################### -->
 
 
@@ -77,6 +85,8 @@
         <result property="name" column="name"/>
         <result property="email" column="email"/>
         <result property="profileImage" column="profile_img"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
 
@@ -86,5 +96,8 @@
         <parameter property="name"/>
         <parameter property="email"/>
         <parameter property="profileImage"/>
+        <parameter property="createdAt"/>
+        <parameter property="updatedAt"/>
+
     </parameterMap>
 </mapper>
