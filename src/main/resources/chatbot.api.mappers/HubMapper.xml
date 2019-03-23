@@ -97,6 +97,29 @@
 	</update>
 
 
+
+    <!-- 처음 메인 페이지로 접속 했을때, 유저가 사용 가능한 허브 목록들 모두 select -->
+    <select id="getHubsInfoByUserId" resultType="chatbot.api.skillHub.domain.HubsVo" parameterType="Long">
+        SELECT
+        h.hub_sequence,
+        h.admin_sequence,
+        h.hub_name,
+        h.external_ip,
+        h.external_port,
+        h.internal_ip,
+        h.internal_port,
+        h.before_ip,
+        h.last_used_time,
+        h.created_at,
+        h.updated_at,
+        h.state,
+        r.role
+        FROM hub_user AS r INNER JOIN hub AS h
+        ON r.hub_sequence = h.hub_sequence
+        WHERE r.user_sequence = #{userId}
+    </select>
+
+
     <!-- ################################################################################### -->
 
 

@@ -2,6 +2,7 @@ package chatbot.api.mappers;
 
 import chatbot.api.skillHub.domain.HubInfoDto;
 import chatbot.api.skillHub.domain.HubTableVo;
+import chatbot.api.skillHub.domain.HubsVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -25,6 +26,11 @@ public interface HubMapper {
 
     // adminId를 가지고 허브info 조회
     ArrayList<HubTableVo> getHubInfoByAdminId(Long adminId);
+
+
+    // 메인 페이지에서 보여줄 허브 목록에 대한 데이터를 가져온다.
+    ArrayList<HubsVo> getHubsInfoByUserId(Long userId);
+
 
     // 딴건 잘되나?
     HubInfoDto getHubInfo(Long hubSeq);

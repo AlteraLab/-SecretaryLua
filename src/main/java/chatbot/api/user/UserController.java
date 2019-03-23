@@ -2,56 +2,58 @@ package chatbot.api.user;
 
 
 import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.mappers.HubMapper;
+import chatbot.api.skillHub.domain.HubTableVo;
+import chatbot.api.skillHub.domain.HubsVo;
 import chatbot.api.user.domain.UserInfoDto;
 import chatbot.api.common.security.UserPrincipal;
 import chatbot.api.mappers.UserMapper;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static chatbot.api.user.utils.UserConstants.*;
 
 @RestController
-@AllArgsConstructor
 public class UserController {
 
+    @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private HubMapper hubMapper;
 
 
 
     @GetMapping(value = "/user/{userId}")
-    public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                          @PathVariable("userId") Long userId) {
-
-        //UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
-        /*
-        해줘야할 것들
-        1. 유저 디비 createdAt / updatedAt 추가 후, 기존 기능들 정상적으로 수행되는지 확인
-        2. 사용자가 사용할 수 있는 허브들에 대해서 hub + role 조인해서 데이터들 모두 메모리로 가져오기
-        3. list 사용해서 데이터들 압축해서 client app 으로 반환
-         */
+    public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         // 1. 유저 디비 createdAt / updatedAt 추가 후, 기존 기능들 정상적으로 수행되는지 확인
-        UserInfoDto userInfoDto = userMapper.getUser(userId).get();  // 실험용
-
-        System.out.println(userInfoDto);
+        UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
+        //UserInfoDto userInfoDto = userMapper.getUser(userId).get();  // 실험용
 
         // 2. 사용자가 사용할 수 있는 허브들에 대해서 hub + role 조인해서 데이터들 모두 메모리로 가져오기
-        // 조인 방법 :
+        List<HubsVo> hubsInfoList;
+        hubsInfoList = hubMapper.getHubsInfoByUserId(userPrincipal.getId());
+        //hubsInfoList = hubMapper.getHubsInfoByUserId(userId);
 
-        // 3.
-
-
+        // 3. data set
+        Map<Object, List<HubsVo>> data = new HashMap<Object, List<HubsVo>>();
+        data.put(userInfoDto, hubsInfoList);
 
         return ResponseDto.builder()
                 .msg("userInfoDto information")
                 .status(HttpStatus.OK)
-                .data(userInfoDto)
+                .data(data)
                 .build();
     }
 
