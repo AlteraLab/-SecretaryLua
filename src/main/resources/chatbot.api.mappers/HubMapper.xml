@@ -73,16 +73,30 @@
 
 
 
-    <!--
-    implicit delete hub schedule
-    <delete id="implicitDeleteHub" parameterType="date">
+    <!-- implicit delete hub schedule -->
+    <delete id="implicitDeleteHub" parameterType="Date">
+        DELETE h, r
+        FROM hub AS h
+        LEFT JOIN hub_user AS r
+        ON h.hub_sequence = r.hub_sequence
+        WHERE h.last_used_time <![CDATA[ < ]]> #{expireDate}
+    </delete>
+
+<!--
+    <delete id="implicitDeleteHub" parameterType="Date">
         DELETE r, h
         FROM hub_user AS r INNER JOIN hub AS h
         ON h.hub_sequence = r.hub_sequence
         WHERE h.last_used_time <![CDATA[ < ]]> #{expireDate}
     </delete>
-    -->
 
+    <delete id="implicitDeleteHub" parameterType="Date">
+        DELETE h
+        FROM hub AS h INNER JOIN hub_user AS r
+        ON h.hub_sequence = r.hub_sequence
+        WHERE h.last_used_time <![CDATA[ < ]]> #{expireDate}
+    </delete>
+    -->
 
 
     <!-- editHub -->

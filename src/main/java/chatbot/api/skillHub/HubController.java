@@ -1,5 +1,6 @@
 package chatbot.api.skillHub;
 
+import chatbot.api.mappers.RoleMapper;
 import chatbot.api.role.domain.RoleDto;
 import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.common.security.UserPrincipal;
@@ -9,11 +10,9 @@ import chatbot.api.skillHub.services.EditHub;
 import chatbot.api.skillHub.services.HubDeleter;
 import chatbot.api.skillHub.services.HubGetter;
 import chatbot.api.skillHub.services.HubRegister;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +24,10 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static chatbot.api.role.utils.RoleConstants.FAIL_MSG_NO_ADMIN;
-import static chatbot.api.role.utils.RoleConstants.FAIL_MSG_NO_EXIST_HUB;
+import static chatbot.api.role.utils.RoleConstants.*;
 import static chatbot.api.skillHub.utils.HubConstants.*;
 
 @RestController
-@AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
 public class HubController {
@@ -48,14 +45,18 @@ public class HubController {
     private EditHub editHub;
 
     @Autowired
+    private RestTemplate deleteIpInHub;
+
+    @Autowired
     private HubMapper hubMapper;
 
     @Autowired
-    private RestTemplate deleteIpInHub;
+    private RoleMapper roleMapper;
 
 
 
     // 특정 유저가 컨트롤 할 수 있는 허브 모두 조회하는 메소드
+    // 이거 왜있는지 모르겠음... 나중에 교준이한테 물어보기..
     @GetMapping("/hub")
     public ResponseDto getSpecificUserHub(@AuthenticationPrincipal UserPrincipal userPrincipal){
 
@@ -70,6 +71,140 @@ public class HubController {
 
 
 
+    // hub를 삭제해주는 메소드, 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블으 모듈들도 제거해주는 코드 작성
+    // 추후에 허브에 모듈이 붙으면 모듈들에 데이터를 제거하는 코드도 추가해야함.
+    @DeleteMapping("/hub")
+    public ResponseDto deleteHub(//@PathVariable("userId") Long userId,
+                                 @AuthenticationPrincipal UserPrincipal userPrincipal,
+                                 @RequestBody HubInfoVo hubInfoVo) {
+
+        RoleDto role = new RoleDto().builder()
+                //.userSeq(userId)
+                .userSeq(userPrincipal.getId())
+                .hubSeq(hubInfoVo.getHubSequence())
+                .build();
+
+        ResponseDto responseDto = new ResponseDto().builder()
+                .status(HttpStatus.ACCEPTED)
+                .build();
+
+
+        HubInfoDto hub = hubMapper.getHubInfo(hubInfoVo.getHubSequence());
+        if(hub == null) {
+            responseDto.setMsg(FAIL_MSG_DELETE_HUB_BECAUSE_NO_EXIST);
+            return responseDto;
+        }
+
+        // ROLE_USER   VS   ROLE_ADMIN
+//        if(!userId.equals(hub.getAdminSeq())) {     // ROLE_USER
+        if(!userPrincipal.getId().equals(hub.getAdminSeq())) {     // ROLE_USER
+
+            // 1. 해당 유저가 ROLE_USER 인지 확인
+            //RoleDto roleUser = roleMapper.getRoleInfo(hubInfoVo.getHubSequence(), userId);
+            RoleDto roleUser = roleMapper.getRoleInfo(hubInfoVo.getHubSequence(), userPrincipal.getId());
+            if(roleUser == null) {
+                responseDto.setMsg(FAIL_MSG_NO_ROLE_USER_AND_ROLE_ADMIN);
+                responseDto.setStatus(HttpStatus.NO_CONTENT);
+                return responseDto;
+            }
+
+            // 2. 한 번 더 확인 (만약 사용 가능하다면, 허브 사용 명단에서 유저를 제거)
+            if(roleUser.getRole().equals(ROLE_USER)) {
+                return hubDeleter.explicitDeleterByUser(role);
+            } else {
+                responseDto.setMsg(FAIL_MSG);
+                return responseDto;
+            }
+
+        } else {     // ROLE_ADMIN
+            // 허브 서버로 db에 저장된 ip 정보 말소 요청
+            String url = "http://" + hub.getExternalIp() + "/" + hub.getExternalPort() + "/ip";
+            ResponseEntity<String> resultAboutDelIp = deleteIpInHub.exchange(url, HttpMethod.DELETE, null, String.class);
+
+            if(resultAboutDelIp.equals("fail")) {
+                responseDto.setMsg(FAIL_MSG_DELETE_HUB_BECAUSE_FAIL_RESTTEMPLATE);
+                responseDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                return responseDto;
+            }
+
+            // 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블으 모듈들도 제거해주는 코드 작성
+            return hubDeleter.explicitDeleterByAdmin(role);
+        }
+    }
+
+
+
+    // 허브 최초 등록, 순서 : hub 등록 -> hub_user 등록
+    @PostMapping("/hub")
+    public ResponseDto registHub(//@PathVariable("userId") Long userId,
+                                 @AuthenticationPrincipal UserPrincipal userPrincipal,
+                                 @RequestBody HubInfoVo hubInfoVo) {
+
+        // beforeIp 가 NULL 인 경우만 생각함
+
+        HubInfoDto hub = HubInfoDto.builder()
+                .hubName(hubInfoVo.getHubName())
+                .externalIp(hubInfoVo.getExternalIp())
+                .externalPort(hubInfoVo.getExternalPort())
+                .internalIp(hubInfoVo.getInternalIp())
+                .internalPort(hubInfoVo.getInternalPort())
+                .beforeIp(null)
+                .lastUsedTime(Timestamp.valueOf(LocalDateTime.now()))
+                .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                .createdAt(Timestamp.valueOf(LocalDateTime.now()))
+                .state(true)
+                .adminSeq(userPrincipal.getId())
+                //.adminSeq(userId)
+                .build();
+
+
+        // not yet set hubSeq
+        RoleDto role = RoleDto.builder()
+                //.userSeq(userId)    // userPrincipal.getId();
+                .userSeq(userPrincipal.getId())    // userPrincipal.getId();
+                .role(ROLE_ADMIN)
+                .build();
+
+        // log
+        log.info(role.toString());
+        log.info(hub.toString());
+
+        // 정상적으로 저장시 허브 서버에 "success"를 전송한다.
+        // 정보를 받은 허브 서버는 react app으로 success status 전달한 이후에 허브는 사설 ip 저장 -> station 모드 실행
+        return hubRegister.register(hub, role);
+    }
+
+
+
+    // hub edit, admin만 수행 가능
+    @PutMapping("/hub")
+    public ResponseDto editHub(//@PathVariable("userId") Long userId,
+                               @AuthenticationPrincipal UserPrincipal userPrincipal,
+                               @RequestBody HubInfoVo hubInfoVo) {
+
+        ResponseDto responseDto = new ResponseDto().builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .build();
+
+        log.info(hubInfoVo.toString());
+
+        responseDto.setMsg(FAIL_MSG_NO_EXIST_HUB);
+        HubInfoDto hub = hubMapper.getHubInfo(hubInfoVo.getHubSequence());
+        if(hub == null)                 return responseDto;
+
+        log.info(hub.toString());
+
+        responseDto.setMsg(FAIL_MSG_TO_EDIT_HUB_BECAUSE_NO_ADMIN);
+        if(userPrincipal.getId() != hub.getAdminSeq()) return responseDto;
+        //if(userId != hub.getAdminSeq()) return responseDto;
+
+        // 실행
+        return editHub.editer(hubInfoVo);
+    }
+
+
+
+    // 일단 만들었는데 안쓸수도 있음
     // get hubInfo<Long == hubSeq, String == hubName> by adminId, 수정 필요할듯...
     // 사용자가 허브 조회를 누르면 hubSeq와 hubName을 화면에 뿌려주는 메소드
     @GetMapping("/hubInfo/SeqAndName")
@@ -98,141 +233,5 @@ public class HubController {
                 .status(HttpStatus.OK)
                 .data(hubsSeqAndName)
                 .build();
-    }
-
-
-
-    // hub를 삭제해주는 메소드, {hubSeq} : 삭제할 허브 시퀀스
-    // 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블으 모듈들도 제거해주는 코드 작성
-    //@DeleteMapping("/hub/{hubSeq}")
-    @DeleteMapping("/hub")
-    public ResponseDto deleteHub(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                 @RequestBody HubInfoVo hubInfoVo) {
-/*
-        return ResponseDto.builder()
-                .data(null)
-                .msg(SUCCESS_MSG_EXPLICIT_DEL)
-                .status(HttpStatus.OK)
-                .build();
-*/
-        ////////////////////////////////////////////////
-        Long adminSeq = userPrincipal.getId();
-
-
-        RoleDto role = new RoleDto().builder()
-                .hubSeq(hubInfoVo.getHubSequence())
-                .userSeq(adminSeq)
-                .build();
-
-        ResponseDto responseDto = new ResponseDto().builder()
-                .status(HttpStatus.ACCEPTED)
-                .build();
-
-
-        //HubInfoDto hub = hubMapper.getHubInfo(hubSeq);
-        HubInfoDto hub = hubMapper.getHubInfo(hubInfoVo.getHubSequence());
-
-        if(hub == null) {
-            responseDto.setMsg(FAIL_MSG_DELETE_HUB_BECAUSE_NO_EXIST);
-            return responseDto;
-        }
-
-        if(!adminSeq.equals(hub.getAdminSeq())) {
-            responseDto.setMsg(FAIL_MSG_DELETE_HUB_BECAUSE_NO_ADMIN);
-            return responseDto;
-        }
-
-        // 허브 서버로 db에 저장된 ip 정보 말소 요청
-        String url = "http://" + hub.getExternalIp() + "/" + hub.getExternalPort() + "/ip";
-        ResponseEntity<String> resultAboutDelIp = deleteIpInHub.exchange(url, HttpMethod.DELETE, null, String.class);
-
-        if(resultAboutDelIp.equals("fail")) {
-            responseDto.setMsg(FAIL_MSG_DELETE_HUB_BECAUSE_FAIL_RESTTEMPLATE);
-            responseDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            return responseDto;
-        }
-
-        // 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블으 모듈들도 제거해주는 코드 작성
-        return hubDeleter.explicitDeleter(role);
-    }
-
-
-
-    // 관리자가 새로운 그룹 유저를 추가해주기 위해 호출하는 메소드
-//    @PostMapping("/hubUser")
-//    public ResponseDto addRole(@AuthenticationPrincipal UserPrincipal userPrincipal,
-//                               @RequestBody UserRegisterVo userRegisterVo) {
-
-//        return roleRegister.register(userRegisterVo, userPrincipal.getId());  // (hubId / email / adminId)
-
-        /* 이코드를 위의 return 문으로 수정, 혹시 위의 코드가 에러가 발생할까봐 남겨뒀음
-        try {
-            responseDto = skillHubUserRegister.register(userRegisterVo, userPrincipal.getId());  // (hubId / email / adminId)
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            return responseDto;
-        }*/
-//    }
-
-
-
-    // 허브 최초 등록, 순서 : hub 등록 -> hub_user 등록
-    @PostMapping("/hub")
-    public ResponseDto registHub(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                 @RequestBody HubInfoVo hubInfoVo) {
-
-        HubInfoDto hub = HubInfoDto.builder()
-                .hubName(hubInfoVo.getHubName())
-                .externalIp(hubInfoVo.getExternalIp())
-                .externalPort(hubInfoVo.getExternalPort())
-                .internalIp(hubInfoVo.getInternalIp())
-                .internalPort(hubInfoVo.getInternalPort())
-                .beforeIp(null)
-                .adminSeq(userPrincipal.getId())
-                //.lastUsedTime(new Date())
-          //      .lastUsedTime(Timestamp.valueOf(LocalDateTime.now()))
-          //      .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
-          //      .createdAt(Timestamp.valueOf(LocalDateTime.now()))
-                .build();
-
-        // not yet set hubSeq
-        RoleDto role = RoleDto.builder()
-                .userSeq(userPrincipal.getId())    // userPrincipal.getId();
-                .role(ROLE_ADMIN)
-                .build();
-
-//        정상적으로 저장시 허브 서버에 "success"를 전송한다.
-//        정보를 받은 허브 서버는 react app으로 success status 전달한 이후에 허브는 사설 ip 저장 -> station 모드 실행
-        return hubRegister.register(hub, role);
-    }
-
-
-
-    // hub edit
-    // admin만 수행 가능
-    @PutMapping("/hub")
-    public ResponseDto editHub(//@AuthenticationPrincipal UserPrincipal userPrincipal,
-                               @RequestBody HubInfoVo hubInfoVo) {
-
-        ResponseDto responseDto = new ResponseDto().builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .build();
-
-        System.out.println(hubInfoVo);
-        // admin 검증
-        responseDto.setMsg(FAIL_MSG_NO_EXIST_HUB);
-        HubInfoDto hub = hubMapper.getHubInfo(hubInfoVo.getHubSequence());
-        System.out.println(hub);
-        if(hub == null)                  return responseDto;
-
-        responseDto.setMsg(FAIL_MSG_NO_ADMIN);
-        //if(userPrincipal.getId() != hub.getAdminSeq()) return responseDto;
-        //if(new Long(3) != hub.getAdminSeq()) return responseDto;
-    //    if(new Long(3).equals(hub.getAdminSeq())) return responseDto;
-
-        System.out.println("test1");
-        // 실행
-        return editHub.editer(hubInfoVo);
     }
 }

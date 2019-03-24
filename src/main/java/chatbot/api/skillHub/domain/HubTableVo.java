@@ -30,9 +30,4 @@ public class HubTableVo {
     private Timestamp updated_at;
 
     private boolean state;
-
-    //private Date last_used_time;
-/*  private boolean command_execution_statement;
-
-    private int connection_module_num;*/
 }

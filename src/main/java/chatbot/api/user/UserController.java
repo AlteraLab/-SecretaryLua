@@ -3,14 +3,12 @@ package chatbot.api.user;
 
 import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.mappers.HubMapper;
-import chatbot.api.skillHub.domain.HubTableVo;
 import chatbot.api.skillHub.domain.HubsVo;
 import chatbot.api.user.domain.UserInfoDto;
 import chatbot.api.common.security.UserPrincipal;
 import chatbot.api.mappers.UserMapper;
-import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 
-import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,11 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static chatbot.api.user.utils.UserConstants.*;
 
 @RestController
+@Slf4j
 public class UserController {
 
     @Autowired
@@ -34,7 +32,9 @@ public class UserController {
 
 
 
-    @GetMapping(value = "/user/{userId}")
+
+    // 메인 페이지에 보여질 사용 가능한 허브들에 대한 정보들을 반환하는 기능
+    @GetMapping(value = "/user")
     public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         // 1. 유저 디비 createdAt / updatedAt 추가 후, 기존 기능들 정상적으로 수행되는지 확인
@@ -56,7 +56,6 @@ public class UserController {
                 .data(data)
                 .build();
     }
-
 
 
 
@@ -82,7 +81,7 @@ public class UserController {
 
 
     // 이메일로 사용자 조회
-    @GetMapping("/users/{email}")
+    @GetMapping("/user/{email}")
     public ResponseDto getUserByEmail(@PathVariable(value = "email") String email) {
 
         UserInfoDto user = userMapper.getUserByEmail(email);
@@ -93,16 +92,16 @@ public class UserController {
                                     .build();
                                     // NO_CONTENT : 요청에 대해서 보내줄 수 있는 콘텐츠가 없지만, 헤더는 의미있을 수 있다.
 
+        // log
+        log.info(user.toString());
 
         ResponseDto responseDto = ResponseDto.builder()
                 .msg(SUCCESS_MSG_SELECT_BY_EMAIL)
-                //.data(user.getUserId())        교준이 문서 대로라면 사라져야함.
-                .data(null)
                 .status(HttpStatus.OK)
+                .data(null)
                 .build();
 
         return responseDto;
-
     }
 }
 

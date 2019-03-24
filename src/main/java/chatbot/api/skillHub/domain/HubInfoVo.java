@@ -8,6 +8,8 @@ import java.util.Date;
 @Data
 public class HubInfoVo {
 
+    // client 로 부터 받는 데이터들
+
     private Long hubSequence;
 
     private String hubName;
@@ -29,9 +31,4 @@ public class HubInfoVo {
     private Timestamp updatedAt;
 
     private boolean state;
-
-    //    private Date lastUsedTime;
-/*  private int connectionModuleNum;
-
-    private boolean commandExecutionStat;  */
 }

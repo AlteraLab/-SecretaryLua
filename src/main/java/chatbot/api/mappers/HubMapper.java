@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -32,7 +33,7 @@ public interface HubMapper {
     ArrayList<HubsVo> getHubsInfoByUserId(Long userId);
 
 
-    // 딴건 잘되나?
+    // get HubInfo
     HubInfoDto getHubInfo(Long hubSeq);
 
 
@@ -44,12 +45,10 @@ public interface HubMapper {
     void implicitDeleteHub(@Param("expireDate") Date expireDate);
 
 
-    // edit hub info about (external ip / port), 9internal ip / port)
+    // edit hub info about (external ip / port), (internal ip / port)
     void editHubAboutIpAndPort(@Param("hubSeq") Long hubSeq,
                                @Param("exIp") String exIp,
                                @Param("inIp") String inIp,
                                @Param("exPort") int exPort,
                                @Param("inPort") int inPort);
-
-
 }

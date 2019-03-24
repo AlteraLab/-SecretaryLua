@@ -26,5 +26,4 @@ public class UserInfoDto {
     private Timestamp createdAt;
 
     private Timestamp updatedAt;
-
 }

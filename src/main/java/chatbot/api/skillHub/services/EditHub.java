@@ -5,7 +5,11 @@ import chatbot.api.mappers.HubMapper;
 import chatbot.api.skillHub.domain.HubInfoVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import static chatbot.api.skillHub.utils.HubConstants.EXCEPTION_MSG_DURING_EDITER;
+import static chatbot.api.skillHub.utils.HubConstants.SUCCESS_MSG_EDIT_HUB;
 
 @Service
 @Slf4j
@@ -18,25 +22,28 @@ public class EditHub {
 
     public ResponseDto editer(HubInfoVo hubInfoVo) {
 
-        System.out.println("test2");
-        // 매퍼 작성...
-        try {
-            System.out.println("test3");
+        ResponseDto responseDto = ResponseDto.builder()
+                .data(null)
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .build();
 
+        try {
             hubMapper.editHubAboutIpAndPort(hubInfoVo.getHubSequence(),
                                             hubInfoVo.getExternalIp(),
                                             hubInfoVo.getInternalIp(),
                                             hubInfoVo.getExternalPort(),
                                             hubInfoVo.getInternalPort());
 
-            System.out.println("test4");
+            responseDto.setStatus(HttpStatus.OK);
+            responseDto.setMsg(SUCCESS_MSG_EDIT_HUB);
 
         } catch (Exception e) {
+            responseDto.setMsg(EXCEPTION_MSG_DURING_EDITER);
             e.printStackTrace();
 
+        } finally {
+            return responseDto;
         }
-        System.out.println("test5");
 
-        return ResponseDto.builder().build();
     }
 }

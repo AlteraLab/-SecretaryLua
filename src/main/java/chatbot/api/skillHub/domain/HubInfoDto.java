@@ -35,9 +35,4 @@ public class HubInfoDto {
     private Timestamp updatedAt;
 
     private boolean state;
-
-    //private Date lastUsedTime;
-/*    private int connectionModuleNum;
-
-    private boolean commandExecutionStat;*/
 }

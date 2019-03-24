@@ -7,9 +7,9 @@ import lombok.Setter;
 import java.sql.Timestamp;
 
 @Data
-@Getter
-@Setter
 public class HubsVo {
+
+    // DB에서 가져올 데이터들
 
     private Long hub_sequence;
 
