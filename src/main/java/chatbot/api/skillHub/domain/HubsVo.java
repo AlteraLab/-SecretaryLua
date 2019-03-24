@@ -1,15 +1,15 @@
 package chatbot.api.skillHub.domain;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Data
-public class HubTableVo {
+public class HubsVo {
 
-    // list 때문에 썻던걸로 기억함.
-    // 디비 컬럼명과 일치
+    // DB에서 가져올 데이터들
 
     private Long hub_sequence;
 
@@ -17,9 +17,13 @@ public class HubTableVo {
 
     private String hub_name;
 
-    private int port_number;
+    private String external_ip;
 
-    private String current_ip;
+    private int external_port;
+
+    private String internal_ip;
+
+    private int internal_port;
 
     private String before_ip;
 
@@ -30,4 +34,6 @@ public class HubTableVo {
     private Timestamp updated_at;
 
     private boolean state;
+
+    private String role;
 }

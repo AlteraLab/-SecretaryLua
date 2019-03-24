@@ -32,11 +32,18 @@ public class HubConstants {
     public static final String EXCEPTION_MSG_DURING_DELETER = "exception : An exception occurred During deleter execution";
 
 
-    public static final String FAIL_MSG_NO_EXIST_USER_FROM_TABLE = "fail : no exist user from user table";
+    public static final String FAIL_MSG_NO_EXIST_USER_FROM_USERS_TABLE = "fail : no exist user from user table";
 
     public static final String FAIL_MSG_REGIST_HUB_INTO_HUB_TABLE = "fail : Failed insert into hub table";
 
-    public static final String SUCCESS_MSG_REGIST_INTO_HUB_AND_ROLL = "success : Succesed to regist hub and roll";
+    public static final String SUCCESS_MSG_REGIST_INTO_HUB_AND_ROLL = "success : Successed to regist hub and roll";
 
 
+    public static final String EXCEPTION_MSG_DURING_EDITER = "exception : An exception occurred During editer execution";
+
+    public static final String EXCEPTION_MSG_DURING_IMPLICIT_DELETE_HUB = "exception : An exception occurred During ImplicitDeleteHub execution";
+
+    public static final String SUCCESS_MSG_EDIT_HUB = "success : Successed to edit hub";
+
+    public static final String FAIL_MSG_TO_EDIT_HUB_BECAUSE_NO_ADMIN = "fail : Failed to edit hub because you are not admin about hub";
 }

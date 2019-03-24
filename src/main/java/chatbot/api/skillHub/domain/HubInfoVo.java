@@ -2,10 +2,15 @@ package chatbot.api.skillHub.domain;
 
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Data
 public class HubInfoVo {
+
+    // client 로 부터 받는 데이터들
+
+    private Long hubSequence;
 
     private String hubName;
 
@@ -19,9 +24,11 @@ public class HubInfoVo {
 
     private String beforeIp;
 
-    private Date lastUsedTime;
+    private Timestamp lastUsedTime;
 
-/*  private int connectionModuleNum;
+    private Timestamp createdAt;
 
-    private boolean commandExecutionStat;  */
+    private Timestamp updatedAt;
+
+    private boolean state;
 }

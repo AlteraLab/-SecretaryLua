@@ -2,38 +2,60 @@ package chatbot.api.user;
 
 
 import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.mappers.HubMapper;
+import chatbot.api.skillHub.domain.HubsVo;
 import chatbot.api.user.domain.UserInfoDto;
 import chatbot.api.common.security.UserPrincipal;
 import chatbot.api.mappers.UserMapper;
-import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 
-import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static chatbot.api.user.utils.UserConstants.*;
 
 @RestController
-@AllArgsConstructor
+@Slf4j
 public class UserController {
 
+    @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private HubMapper hubMapper;
 
 
+
+
+    // 메인 페이지에 보여질 사용 가능한 허브들에 대한 정보들을 반환하는 기능
     @GetMapping(value = "/user")
     public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
+        // 1. 유저 디비 createdAt / updatedAt 추가 후, 기존 기능들 정상적으로 수행되는지 확인
         UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
+        //UserInfoDto userInfoDto = userMapper.getUser(userId).get();  // 실험용
+
+        // 2. 사용자가 사용할 수 있는 허브들에 대해서 hub + role 조인해서 데이터들 모두 메모리로 가져오기
+        List<HubsVo> hubsInfoList;
+        hubsInfoList = hubMapper.getHubsInfoByUserId(userPrincipal.getId());
+        //hubsInfoList = hubMapper.getHubsInfoByUserId(userId);
+
+        // 3. data set
+        Map<Object, List<HubsVo>> data = new HashMap<Object, List<HubsVo>>();
+        data.put(userInfoDto, hubsInfoList);
 
         return ResponseDto.builder()
                 .msg("userInfoDto information")
                 .status(HttpStatus.OK)
-                .data(userInfoDto)
+                .data(data)
                 .build();
     }
-
 
 
 
@@ -41,7 +63,8 @@ public class UserController {
     @GetMapping("/userToken")
     public ResponseDto checkValidToken(@AuthenticationPrincipal UserPrincipal UserPrincipal) {
 
-        UserInfoDto userInfoDto = userMapper.getUserByUserId(UserPrincipal.getId());
+        //UserInfoDto userInfoDto = userMapper.getUserByUserId(UserPrincipal.getId());
+        UserInfoDto userInfoDto = userMapper.getUserByUserId(new Long(5));
 
         // 유저를 검색하지 못하면  -> hub에게 "not valid token" 메시지 전송
         if(userInfoDto == null) return ResponseDto.builder()
@@ -58,24 +81,27 @@ public class UserController {
 
 
     // 이메일로 사용자 조회
-    @GetMapping("/users/{email}")
+    @GetMapping("/user/{email}")
     public ResponseDto getUserByEmail(@PathVariable(value = "email") String email) {
 
         UserInfoDto user = userMapper.getUserByEmail(email);
         if(user == null) return ResponseDto.builder()
                                     .msg(FAIL_MSG_SELECT_BY_EMAIL)
-                                    .status(HttpStatus.OK)
+                                    .status(HttpStatus.NO_CONTENT)
                                     .data(null)
                                     .build();
+                                    // NO_CONTENT : 요청에 대해서 보내줄 수 있는 콘텐츠가 없지만, 헤더는 의미있을 수 있다.
+
+        // log
+        log.info(user.toString());
 
         ResponseDto responseDto = ResponseDto.builder()
                 .msg(SUCCESS_MSG_SELECT_BY_EMAIL)
-                .data(user.getUserId())
                 .status(HttpStatus.OK)
+                .data(null)
                 .build();
 
         return responseDto;
-
     }
 }
 

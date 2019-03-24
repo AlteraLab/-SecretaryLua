@@ -1,12 +1,15 @@
 package chatbot.api.skillHub.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 @Data
 @Builder
+@NoArgsConstructor @AllArgsConstructor
 public class HubInfoDto {
 
     private Long hubSeq;
@@ -25,9 +28,11 @@ public class HubInfoDto {
 
     private String beforeIp;
 
-    private Date lastUsedTime;
+    private Timestamp lastUsedTime;
 
-/*    private int connectionModuleNum;
+    private Timestamp createdAt;
 
-    private boolean commandExecutionStat;*/
+    private Timestamp updatedAt;
+
+    private boolean state;
 }
