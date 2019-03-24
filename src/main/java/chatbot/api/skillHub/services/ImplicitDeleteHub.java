@@ -21,7 +21,7 @@ public class ImplicitDeleteHub {
     HubMapper hubMapper;
 
 
-    @Scheduled(cron = "0 * 5 * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     public void implicitDeleteHub() {
 
         Date expireDate = Date.from(LocalDateTime.now().minusDays(30).atZone(ZoneId.systemDefault()).toInstant());
