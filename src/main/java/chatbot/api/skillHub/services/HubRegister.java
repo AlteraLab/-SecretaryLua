@@ -42,7 +42,7 @@ public class HubRegister {
             // 관리자로 등록하려는 사용자의 id는 users 테이블에 있는 데이터인가?
             UserInfoDto user = userMapper.getUserByUserId(role.getUserSeq());
             if(user == null) {
-                responseDto.setMsg(FAIL_MSG_NO_EXIST_USER_FROM_TABLE);
+                responseDto.setMsg(FAIL_MSG_NO_EXIST_USER_FROM_USERS_TABLE);
                 responseDto.setStatus(HttpStatus.ACCEPTED);
 
                 return responseDto;
@@ -61,7 +61,6 @@ public class HubRegister {
 
             responseDto.setMsg(SUCCESS_MSG_REGIST_INTO_HUB_AND_ROLL);
             responseDto.setStatus(HttpStatus.CREATED);
-            responseDto.setData(role);
 
         } catch (Exception e) {
             log.info(EXCEPTION_MSG_DURING_REGISTER);

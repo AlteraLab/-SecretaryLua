@@ -33,10 +33,31 @@
 
 
     <!-- delete hubuser record -->
-    <delete id="deleteRole" parameterType="chatbot.api.role.domain.RoleDto">
+    <delete id="deleteAllRoleByAdmin" parameterType="chatbot.api.role.domain.RoleDto">
         DELETE FROM hub_user WHERE hub_sequence = #{hubSeq}
     </delete>
 
+
+
+    <!--
+    // 역할1 : 일반 유저 스스로 허브 권한 삭제
+    // 역할2 : admin 유저가 일반 유저를 삭제
+    -->
+    <delete id="deleteRoleUser" parameterType="chatbot.api.role.domain.RoleDto">
+        DELETE FROM hub_user
+        WHERE hub_sequence = #{hubSeq}
+          AND user_sequence = #{userSeq}
+          AND role = #{role}
+    </delete>
+
+
+
+    <!-- 특정 허브 관리 페이지로 이동했을때 허브에 권한을 가진 role 들을 화면에 배치, 특정 허브에 대한 role 들을 모두 select -->
+    <select id="getRolesInfoByHubId" resultType="chatbot.api.role.domain.RoleVo" parameterType="Long">
+        SELECT *
+        FROM hub_user AS r
+        WHERE r.hub_sequence = #{hubId}
+    </select>
 
     <!-- ################################################################################### -->
 

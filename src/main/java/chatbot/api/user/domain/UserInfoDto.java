@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,4 +23,7 @@ public class UserInfoDto {
 
     private String profileImage;
 
+    private Timestamp createdAt;
+
+    private Timestamp updatedAt;
 }
