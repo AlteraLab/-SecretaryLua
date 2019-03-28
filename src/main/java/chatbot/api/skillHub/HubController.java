@@ -127,7 +127,7 @@ public class HubController {
                 return responseDto;
             }
 
-            // 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블으 모듈들도 제거해주는 코드 작성
+            // 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블을 모듈들도 제거해주는 코드 작성
             return hubDeleter.explicitDeleterByAdmin(role);
         }
     }
@@ -198,7 +198,6 @@ public class HubController {
         if(userPrincipal.getId() != hub.getAdminSeq()) return responseDto;
         //if(userId != hub.getAdminSeq()) return responseDto;
 
-        // 실행
         return editHub.editer(hubInfoVo);
     }
 
