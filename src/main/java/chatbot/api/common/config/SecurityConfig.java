@@ -73,7 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             .authorizeRequests()
                 //허용하는 url 설정
-                .antMatchers("/auth/**", "/oauth2/**", "/hubInfo/**", "/hubUser", "/hub/**", "/userToken", "/module/ac/{command}/v1", "/hub/{hubId}/roles", "/module/type", "/hub/id", "/module/id", "/command/code", "/command/type")
+                .antMatchers("/auth/**", "/oauth2/**", "/hubInfo/**", "/hubUser", "/hub/**", "/userToken", "/module/ac/{command}/v1", "/hub/{hubId}/roles", "/module/type", "/hub/id", "/module/id", "/command/code", "/command/type", "/redis/**", "/user/**", "/**")
                     .permitAll()
                 //허용하는 url 이외의 url은 인증 요청
                 .anyRequest()

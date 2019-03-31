@@ -34,8 +34,10 @@ public class UserController {
 
 
     // 메인 페이지에 보여질 사용 가능한 허브들에 대한 정보들을 반환하는 기능
+    //@GetMapping(value = "/{userId}")
     @GetMapping(value = "/user")
-    public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseDto kakaoAuthoriaztion(//@PathVariable("userId") Long userId,
+                                          @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         // 1. 유저 디비 createdAt / updatedAt 추가 후, 기존 기능들 정상적으로 수행되는지 확인
         UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
@@ -63,8 +65,8 @@ public class UserController {
     @GetMapping("/userToken")
     public ResponseDto checkValidToken(@AuthenticationPrincipal UserPrincipal UserPrincipal) {
 
-        //UserInfoDto userInfoDto = userMapper.getUserByUserId(UserPrincipal.getId());
-        UserInfoDto userInfoDto = userMapper.getUserByUserId(new Long(5));
+        UserInfoDto userInfoDto = userMapper.getUserByUserId(UserPrincipal.getId());
+        //UserInfoDto userInfoDto = userMapper.getUserByUserId(new Long(5));
 
         // 유저를 검색하지 못하면  -> hub에게 "not valid token" 메시지 전송
         if(userInfoDto == null) return ResponseDto.builder()
