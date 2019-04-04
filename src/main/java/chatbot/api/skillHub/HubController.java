@@ -27,6 +27,7 @@ import java.util.*;
 import static chatbot.api.role.utils.RoleConstants.*;
 import static chatbot.api.skillHub.utils.HubConstants.*;
 
+@SuppressWarnings("ALL")
 @RestController
 @NoArgsConstructor
 @Slf4j
@@ -108,13 +109,14 @@ public class HubController {
                 return responseDto;
             }
 
+            return hubDeleter.explicitDeleterByUser(role);
             // 2. 한 번 더 확인 (만약 사용 가능하다면, 허브 사용 명단에서 유저를 제거)
-            if(roleUser.getRole().equals(ROLE_USER)) {
+     /*       if(roleUser.getRole().equals(ROLE_USER)) {
                 return hubDeleter.explicitDeleterByUser(role);
             } else {
                 responseDto.setMsg(FAIL_MSG);
                 return responseDto;
-            }
+            }*/
 
         } else {     // ROLE_ADMIN
             // 허브 서버로 db에 저장된 ip 정보 말소 요청
@@ -134,21 +136,44 @@ public class HubController {
 
 
 
-    // 허브 최초 등록, 순서 : hub 등록 -> hub_user 등록
+    // 허브 최초 등록 순서 : hub 등록 -> hub_user 등록
+    /*
+    http://localhost:8888/user?data=002
+    @PostMapping("user")
+    public @ResponseBody item getitem(@RequestParam("data") String itemid){
+        item i = itemDao.findOne(itemid);
+        String itemname = i.getItemname();
+        String price = i.getPrice();
+        return i;
+    }
+    */
+    //@PostMapping("/hub/{userId}")
     @PostMapping("/hub")
-    public ResponseDto registHub(//@PathVariable("userId") Long userId,
+    public ResponseDto registHub(//@RequestBody HubInfoVo hubInfoVo
+                                 //@PathVariable("userId") Long userId,
                                  @AuthenticationPrincipal UserPrincipal userPrincipal,
-                                 @RequestBody HubInfoVo hubInfoVo) {
+                                 @RequestParam("hubName") String  hubName,
+                                 @RequestParam("externalIp") String  externalIp,
+                                 @RequestParam("internalIp") String  internalIp,
+                                 @RequestParam("externalPort") int externalPort,
+                                 @RequestParam("internalPort") int internalPort,
+                                 @RequestParam("macAddr") String  macAddress) {
 
-        // beforeIp 가 NULL 인 경우만 생각함
+        HubInfoDto hub = null;
 
-        HubInfoDto hub = HubInfoDto.builder()
-                .hubName(hubInfoVo.getHubName())
+        hub = HubInfoDto.builder()
+                /*.hubName(hubInfoVo.getHubName())
                 .externalIp(hubInfoVo.getExternalIp())
                 .externalPort(hubInfoVo.getExternalPort())
                 .internalIp(hubInfoVo.getInternalIp())
-                .internalPort(hubInfoVo.getInternalPort())
+                .internalPort(hubInfoVo.getInternalPort())*/
+                .hubName(hubName)
+                .externalIp(externalIp)
+                .externalPort(externalPort)
+                .internalIp(internalIp)
+                .internalPort(internalPort)
                 .beforeIp(null)
+                // Mac Address
                 .lastUsedTime(Timestamp.valueOf(LocalDateTime.now()))
                 .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .createdAt(Timestamp.valueOf(LocalDateTime.now()))
@@ -156,6 +181,7 @@ public class HubController {
                 .adminSeq(userPrincipal.getId())
                 //.adminSeq(userId)
                 .build();
+
 
 
         // not yet set hubSeq
@@ -199,6 +225,21 @@ public class HubController {
         //if(userId != hub.getAdminSeq()) return responseDto;
 
         return editHub.editer(hubInfoVo);
+    }
+
+
+
+    // UPnP 수행 이후, 할당 받은 Ip가 이전 Ip와 다르다면 스킬 서버로 데이터를 전송해서
+    // Ip 수정 실시
+    @PutMapping("/hub/upnpIp")
+    public ResponseDto updateUpnpIp(@RequestBody HubInfoVo hub) {
+
+        log.info(hub.toString());
+
+        return ResponseDto.builder()
+                .msg("UPNP IP")
+                .status(HttpStatus.OK)
+                .build();
     }
 
 

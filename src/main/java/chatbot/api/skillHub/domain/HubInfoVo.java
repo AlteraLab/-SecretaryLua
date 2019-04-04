@@ -3,7 +3,6 @@ package chatbot.api.skillHub.domain;
 import lombok.Data;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Data
 public class HubInfoVo {

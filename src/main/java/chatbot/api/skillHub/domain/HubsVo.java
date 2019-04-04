@@ -1,11 +1,10 @@
 package chatbot.api.skillHub.domain;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.sql.Timestamp;
 
+@SuppressWarnings("ALL")
 @Data
 public class HubsVo {
 

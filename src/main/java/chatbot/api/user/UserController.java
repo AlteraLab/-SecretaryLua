@@ -2,7 +2,11 @@ package chatbot.api.user;
 
 
 import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.common.domain.kakao.openbuilder.RequestDto;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
 import chatbot.api.mappers.HubMapper;
+import chatbot.api.response.services.AlreadyJoinedResponser;
+import chatbot.api.response.services.RequestJoinResponser;
 import chatbot.api.skillHub.domain.HubsVo;
 import chatbot.api.user.domain.UserInfoDto;
 import chatbot.api.common.security.UserPrincipal;
@@ -30,12 +34,19 @@ public class UserController {
     @Autowired
     private HubMapper hubMapper;
 
+    @Autowired
+    private AlreadyJoinedResponser alreadyJoinedResponser;
+
+    @Autowired
+    private RequestJoinResponser requestJoinResponser;
 
 
 
     // 메인 페이지에 보여질 사용 가능한 허브들에 대한 정보들을 반환하는 기능
+    //@GetMapping(value = "/{userId}")
     @GetMapping(value = "/user")
-    public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseDto kakaoAuthoriaztion(//@PathVariable("userId") Long userId,
+                                          @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         // 1. 유저 디비 createdAt / updatedAt 추가 후, 기존 기능들 정상적으로 수행되는지 확인
         UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
@@ -63,8 +74,8 @@ public class UserController {
     @GetMapping("/userToken")
     public ResponseDto checkValidToken(@AuthenticationPrincipal UserPrincipal UserPrincipal) {
 
-        //UserInfoDto userInfoDto = userMapper.getUserByUserId(UserPrincipal.getId());
-        UserInfoDto userInfoDto = userMapper.getUserByUserId(new Long(5));
+        UserInfoDto userInfoDto = userMapper.getUserByUserId(UserPrincipal.getId());
+        //UserInfoDto userInfoDto = userMapper.getUserByUserId(new Long(5));
 
         // 유저를 검색하지 못하면  -> hub에게 "not valid token" 메시지 전송
         if(userInfoDto == null) return ResponseDto.builder()
@@ -102,6 +113,25 @@ public class UserController {
                 .build();
 
         return responseDto;
+    }
+
+
+
+    // 0. 사용자가 "등록"을 발화로 입력하면, 사용자 id를 바인딩하여서 react app url 반환
+    @PostMapping("/signUp")
+    public ResponseDtoVerTwo requestSignUp(@RequestBody RequestDto requestDto) {
+
+        // 1. 해당 사용자의 id 값이 이미 데이터베이스에 저장되어 있는지 확인.
+        // db에서 id값을 바탕으로 user정보를 select 해오는 코드
+
+
+        // 2-1. 확인 결과 이미 있는 id 값이면, "이미 등록된 아이디 입니다." 리턴
+/*        if(requestDto != null) {
+            return alreadyJoinedResponser.responser();
+        }*/
+
+        // 2-2. 확인 결과 없는 id 값이면, "등록 하세요" 실시!
+        return requestJoinResponser.responser(requestDto.getUserRequest().getUser().getId());
     }
 }
 
