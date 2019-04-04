@@ -40,8 +40,6 @@ public class UserController {
     @Autowired
     private RequestJoinResponser requestJoinResponser;
 
-
-
     // 메인 페이지에 보여질 사용 가능한 허브들에 대한 정보들을 반환하는 기능
     //@GetMapping(value = "/{userId}")
     @GetMapping(value = "/user")
@@ -69,7 +67,6 @@ public class UserController {
     }
 
 
-
     // 유효한 토큰인지 체크
     @GetMapping("/userToken")
     public ResponseDto checkValidToken(@AuthenticationPrincipal UserPrincipal UserPrincipal) {
@@ -78,17 +75,16 @@ public class UserController {
         //UserInfoDto userInfoDto = userMapper.getUserByUserId(new Long(5));
 
         // 유저를 검색하지 못하면  -> hub에게 "not valid token" 메시지 전송
-        if(userInfoDto == null) return ResponseDto.builder()
-                                        .msg(FAIL_MSG_TOKEN)
-                                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                        .build();
-        // 유저를 검색한다면      -> hub에게 "valid token" 메시지 전송
-        else                    return ResponseDto.builder()
-                                        .msg(SUCCESS_MSG_TOKEN)
-                                        .status(HttpStatus.OK)
-                                        .build();
+        if (userInfoDto == null) return ResponseDto.builder()
+                .msg(FAIL_MSG_TOKEN)
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .build();
+            // 유저를 검색한다면      -> hub에게 "valid token" 메시지 전송
+        else return ResponseDto.builder()
+                .msg(SUCCESS_MSG_TOKEN)
+                .status(HttpStatus.OK)
+                .build();
     }
-
 
 
     // 이메일로 사용자 조회
@@ -96,12 +92,12 @@ public class UserController {
     public ResponseDto getUserByEmail(@PathVariable(value = "email") String email) {
 
         UserInfoDto user = userMapper.getUserByEmail(email);
-        if(user == null) return ResponseDto.builder()
-                                    .msg(FAIL_MSG_SELECT_BY_EMAIL)
-                                    .status(HttpStatus.NO_CONTENT)
-                                    .data(null)
-                                    .build();
-                                    // NO_CONTENT : 요청에 대해서 보내줄 수 있는 콘텐츠가 없지만, 헤더는 의미있을 수 있다.
+        if (user == null) return ResponseDto.builder()
+                .msg(FAIL_MSG_SELECT_BY_EMAIL)
+                .status(HttpStatus.NO_CONTENT)
+                .data(null)
+                .build();
+        // NO_CONTENT : 요청에 대해서 보내줄 수 있는 콘텐츠가 없지만, 헤더는 의미있을 수 있다.
 
         // log
         log.info(user.toString());

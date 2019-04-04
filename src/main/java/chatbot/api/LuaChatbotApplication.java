@@ -21,12 +21,11 @@ public class LuaChatbotApplication {
 
 	public static void main(String[] args) {
 
-		log.trace("Hello World");
+		/*log.trace("Hello World");
 		log.debug("Hello World");
 		log.info("Hello World");
 		log.warn("Hello World");
-		log.error("Hello World");
-
+		log.error("Hello World");*/
 
 		new SpringApplicationBuilder(LuaChatbotApplication.class)
 				.properties(APP_LOCATIONS)

@@ -22,9 +22,9 @@ spring:
 #    dbcp2:
 #      validation-query: SELECT 1
   datasource:
-    url: jdbc:mariadb://192.168.99.100:3307/skill_server
+    url: jdbc:mariadb://127.0.0.1:3307/skill_server
     username: root
-    password: tkddnjs234
+    password: 1234
     driver-class-name: org.mariadb.jdbc.Driver
     dbcp2:
       validation-query: SELECT 1
