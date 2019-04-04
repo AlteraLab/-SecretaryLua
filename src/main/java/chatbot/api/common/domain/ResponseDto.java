@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class ResponseDto {
 	// return type to chatbot
 	private String msg;
+	private String title; //
 	private HttpStatus status;
 	private Object data;
 }

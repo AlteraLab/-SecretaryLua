@@ -1,6 +1,5 @@
 package chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.basicCard;
 
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.Component;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
