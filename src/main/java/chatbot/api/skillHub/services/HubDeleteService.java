@@ -16,7 +16,7 @@ import static chatbot.api.skillHub.utils.HubConstants.*;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class HubDeleter {
+public class HubDeleteService {
 
     private HubMapper hubMapper;
 
@@ -45,7 +45,7 @@ public class HubDeleter {
 
             // skillHubMapper.deleterUser
             responseDto.setMsg(FAIL_MSG_EXPLICIT_DEL_AT_QUERY_ABOUT_HUB);
-            hubMapper.deleteHub(role.getHubSeq());
+            hubMapper.deleteHub(role.getHubId());
 
             responseDto.setMsg(SUCCESS_MSG_EXPLICIT_DEL);
             responseDto.setStatus(HttpStatus.OK);

@@ -6,10 +6,10 @@ import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.common.security.UserPrincipal;
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.skillHub.domain.*;
-import chatbot.api.skillHub.services.EditHub;
-import chatbot.api.skillHub.services.HubDeleter;
-import chatbot.api.skillHub.services.HubGetter;
-import chatbot.api.skillHub.services.HubRegister;
+import chatbot.api.skillHub.services.HubEditService;
+import chatbot.api.skillHub.services.HubDeleteService;
+import chatbot.api.skillHub.services.HubSelectService;
+import chatbot.api.skillHub.services.HubRegisterService;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,16 +34,16 @@ import static chatbot.api.skillHub.utils.HubConstants.*;
 public class HubController {
 
     @Autowired
-    private HubRegister hubRegister;
+    private HubRegisterService hubRegisterService;
 
     @Autowired
-    private HubDeleter hubDeleter;
+    private HubDeleteService hubDeleteService;
 
     @Autowired
-    private HubGetter hubGetter;
+    private HubSelectService hubSelectService;
 
     @Autowired
-    private EditHub editHub;
+    private HubEditService hubEditService;
 
     @Autowired
     private RestTemplate deleteIpInHub;
@@ -81,8 +81,8 @@ public class HubController {
 
         RoleDto role = new RoleDto().builder()
                 //.userSeq(userId)
-                .userSeq(userPrincipal.getId())
-                .hubSeq(hubInfoVo.getHubSequence())
+                .userId(userPrincipal.getId())
+                .hubId(hubInfoVo.getHubSequence())
                 .build();
 
         ResponseDto responseDto = new ResponseDto().builder()
@@ -98,7 +98,7 @@ public class HubController {
 
         // ROLE_USER   VS   ROLE_ADMIN
 //        if(!userId.equals(hub.getAdminSeq())) {     // ROLE_USER
-        if(!userPrincipal.getId().equals(hub.getAdminSeq())) {     // ROLE_USER
+        if(!userPrincipal.getId().equals(hub.getAdminId())) {     // ROLE_USER
 
             // 1. 해당 유저가 ROLE_USER 인지 확인
             //RoleDto roleUser = roleMapper.getRoleInfo(hubInfoVo.getHubSequence(), userId);
@@ -109,7 +109,7 @@ public class HubController {
                 return responseDto;
             }
 
-            return hubDeleter.explicitDeleterByUser(role);
+            return hubDeleteService.explicitDeleterByUser(role);
             // 2. 한 번 더 확인 (만약 사용 가능하다면, 허브 사용 명단에서 유저를 제거)
      /*       if(roleUser.getRole().equals(ROLE_USER)) {
                 return hubDeleter.explicitDeleterByUser(role);
@@ -130,7 +130,7 @@ public class HubController {
             }
 
             // 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블을 모듈들도 제거해주는 코드 작성
-            return hubDeleter.explicitDeleterByAdmin(role);
+            return hubDeleteService.explicitDeleterByAdmin(role);
         }
     }
 
@@ -178,7 +178,7 @@ public class HubController {
                 .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .createdAt(Timestamp.valueOf(LocalDateTime.now()))
                 .state(true)
-                .adminSeq(userPrincipal.getId())
+                .adminId(userPrincipal.getId())
                 //.adminSeq(userId)
                 .build();
 
@@ -187,7 +187,7 @@ public class HubController {
         // not yet set hubSeq
         RoleDto role = RoleDto.builder()
                 //.userSeq(userId)    // userPrincipal.getId();
-                .userSeq(userPrincipal.getId())    // userPrincipal.getId();
+                .userId(userPrincipal.getId())    // userPrincipal.getId();
                 .role(ROLE_ADMIN)
                 .build();
 
@@ -197,7 +197,7 @@ public class HubController {
 
         // 정상적으로 저장시 허브 서버에 "success"를 전송한다.
         // 정보를 받은 허브 서버는 react app으로 success status 전달한 이후에 허브는 사설 ip 저장 -> station 모드 실행
-        return hubRegister.register(hub, role);
+        return hubRegisterService.register(hub, role);
     }
 
 
@@ -221,10 +221,10 @@ public class HubController {
         log.info(hub.toString());
 
         responseDto.setMsg(FAIL_MSG_TO_EDIT_HUB_BECAUSE_NO_ADMIN);
-        if(userPrincipal.getId() != hub.getAdminSeq()) return responseDto;
+        if(userPrincipal.getId() != hub.getAdminId()) return responseDto;
         //if(userId != hub.getAdminSeq()) return responseDto;
 
-        return editHub.editer(hubInfoVo);
+        return hubEditService.editer(hubInfoVo);
     }
 
 
@@ -251,7 +251,7 @@ public class HubController {
     public ResponseDto getHubsSeqAndNameByAdminId(@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         // get hubs by adminId
-        List<HubTableVo> hubInfoList = hubGetter.getHubsInfoByadminId(userPrincipal.getId());
+        List<HubTableVo> hubInfoList = hubSelectService.getHubsInfoByadminId(userPrincipal.getId());
         if(hubInfoList == null) {
             return ResponseDto.builder()
                     .msg(FAIL_MSG_NO_HUB_REGISTED_AS_ADMIN)

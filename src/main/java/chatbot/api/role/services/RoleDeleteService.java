@@ -17,7 +17,7 @@ import static chatbot.api.skillHub.utils.HubConstants.ROLE_USER;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class RoleDeleter {
+public class RoleDeleteService {
 
     private RoleMapper roleMapper;
 
@@ -40,7 +40,7 @@ public class RoleDeleter {
 
             log.info(hub.toString());
 
-            if(!adminId.equals(hub.getAdminSeq())) {
+            if(!adminId.equals(hub.getAdminId())) {
                 responseDto.setMsg(FAIL_MSG_NO_ADMIN);
                 return responseDto;
             }

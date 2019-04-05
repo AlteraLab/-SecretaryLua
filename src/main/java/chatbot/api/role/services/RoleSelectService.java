@@ -17,7 +17,7 @@ import static chatbot.api.role.utils.RoleConstants.SUCCESS_MSG_GET_ROLES_USER;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class RoleGetter {
+public class RoleSelectService {
 
     private RoleMapper roleMapper;
 

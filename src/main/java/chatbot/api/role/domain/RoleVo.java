@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class RoleVo {
 
-    private Long hub_sequence;
+    private Long hub_id;
 
-    private Long user_sequence;
+    private Long user_id;
 
     private String role;
 }

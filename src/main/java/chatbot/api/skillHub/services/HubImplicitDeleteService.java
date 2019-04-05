@@ -16,7 +16,7 @@ import static chatbot.api.skillHub.utils.HubConstants.EXCEPTION_MSG_DURING_IMPLI
 @Component
 @Slf4j
 @AllArgsConstructor
-public class ImplicitDeleteHub {
+public class HubImplicitDeleteService {
 
     HubMapper hubMapper;
 

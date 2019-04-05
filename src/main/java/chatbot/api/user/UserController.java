@@ -7,7 +7,7 @@ import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTw
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.response.services.AlreadyJoinedResponser;
 import chatbot.api.response.services.RequestJoinResponser;
-import chatbot.api.skillHub.domain.HubsVo;
+import chatbot.api.skillHub.domain.HubVo;
 import chatbot.api.user.domain.UserInfoDto;
 import chatbot.api.common.security.UserPrincipal;
 import chatbot.api.mappers.UserMapper;
@@ -51,18 +51,21 @@ public class UserController {
         //UserInfoDto userInfoDto = userMapper.getUser(userId).get();  // 실험용
 
         // 2. 사용자가 사용할 수 있는 허브들에 대해서 hub + role 조인해서 데이터들 모두 메모리로 가져오기
-        List<HubsVo> hubsInfoList;
+        List<HubVo> hubsInfoList;
         hubsInfoList = hubMapper.getHubsInfoByUserId(userPrincipal.getId());
         //hubsInfoList = hubMapper.getHubsInfoByUserId(userId);
 
         // 3. data set
-        Map<Object, List<HubsVo>> data = new HashMap<Object, List<HubsVo>>();
-        data.put(userInfoDto, hubsInfoList);
+        //Map<Object, List<HubVo>> data = new HashMap<Object, List<HubVo>>();
+        //data.put(userInfoDto, hubsInfoList); //수정 필요
 
         return ResponseDto.builder()
                 .msg("userInfoDto information")
                 .status(HttpStatus.OK)
-                .data(data)
+                .data(new Object(){
+                    public UserInfoDto user = userInfoDto;
+                    public List<HubVo> hubs = hubsInfoList;
+                })
                 .build();
     }
 

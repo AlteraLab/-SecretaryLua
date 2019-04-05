@@ -2,12 +2,11 @@ package chatbot.api.mappers;
 
 import chatbot.api.skillHub.domain.HubInfoDto;
 import chatbot.api.skillHub.domain.HubTableVo;
-import chatbot.api.skillHub.domain.HubsVo;
+import chatbot.api.skillHub.domain.HubVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -30,7 +29,7 @@ public interface HubMapper {
 
 
     // 메인 페이지에서 보여줄 허브 목록에 대한 데이터를 가져온다.
-    ArrayList<HubsVo> getHubsInfoByUserId(Long userId);
+    ArrayList<HubVo> getHubsInfoByUserId(Long userId);
 
 
     // get HubInfo
@@ -46,7 +45,7 @@ public interface HubMapper {
 
 
     // edit hub info about (external ip / port), (internal ip / port)
-    void editHubAboutIpAndPort(@Param("hubSeq") Long hubSeq,
+    void editHubAboutIpAndPort(@Param("hubId") Long hubId,
                                @Param("exIp") String exIp,
                                @Param("inIp") String inIp,
                                @Param("exPort") int exPort,

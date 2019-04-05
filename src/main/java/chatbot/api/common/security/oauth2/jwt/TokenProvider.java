@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-/*
-토큰 공급자 정의
-JJWT를 사용하고 있으나 추후에 JOSE+JWT로 교체하여야
+/**
+*토큰 공급자 정의 JJWT를 사용하고 있으나 추후에 JOSE+JWT로 교체하여야
+*@author GYOJUN AN
 */
 @Service
 public class TokenProvider {

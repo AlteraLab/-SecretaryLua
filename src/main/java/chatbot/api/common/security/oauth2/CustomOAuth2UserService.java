@@ -27,7 +27,10 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 import java.util.Optional;
 
-//oauth2 provider로 부터 access Token을 얻은 이후 호출
+/**
+ * oauth2 provider로 부터 access Token을 얻은 이후 호출
+ * @author GYOJUN AN
+ */
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
@@ -81,7 +84,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         }
 
         RequestEntity<?> request = this.requestEntityConverter.convert(userRequest);
-        System.out.println(request.getHeaders());
 
         ResponseEntity<Map<String, Object>> response;
 
@@ -114,9 +116,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         final ObjectMapper mapper = new ObjectMapper(); // jackson's objectmapper
         KakaoUserInfoDto kakaoUserInfo = mapper.convertValue(userAttributes, KakaoUserInfoDto.class);
 
-        System.out.println("kakao nick: "+kakaoUserInfo.getProperties().getNickname()); //??으로 출력됨, 해결 필요
+        System.out.println(kakaoUserInfo.toString());
 
-        return processOAuth2User(kakaoUserInfo);
+        OAuth2User oauth2User = processOAuth2User(kakaoUserInfo);
+        System.out.println(oauth2User.toString());
+        return oauth2User;
 
         /*Set<GrantedAuthority> authorities = Collections.singleton(new OAuth2UserAuthority(userAttributes));
 
@@ -129,9 +133,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         UserInfoDto userInfoDto;
         if(userOptional.isPresent()) { //사용자 정보 업데이트
             userInfoDto = userOptional.get();
-            userInfoDto =updateExistingUser(userInfoDto, kakaoUserInfo);
+            userInfoDto = updateExistingUser(userInfoDto, kakaoUserInfo);
         } else { //등록이 안된 경우 새로 등록
-            userInfoDto =registerNewUser(kakaoUserInfo);
+            userInfoDto = registerNewUser(kakaoUserInfo);
         }
 
         return UserPrincipal.create(userInfoDto);
@@ -142,17 +146,18 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         UserInfoDto userInfoDto = new UserInfoDto();
         userInfoDto.setProviderId(kakaoUserInfo.getId());
         //userInfoDto.setName(kakaoUserInfo.getProperties().getNickname());
-        userInfoDto.setName("test");
+        userInfoDto.setName("test"); //추후에 이름 변경해야
         userInfoDto.setEmail(kakaoUserInfo.getKakaoAccount().getEmail());
         userInfoDto.setProfileImage(kakaoUserInfo.getProperties().getProfileImage());
         userMapper.save(userInfoDto);
+        userInfoDto = userMapper.getUserByProviderId(kakaoUserInfo.getId()).get(); //추후에 최적화를 위한다면 provider_id가 PK가 되어야만 함
         return userInfoDto;
     }
 
     //기존 사용자 정보 업데이트
     private UserInfoDto updateExistingUser(UserInfoDto existingUserInfoDto, KakaoUserInfoDto kakaoUserInfo) {
         //existingUserInfoDto.setName(kakaoUserInfo.getProperties().getNickname());
-        existingUserInfoDto.setName("test");
+        existingUserInfoDto.setName("test"); //추후에 이름 변경해야
         existingUserInfoDto.setProfileImage(kakaoUserInfo.getProperties().getProfileImage());
         existingUserInfoDto.setEmail(kakaoUserInfo.getKakaoAccount().getEmail());
         userMapper.update(existingUserInfoDto);
