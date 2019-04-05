@@ -52,8 +52,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String token = tokenProvider.createToken(authentication); //JWT 발급
 
-        System.out.println("redirect REACT");
-
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", token) //쿼리스트링에 token 포함하여 전송
                 .build().toUriString();

@@ -13,8 +13,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.util.Collection;
 import java.util.Map;
 
-// 문제 생기면 argsConstructor 지워보기, 테스트 코드땜에 추가한거임
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Data
@@ -32,8 +30,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
                 new SimpleGrantedAuthority(role.getName().name())
         ).collect(Collectors.toList());*/
 
-        return UserPrincipal
-                .builder()
+        return UserPrincipal.builder()
                 .id(userInfoDto.getUserId())
                 .username(userInfoDto.getName())
                 //.authorities(authorities)

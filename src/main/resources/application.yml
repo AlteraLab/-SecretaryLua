@@ -24,7 +24,7 @@ spring:
   datasource:
     url: jdbc:mariadb://127.0.0.1:3307/skill_server
     username: root
-    password: 1234
+    password: 1111
     driver-class-name: org.mariadb.jdbc.Driver
     dbcp2:
       validation-query: SELECT 1
@@ -53,7 +53,7 @@ app:
     tokenExpirationMsec: 864000000
   oauth2:
     authorizedRedirectUris:
-      - http://localhost:3000/oauth2/redirect
+      - http://203.250.32.29:3000/oauth2/redirect
 
 mybatis:
   config-location: classpath:mybatis-config.xml

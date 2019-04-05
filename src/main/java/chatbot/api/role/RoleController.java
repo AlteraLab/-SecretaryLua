@@ -3,31 +3,27 @@ package chatbot.api.role;
 
 import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.common.security.UserPrincipal;
-import chatbot.api.role.services.RoleDeleter;
-import chatbot.api.role.services.RoleGetter;
-import chatbot.api.role.services.RoleRegister;
-import chatbot.api.skillHub.domain.HubTableVo;
+import chatbot.api.role.services.RoleDeleteService;
+import chatbot.api.role.services.RoleSelectService;
+import chatbot.api.role.services.RoleRegisterService;
 import chatbot.api.user.domain.UserRegisterVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @Slf4j
 public class RoleController {
 
     @Autowired
-    private RoleRegister roleRegister;
+    private RoleRegisterService roleRegisterService;
 
     @Autowired
-    private RoleDeleter roleDeleter;
+    private RoleDeleteService roleDeleteService;
 
     @Autowired
-    private RoleGetter roleGetter;
+    private RoleSelectService roleSelectService;
 
 
     // 관리자가 새로운 그룹 유저를 추가해주기 위해 호출하는 메소드
@@ -38,7 +34,7 @@ public class RoleController {
                                @RequestBody UserRegisterVo userRegisterVo) {
 
         log.info(userRegisterVo.toString());
-        return roleRegister.register(userRegisterVo, userPrincipal.getId());
+        return roleRegisterService.register(userRegisterVo, userPrincipal.getId());
         //return roleRegister.register(userRegisterVo, userId);
     }
 
@@ -51,7 +47,7 @@ public class RoleController {
                                       @RequestBody UserRegisterVo userRegisterVo) {
 
         log.info(userRegisterVo.toString());
-        return roleDeleter.deleterRoleUserByAdmin(userRegisterVo, userPrincipal.getId());
+        return roleDeleteService.deleterRoleUserByAdmin(userRegisterVo, userPrincipal.getId());
         //return roleDeleter.deleterRoleUserByAdmin(userRegisterVo, adminId);
     }
 
@@ -61,6 +57,6 @@ public class RoleController {
     // 허브에 대해 권한을 가진 유저들에 대한 정보를 반환하는 기능
     @GetMapping("/hub/{hubId}/roles")
     public ResponseDto getRoles(@PathVariable("hubId") Long hubId) {
-        return roleGetter.getRoles(hubId);
+        return roleSelectService.getRoles(hubId);
     }
 }

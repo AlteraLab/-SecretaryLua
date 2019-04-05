@@ -5,39 +5,31 @@
 
 <mapper namespace="chatbot.api.mappers.RoleMapper">
 
-
-
     <!-- hubUser 레코드 추가 -->
     <insert id="save" parameterMap="RoleInfoDto">
         INSERT INTO hub_user
         (
-        hub_sequence,
-        user_sequence,
+        hub_id,
+        user_id,
         role
         )
         VALUES
         (
-        #{hubSeq},
-        #{userSeq},
+        #{hubId},
+        #{userId},
         #{role}
         )
     </insert>
 
-
-
     <!-- 레코드 검색 : (userSeq, hubSeq) -->
     <select id="getRoleInfo" resultMap="RoleInfoDto" parameterType="map">
-        SELECT * FROM hub_user WHERE user_sequence = #{userSeq} AND hub_sequence = #{hubSeq}
+        SELECT * FROM hub_user WHERE user_id = #{userId} AND hub_id = #{hubId}
     </select>
-
-
 
     <!-- delete hubuser record -->
     <delete id="deleteAllRoleByAdmin" parameterType="chatbot.api.role.domain.RoleDto">
-        DELETE FROM hub_user WHERE hub_sequence = #{hubSeq}
+        DELETE FROM hub_user WHERE hub_id = #{hubId}
     </delete>
-
-
 
     <!--
     // 역할1 : 일반 유저 스스로 허브 권한 삭제
@@ -45,35 +37,27 @@
     -->
     <delete id="deleteRoleUser" parameterType="chatbot.api.role.domain.RoleDto">
         DELETE FROM hub_user
-        WHERE hub_sequence = #{hubSeq}
-          AND user_sequence = #{userSeq}
+        WHERE hub_id = #{hubId}
+          AND user_id = #{userId}
           AND role = #{role}
     </delete>
-
-
 
     <!-- 특정 허브 관리 페이지로 이동했을때 허브에 권한을 가진 role 들을 화면에 배치, 특정 허브에 대한 role 들을 모두 select -->
     <select id="getRolesInfoByHubId" resultType="chatbot.api.role.domain.RoleVo" parameterType="Long">
         SELECT *
         FROM hub_user AS r
-        WHERE r.hub_sequence = #{hubId}
+        WHERE r.hub_id = #{hubId}
     </select>
 
-    <!-- ################################################################################### -->
-
-
-
     <resultMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDto">
-        <result property="hubSeq" column="hub_sequence"/>
-        <result property="userSeq" column="user_sequence"/>
+        <result property="hubId" column="hub_id"/>
+        <result property="userId" column="user_id"/>
         <result property="role" column="role"/>
     </resultMap>
 
-
-
     <parameterMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDto">
-        <parameter property="hubSeq"/>
-        <parameter property="userSeq"/>
+        <parameter property="hubId"/>
+        <parameter property="userId"/>
         <parameter property="role"/>
     </parameterMap>
 

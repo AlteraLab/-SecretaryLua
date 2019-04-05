@@ -22,7 +22,7 @@ import static chatbot.api.user.utils.UserConstants.FAIL_MSG_SELECT_BY_EMAIL;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class RoleRegister {
+public class RoleRegisterService {
 
     private UserMapper userMapper;
 
@@ -47,7 +47,7 @@ public class RoleRegister {
             log.info(hub.toString());
 
             responseDto.setMsg(FAIL_MSG_NO_ADMIN);
-            if(adminId != hub.getAdminSeq()) return responseDto;
+            if(adminId != hub.getAdminId()) return responseDto;
 
             responseDto.setMsg(FAIL_MSG_SELECT_BY_EMAIL);
             UserInfoDto user = userMapper.getUserByEmail(userRegisterVo.getEmail());
@@ -64,8 +64,8 @@ public class RoleRegister {
 
             // Init Create
             role = new RoleDto().builder()
-                    .hubSeq(userRegisterVo.getHubId())
-                    .userSeq(user.getUserId())
+                    .hubId(userRegisterVo.getHubId())
+                    .userId(user.getUserId())
                     .role(ROLE_USER)
                     .build();
 

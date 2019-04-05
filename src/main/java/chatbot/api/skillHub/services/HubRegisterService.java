@@ -20,7 +20,7 @@ import static chatbot.api.skillHub.utils.HubConstants.*;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class HubRegister {
+public class HubRegisterService {
 
     private HubMapper hubMapper;
 
@@ -40,7 +40,7 @@ public class HubRegister {
 
         try {
             // 관리자로 등록하려는 사용자의 id는 users 테이블에 있는 데이터인가?
-            UserInfoDto user = userMapper.getUserByUserId(role.getUserSeq());
+            UserInfoDto user = userMapper.getUserByUserId(role.getUserId());
             if(user == null) {
                 responseDto.setMsg(FAIL_MSG_NO_EXIST_USER_FROM_USERS_TABLE);
                 responseDto.setStatus(HttpStatus.ACCEPTED);
@@ -53,7 +53,7 @@ public class HubRegister {
             hubMapper.save(hub);
 
             // role 객체의 hubSeq 멤버를 set
-            role.setHubSeq(hub.getHubSeq());
+            role.setHubId(hub.getHubId());
 
             // role 저장
             responseDto.setMsg(FAIL_MSG_REGIST_ROLE_INTO_ROLE_TABLE);

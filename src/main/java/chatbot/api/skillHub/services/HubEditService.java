@@ -14,7 +14,7 @@ import static chatbot.api.skillHub.utils.HubConstants.SUCCESS_MSG_EDIT_HUB;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class EditHub {
+public class HubEditService {
 
     private HubMapper hubMapper;
 

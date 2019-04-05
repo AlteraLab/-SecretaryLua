@@ -6,19 +6,16 @@
 <mapper namespace="chatbot.api.mappers.UserMapper">
 
 
-
     <!-- userId를 이용하여 userinfo get -->
     <select id="getUser" resultMap="UserInfoDto" parameterType="Long">
-        SELECT * FROM users WHERE user_sequence = #{userId}
+        SELECT * FROM users WHERE user_id = #{userId}
     </select>
-
 
 
     <!-- userId를 이용하여 userinfo get, optional 안씀 -->
     <select id="getUserByUserId" resultMap="UserInfoDto" parameterType="Long">
-        SELECT * FROM users WHERE user_sequence = #{userId}
+        SELECT * FROM users WHERE user_id = #{userId}
     </select>
-
 
 
     <!-- email을 이용하여 userinfo get -->
@@ -28,19 +25,17 @@
     </select>
 
 
-
     <!-- providerId를 이용하여 유저 get -->
     <select id="getUserByProviderId" resultMap="UserInfoDto" parameterType="String">
         SELECT * FROM users WHERE provider_id = #{providerId}
     </select>
 
 
-
     <!-- 유저 레코드 저장 -->
     <insert id="save" parameterMap="UserInfoDto">
         INSERT INTO users
         (
-            user_sequence,
+            user_id,
             provider_id,
             name,
             email,
@@ -57,30 +52,28 @@
     </insert>
 
 
-
     <!-- -->
     <update id="update">
         UPDATE users
         SET name=#{name}, email=#{email}, profile_img=#{profileImage}
-        WHERE user_sequence=#{userId}
+        WHERE user_id=#{userId}
     </update>
-
 
 
     <!-- 처음 메인 페이지로 접속 했을때, 유저가 사용 가능한 허브 목록들 모두 select -->
     <select id="implicitDeleteHub" parameterType="date">
         SELECT *
         FROM hub_user AS r INNER JOIN hub AS h
-        ON h.hub_sequence = r.hub_sequence
+        ON h.hub_id = r.hub_id
         WHERE h.last_used_time <![CDATA[ < ]]> #{expireDate}
     </select>
 
     <!-- ################################################################################### -->
 
 
-<!-- <result property="userId" column="user_id"/> -->
+    <!-- <result property="userId" column="user_id"/> -->
     <resultMap id="UserInfoDto" type="chatbot.api.user.domain.UserInfoDto">
-        <result property="userId" column="user_sequence"/>
+        <result property="userId" column="user_id"/>
         <result property="providerId" column="provider_id"/>
         <result property="name" column="name"/>
         <result property="email" column="email"/>

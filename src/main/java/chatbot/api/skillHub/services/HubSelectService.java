@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class HubGetter {
+public class HubSelectService {
 
     //@Autowired
     private HubMapper hub;

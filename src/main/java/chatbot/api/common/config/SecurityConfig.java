@@ -72,20 +72,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 
             .authorizeRequests()
-                .anyRequest()
-                    .permitAll()
-                ;//.and()
-
-            /*.authorizeRequests()
                 //허용하는 url 설정
                 .antMatchers("/auth/**", "/oauth2/**", "/hubInfo/**", "/hubUser", "/hub/**", "/userToken", "/module/ac/{command}/v1", "/hub/{hubId}/roles", "/module/type", "/hub/id", "/module/id", "/command/code", "/command/type", "/redis/**", "/user/**", "/**", "/test/**", "/signUp/**", "/signUp")
                     .permitAll()
                 //허용하는 url 이외의 url은 인증 요청
                 .anyRequest()
                     .authenticated()
-                .and()*/
+                .and()
 
-            /*.oauth2Login()//외부 서버에 대한 인증 요청을 트리거하기 위해 사용하는 엔드포인트
+            .oauth2Login()//외부 서버에 대한 인증 요청을 트리거하기 위해 사용하는 엔드포인트
                 .authorizationEndpoint() //자원 소유자로부터 권한을 얻어오기 위해 사용
                     .baseUri("/oauth2/authorize")
                     .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)

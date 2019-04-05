@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 @SuppressWarnings("ALL")
 @Data
-public class HubsVo {
+public class HubVo {
 
     // DB에서 가져올 데이터들
 

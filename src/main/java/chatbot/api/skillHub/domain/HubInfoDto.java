@@ -12,9 +12,9 @@ import java.sql.Timestamp;
 @NoArgsConstructor @AllArgsConstructor
 public class HubInfoDto {
 
-    private Long hubSeq;
+    private Long hubId;
 
-    private Long adminSeq;
+    private Long adminId;
 
     private String hubName;
 
