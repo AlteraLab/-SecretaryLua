@@ -43,11 +43,14 @@
     </delete>
 
     <!-- 특정 허브 관리 페이지로 이동했을때 허브에 권한을 가진 role 들을 화면에 배치, 특정 허브에 대한 role 들을 모두 select -->
-    <select id="getRolesInfoByHubId" resultType="chatbot.api.role.domain.RoleVo" parameterType="Long">
+    <select id="getRolesInfoByHubId" resultMap="RoleInfoDto" parameterType="Long">
         SELECT *
         FROM hub_user AS r
         WHERE r.hub_id = #{hubId}
     </select>
+
+
+
 
     <resultMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDto">
         <result property="hubId" column="hub_id"/>

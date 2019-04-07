@@ -1,7 +1,6 @@
 package chatbot.api.mappers;
 
 import chatbot.api.role.domain.RoleDto;
-import chatbot.api.role.domain.RoleVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -31,5 +30,5 @@ public interface RoleMapper {
 
 
     // 특정 허브에 대한 권한을 가진 유저들에 대한 정보를 get
-    ArrayList<RoleVo> getRolesInfoByHubId(Long hubId);
+    ArrayList<RoleDto> getRolesInfoByHubId(Long hubId);
 }

@@ -4,9 +4,8 @@ package chatbot.api.user;
 import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.common.domain.kakao.openbuilder.RequestDto;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
+import chatbot.api.common.services.KakaoBasicCardResponseService;
 import chatbot.api.mappers.HubMapper;
-import chatbot.api.response.services.AlreadyJoinedResponser;
-import chatbot.api.response.services.RequestJoinResponser;
 import chatbot.api.skillHub.domain.HubVo;
 import chatbot.api.user.domain.UserInfoDto;
 import chatbot.api.common.security.UserPrincipal;
@@ -18,9 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static chatbot.api.user.utils.UserConstants.*;
 
@@ -35,15 +32,14 @@ public class UserController {
     private HubMapper hubMapper;
 
     @Autowired
-    private AlreadyJoinedResponser alreadyJoinedResponser;
+    private KakaoBasicCardResponseService kakaoBasicCardResponseService;
 
-    @Autowired
-    private RequestJoinResponser requestJoinResponser;
+
 
     // 메인 페이지에 보여질 사용 가능한 허브들에 대한 정보들을 반환하는 기능
     //@GetMapping(value = "/{userId}")
     @GetMapping(value = "/user")
-    public ResponseDto kakaoAuthoriaztion(//@PathVariable("userId") Long userId,
+    public ResponseDto kakaoAuthoriaztion(//@PathVariable("userId") Long userId
                                           @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         // 1. 유저 디비 createdAt / updatedAt 추가 후, 기존 기능들 정상적으로 수행되는지 확인
@@ -54,10 +50,6 @@ public class UserController {
         List<HubVo> hubsInfoList;
         hubsInfoList = hubMapper.getHubsInfoByUserId(userPrincipal.getId());
         //hubsInfoList = hubMapper.getHubsInfoByUserId(userId);
-
-        // 3. data set
-        //Map<Object, List<HubVo>> data = new HashMap<Object, List<HubVo>>();
-        //data.put(userInfoDto, hubsInfoList); //수정 필요
 
         return ResponseDto.builder()
                 .msg("userInfoDto information")
@@ -130,7 +122,7 @@ public class UserController {
         }*/
 
         // 2-2. 확인 결과 없는 id 값이면, "등록 하세요" 실시!
-        return requestJoinResponser.responser(requestDto.getUserRequest().getUser().getId());
+        return kakaoBasicCardResponseService.responserRequestJoin(requestDto.getUserRequest().getUser().getId());
     }
 }
 

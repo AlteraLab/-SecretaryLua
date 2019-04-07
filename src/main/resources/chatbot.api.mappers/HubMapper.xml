@@ -8,16 +8,19 @@
 
 
     <!-- hub 레코드 추가, useGeneratedKeys를 사용하면 데이터를 저장할때 keyproperty 컬럼 값이 초기화된 값을 알 수 있다. -->
-    <insert id="save" useGeneratedKeys="true" keyProperty="hubSeq" parameterType="chatbot.api.skillHub.domain.HubInfoDto">
+    <insert id="save" useGeneratedKeys="true" keyProperty="hubId" parameterType="chatbot.api.skillHub.domain.HubInfoDto">
         INSERT INTO hub
         (
         hub_id,
+        admin_id,
         hub_name,
+        hub_descript,
+        search_id,
+        mac_addr,
         external_ip,
         external_port,
         internal_ip,
         internal_port,
-        admin_id,
         before_ip,
         last_used_time,
         created_at,
@@ -27,12 +30,15 @@
         VALUES
         (
         #{hubId},
+        #{adminId},
         #{hubName},
+        #{hubDescript},
+        #{hubSearchId},
+        #{macAddr},
         #{externalIp},
         #{externalPort},
         #{internalIp},
         #{internalPort},
-        #{adminSeq},
         #{beforeIp},
         #{lastUsedTime},
         #{createdAt},
@@ -53,7 +59,7 @@
 
 
     <!-- 해당 adminId와 일치하는 레코드들을 모두 검색 -->
-    <select id="getHubInfoByAdminId" resultType="chatbot.api.skillHub.domain.HubTableVo" parameterType="chatbot.api.skillHub.domain.HubInfoDto">
+    <select id="getHubInfoByAdminId" resultMap="HubInfoDto" parameterType="Long">
         SELECT * FROM hub WHERE admin_id = #{adminId}
     </select>
 
@@ -82,21 +88,6 @@
         WHERE h.last_used_time <![CDATA[ < ]]> #{expireDate}
     </delete>
 
-<!--
-    <delete id="implicitDeleteHub" parameterType="Date">
-        DELETE r, h
-        FROM hub_user AS r INNER JOIN hub AS h
-        ON h.hub_sequence = r.hub_sequence
-        WHERE h.last_used_time <![CDATA[ < ]]> #{expireDate}
-    </delete>
-
-    <delete id="implicitDeleteHub" parameterType="Date">
-        DELETE h
-        FROM hub AS h INNER JOIN hub_user AS r
-        ON h.hub_sequence = r.hub_sequence
-        WHERE h.last_used_time <![CDATA[ < ]]> #{expireDate}
-    </delete>
-    -->
 
 
     <!-- editHub -->
@@ -111,13 +102,21 @@
 	</update>
 
 
+    <select id="getHubInfoByMacAddr" resultMap="HubInfoDto" parameterType="String">
+        SELECT * FROM hub WHERE mac_addr = #{macAddr}
+    </select>
 
-    <!-- 처음 메인 페이지로 접속 했을때, 유저가 사용 가능한 허브 목록들 모두 select -->
-    <select id="getHubsInfoByUserId" resultType="chatbot.api.skillHub.domain.HubVo" parameterType="Long">
+
+    <!-- 처음 메인 페이지로 접속 했을때, 유저가 사용 가능한 허브 목록들 모두 select
+    <select id="getHubsInfoByUserId" resultType="chatbot.api.skillHub.domain.HubVo" parameterType="Long">-->
+    <select id="getHubsInfoByUserId" resultMap="HubVo" parameterType="Long">
         SELECT
         h.hub_id,
         h.admin_id,
         h.hub_name,
+        h.hub_descript,
+        h.search_id,
+        h.mac_addr,
         h.external_ip,
         h.external_port,
         h.internal_ip,
@@ -133,10 +132,27 @@
         WHERE r.user_id = #{userId}
     </select>
 
+
+
+    <!-- 사용자가 사용할 수 있는 허브들중에서 사용자가 요청한 장치 타입이 부착된 허브들을 조회 -->
+    <!-- 1. role.user_id = #{userId} , hub_name, external_ip, external_port-->
+    <select id="getHubInfoByDevCategory" resultMap="HubInfoDto" parameterType="hashmap">
+      SELECT h.hub_id, h.hub_name, h.external_ip, h.external_port
+      FROM dev AS d,
+      (SELECT hub.hub_id, hub.hub_name, hub.external_ip, hub.external_port FROM hub,
+      (SELECT * FROM hub_user WHERE user_id = #{userId}) AS r WHERE hub.hub_id = r.hub_id) AS h
+      WHERE d.hub_id = h.hub_id AND d.dev_category = #{devCategory}
+    </select>
+
+
+
     <resultMap id="HubInfoDto" type="chatbot.api.skillHub.domain.HubInfoDto">
         <result property="hubId" column="hub_id"/>
         <result property="adminId" column="admin_id"/>
         <result property="hubName" column="hub_name"/>
+        <result property="hubDescript" column="hub_descript"/>
+        <result property="hubSearchId" column="search_id"/>
+        <result property="macAddr" column="mac_addr"/>
         <result property="externalIp" column="external_ip"/>
         <result property="externalPort" column="external_port"/>
         <result property="internalIp" column="internal_ip"/>
@@ -149,17 +165,42 @@
     </resultMap>
 
 
-<!--
+    <resultMap id="HubVo" type="chatbot.api.skillHub.domain.HubVo">
+        <result property="hubId" column="hub_id"/>
+        <result property="adminId" column="admin_id"/>
+        <result property="name" column="hub_name"/>
+        <result property="desc" column="hub_descript"/>
+        <result property="searchId" column="search_id"/>
+        <result property="macAddr" column="mac_addr"/>
+        <result property="externalIp" column="external_ip"/>
+        <result property="externalPort" column="external_port"/>
+        <result property="internalIp" column="internal_ip"/>
+        <result property="internalPort" column="internal_port"/>
+        <result property="beforeIp" column="before_ip"/>
+        <result property="lastUsedTime" column="last_used_time"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="state" column="state"/>
+        <result property="role" column="role"/>
+    </resultMap>
+
+
     <parameterMap id="HubInfoDto" type="chatbot.api.skillHub.domain.HubInfoDto">
-        <parameter property="hubSeq"/>
-        <parameter property="adminSeq"/>
+        <parameter property="hubId"/>
+        <parameter property="adminId"/>
         <parameter property="hubName"/>
+        <parameter property="hubDescript"/>
+        <parameter property="hubSearchId"/>
+        <parameter property="macAddr"/>
         <parameter property="externalIp"/>
         <parameter property="externalPort"/>
         <parameter property="internalIp"/>
         <parameter property="internalPort"/>
         <parameter property="beforeIp"/>
         <parameter property="lastUsedTime"/>
-    </parameterMap>-->
+        <parameter property="createdAt"/>
+        <parameter property="updatedAt"/>
+        <parameter property="state"/>
+    </parameterMap>
 
 </mapper>

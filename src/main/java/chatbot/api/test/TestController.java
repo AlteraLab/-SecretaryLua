@@ -1,6 +1,6 @@
 package chatbot.api.test;
 
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.basicCard.Component;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.basicCard.ComponentBasicCard;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.basicCard.BasicCard;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.basicCard.Button;
@@ -31,10 +31,11 @@ public class TestController {
                 .buttons(buttons)
                 .build();
 
-        Component basicCard = new Component();
+        ComponentBasicCard basicCard = new ComponentBasicCard();
         basicCard.setBasicCard(basicCardVo);
 
-        ArrayList<Component> outputs = new ArrayList<Component>();
+        //ArrayList<Component> outputs = new ArrayList<Component>();
+        ArrayList<Object> outputs = new ArrayList<Object>();
         outputs.add(basicCard);
 
 

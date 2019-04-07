@@ -20,8 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import javax.validation.Valid;
 import java.util.*;
 
 import static chatbot.api.role.utils.RoleConstants.*;
@@ -72,17 +71,40 @@ public class HubController {
 
 
 
+    // 허브 등록 순서 : hub 등록 -> hub_user 등록
+    //@PostMapping("/hub/{userId}")
+    @PostMapping("/hub")
+    public ResponseDto registHub(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                 @Valid @RequestBody HubVo hub) {
+
+        log.info(hub.toString());
+        return hubRegisterService.register(userPrincipal.getId(), hub);
+        //return hubRegisterService.register(new Long(2), hub);
+    }
+
+
+
+    // UPnP 수행 이후, 할당 받은 Ip가 이전 Ip와 다르다면 스킬 서버로 데이터를 전송
+    // Ip 수정 실시
+    @PutMapping("/hub/upnpIp")
+    public ResponseDto updateUpnpIp(@RequestBody HubVo hubInfoVo) {
+        log.info(hubInfoVo.toString());
+        return hubEditService.editerHubUPnPIp(hubInfoVo, hubEditService);
+    }
+
+
+
     // hub를 삭제해주는 메소드, 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블으 모듈들도 제거해주는 코드 작성
     // 추후에 허브에 모듈이 붙으면 모듈들에 데이터를 제거하는 코드도 추가해야함.
     @DeleteMapping("/hub")
     public ResponseDto deleteHub(//@PathVariable("userId") Long userId,
                                  @AuthenticationPrincipal UserPrincipal userPrincipal,
-                                 @RequestBody HubInfoVo hubInfoVo) {
+                                 @RequestBody HubVo hubInfoVo) {
 
         RoleDto role = new RoleDto().builder()
                 //.userSeq(userId)
                 .userId(userPrincipal.getId())
-                .hubId(hubInfoVo.getHubSequence())
+                .hubId(hubInfoVo.getHubId())
                 .build();
 
         ResponseDto responseDto = new ResponseDto().builder()
@@ -90,9 +112,9 @@ public class HubController {
                 .build();
 
 
-        HubInfoDto hub = hubMapper.getHubInfo(hubInfoVo.getHubSequence());
+        HubInfoDto hub = hubMapper.getHubInfo(hubInfoVo.getHubId());
         if(hub == null) {
-            responseDto.setMsg(FAIL_MSG_DELETE_HUB_BECAUSE_NO_EXIST);
+            responseDto.setMsg(FAIL_MSG_BECAUSE_NO_EXIST);
             return responseDto;
         }
 
@@ -102,7 +124,7 @@ public class HubController {
 
             // 1. 해당 유저가 ROLE_USER 인지 확인
             //RoleDto roleUser = roleMapper.getRoleInfo(hubInfoVo.getHubSequence(), userId);
-            RoleDto roleUser = roleMapper.getRoleInfo(hubInfoVo.getHubSequence(), userPrincipal.getId());
+            RoleDto roleUser = roleMapper.getRoleInfo(hubInfoVo.getHubId(), userPrincipal.getId());
             if(roleUser == null) {
                 responseDto.setMsg(FAIL_MSG_NO_ROLE_USER_AND_ROLE_ADMIN);
                 responseDto.setStatus(HttpStatus.NO_CONTENT);
@@ -136,77 +158,11 @@ public class HubController {
 
 
 
-    // 허브 최초 등록 순서 : hub 등록 -> hub_user 등록
-    /*
-    http://localhost:8888/user?data=002
-    @PostMapping("user")
-    public @ResponseBody item getitem(@RequestParam("data") String itemid){
-        item i = itemDao.findOne(itemid);
-        String itemname = i.getItemname();
-        String price = i.getPrice();
-        return i;
-    }
-    */
-    //@PostMapping("/hub/{userId}")
-    @PostMapping("/hub")
-    public ResponseDto registHub(//@RequestBody HubInfoVo hubInfoVo
-                                 //@PathVariable("userId") Long userId,
-                                 @AuthenticationPrincipal UserPrincipal userPrincipal,
-                                 @RequestParam("hubName") String  hubName,
-                                 @RequestParam("externalIp") String  externalIp,
-                                 @RequestParam("internalIp") String  internalIp,
-                                 @RequestParam("externalPort") int externalPort,
-                                 @RequestParam("internalPort") int internalPort,
-                                 @RequestParam("macAddr") String  macAddress) {
-
-        HubInfoDto hub = null;
-
-        hub = HubInfoDto.builder()
-                /*.hubName(hubInfoVo.getHubName())
-                .externalIp(hubInfoVo.getExternalIp())
-                .externalPort(hubInfoVo.getExternalPort())
-                .internalIp(hubInfoVo.getInternalIp())
-                .internalPort(hubInfoVo.getInternalPort())*/
-                .hubName(hubName)
-                .externalIp(externalIp)
-                .externalPort(externalPort)
-                .internalIp(internalIp)
-                .internalPort(internalPort)
-                .beforeIp(null)
-                // Mac Address
-                .lastUsedTime(Timestamp.valueOf(LocalDateTime.now()))
-                .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
-                .createdAt(Timestamp.valueOf(LocalDateTime.now()))
-                .state(true)
-                .adminId(userPrincipal.getId())
-                //.adminSeq(userId)
-                .build();
-
-
-
-        // not yet set hubSeq
-        RoleDto role = RoleDto.builder()
-                //.userSeq(userId)    // userPrincipal.getId();
-                .userId(userPrincipal.getId())    // userPrincipal.getId();
-                .role(ROLE_ADMIN)
-                .build();
-
-        // log
-        log.info(role.toString());
-        log.info(hub.toString());
-
-        // 정상적으로 저장시 허브 서버에 "success"를 전송한다.
-        // 정보를 받은 허브 서버는 react app으로 success status 전달한 이후에 허브는 사설 ip 저장 -> station 모드 실행
-        return hubRegisterService.register(hub, role);
-    }
-
-
-
     // hub edit, admin만 수행 가능
     @PutMapping("/hub")
     public ResponseDto editHub(//@PathVariable("userId") Long userId,
                                @AuthenticationPrincipal UserPrincipal userPrincipal,
-                               @RequestBody HubInfoVo hubInfoVo) {
+                               @RequestBody HubVo hubInfoVo) {
 
         ResponseDto responseDto = new ResponseDto().builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -215,7 +171,7 @@ public class HubController {
         log.info(hubInfoVo.toString());
 
         responseDto.setMsg(FAIL_MSG_NO_EXIST_HUB);
-        HubInfoDto hub = hubMapper.getHubInfo(hubInfoVo.getHubSequence());
+        HubInfoDto hub = hubMapper.getHubInfo(hubInfoVo.getHubId());
         if(hub == null)                 return responseDto;
 
         log.info(hub.toString());
@@ -224,22 +180,11 @@ public class HubController {
         if(userPrincipal.getId() != hub.getAdminId()) return responseDto;
         //if(userId != hub.getAdminSeq()) return responseDto;
 
-        return hubEditService.editer(hubInfoVo);
-    }
-
-
-
-    // UPnP 수행 이후, 할당 받은 Ip가 이전 Ip와 다르다면 스킬 서버로 데이터를 전송해서
-    // Ip 수정 실시
-    @PutMapping("/hub/upnpIp")
-    public ResponseDto updateUpnpIp(@RequestBody HubInfoVo hub) {
-
-        log.info(hub.toString());
-
-        return ResponseDto.builder()
-                .msg("UPNP IP")
-                .status(HttpStatus.OK)
-                .build();
+        return hubEditService.editer(hubInfoVo.getHubId(),
+                                     hubInfoVo.getExternalIp(),
+                                     hubInfoVo.getInternalIp(),
+                                     hubInfoVo.getExternalPort(),
+                                     hubInfoVo.getInternalPort());
     }
 
 
@@ -251,7 +196,7 @@ public class HubController {
     public ResponseDto getHubsSeqAndNameByAdminId(@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         // get hubs by adminId
-        List<HubTableVo> hubInfoList = hubSelectService.getHubsInfoByadminId(userPrincipal.getId());
+        List<HubInfoDto> hubInfoList = hubSelectService.getHubsInfoByadminId(userPrincipal.getId());
         if(hubInfoList == null) {
             return ResponseDto.builder()
                     .msg(FAIL_MSG_NO_HUB_REGISTED_AS_ADMIN)
@@ -263,7 +208,8 @@ public class HubController {
         // set hubsSeqAndName,  <Long == hubSeq, String == hubName>
         Map<Long, String> hubsSeqAndName = new HashMap<Long, String>();
         for(int i = 0; i < hubInfoList.size(); i++) {
-            hubsSeqAndName.put(hubInfoList.get(i).getHub_sequence(), hubInfoList.get(i).getHub_name());
+            //hubsSeqAndName.put(hubInfoList.get(i).getHub_sequence(), hubInfoList.get(i).getHub_name());
+            hubsSeqAndName.put(hubInfoList.get(i).getHubId(), hubInfoList.get(i).getHubName());
         }
 
         // return <Long == hubSeqs, String == hubNames>

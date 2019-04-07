@@ -1,7 +1,5 @@
 package chatbot.api.email;
 
-import chatbot.api.common.domain.ResponseDto;
-import chatbot.api.common.domain.kakao.openbuilder.RequestDto;
 import chatbot.api.email.domain.SignUpDataVo;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

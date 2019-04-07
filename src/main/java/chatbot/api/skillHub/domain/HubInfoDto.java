@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
 @Data
@@ -17,6 +18,12 @@ public class HubInfoDto {
     private Long adminId;
 
     private String hubName;
+
+    private String hubDescript;
+
+    private String hubSearchId;
+
+    private String macAddr;
 
     private String externalIp;
 

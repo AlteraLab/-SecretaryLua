@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class Component {
+public class ComponentBasicCard {
 
     private BasicCard basicCard;
 }

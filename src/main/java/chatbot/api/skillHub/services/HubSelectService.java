@@ -1,9 +1,8 @@
 package chatbot.api.skillHub.services;
 
 import chatbot.api.mappers.HubMapper;
-import chatbot.api.skillHub.domain.HubTableVo;
+import chatbot.api.skillHub.domain.HubInfoDto;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,22 +11,22 @@ import java.util.List;
 @AllArgsConstructor
 public class HubSelectService {
 
-    //@Autowired
     private HubMapper hub;
 
-    // get hubs by adminId
-    public List<HubTableVo> getHubsInfoByadminId(Long adminId) {
 
-        List<HubTableVo> hubsInfoList;
+
+    // get hubs by adminId
+    public List<HubInfoDto> getHubsInfoByadminId(Long adminId) {
+
+        List<HubInfoDto> hubsInfoList = null;
 
         try {
             hubsInfoList = hub.getHubInfoByAdminId(adminId);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            return hubsInfoList;
         }
-
-        return hubsInfoList;
     }
-
 }

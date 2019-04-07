@@ -16,7 +16,7 @@ public class HubConstants {
     public static final String SUCCESS_MSG_GET_HUBS_SEQ_AND_NAME = "success : List of id and name of hub registered as admin";
 
 
-    public static final String FAIL_MSG_DELETE_HUB_BECAUSE_NO_EXIST = "fail : No exist hub";
+    public static final String FAIL_MSG_BECAUSE_NO_EXIST = "fail : No exist hub";
 
     public static final String FAIL_MSG_DELETE_HUB_BECAUSE_NO_ADMIN  = "fail : Exist hub but You are not a hub admin";
 

@@ -9,11 +9,16 @@ spring:
 
   # redis test
   redis:
-    #host: localhost
-    #url: redis://192.168.99.100:6379
     host: 192.168.99.100
     port: 6379
 
+  datasource:
+    url: jdbc:mariadb://192.168.99.100:3307/skill_server
+    username: root
+    password: tkddnjs234
+    driver-class-name: org.mariadb.jdbc.Driver
+    dbcp2:
+      validation-query: SELECT 1
   #  datasource:
 #    url: jdbc:mariadb://192.168.99.101:3306/lua
 #    username: root
@@ -21,13 +26,13 @@ spring:
 #    driver-class-name: org.mariadb.jdbc.Driver
 #    dbcp2:
 #      validation-query: SELECT 1
-  datasource:
-    url: jdbc:mariadb://127.0.0.1:3307/skill_server
-    username: root
-    password: 1111
-    driver-class-name: org.mariadb.jdbc.Driver
-    dbcp2:
-      validation-query: SELECT 1
+#  datasource:
+#    url: jdbc:mariadb://127.0.0.1:3307/skill_server
+#    username: root
+#    password: 1111
+#    driver-class-name: org.mariadb.jdbc.Driver
+#    dbcp2:
+#      validation-query: SELECT 1
 
   security:
     oauth2:

@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class Component {
+public class ComponentSimpleText {
 
     private SimpleText simpleText;
 }
