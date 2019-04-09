@@ -4,10 +4,8 @@ import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.skillHub.domain.HubInfoDto;
 import chatbot.api.skillHub.domain.HubVo;
-import com.sun.mail.iap.Response;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +23,13 @@ public class HubEditService {
 
 
 
-    public ResponseDto editer(Long hubId,
+    public ResponseDto editer(String macAddr,
+                              String hubName,
+                              String searchId,
+                              String desc,
                               String externalIp,
-                              String internalIp,
                               int externalPort,
-                              int internalPort) {
+                              String beforeIp) {
 
 
         ResponseDto responseDto = ResponseDto.builder()
@@ -38,11 +38,13 @@ public class HubEditService {
                 .build();
 
         try {
-            hubMapper.editHubAboutIpAndPort(hubId,
-                                            externalIp,
-                                            internalIp,
-                                            externalPort,
-                                            internalPort);
+            hubMapper.editHub(macAddr,
+                            hubName,
+                            searchId,
+                            desc,
+                            externalIp,
+                            externalPort,
+                            beforeIp);
 
             responseDto.setStatus(HttpStatus.OK);
             responseDto.setMsg(SUCCESS_MSG_EDIT_HUB);
@@ -66,7 +68,7 @@ public class HubEditService {
                 .status(HttpStatus.OK)
                 .build();
 
-
+/*
         ResponseDto responseDto = hubEditService.editer(hub.getHubId(),
                                                         hubInfoVo.getExternalIp(),
                                                         hubInfoVo.getInternalIp(),
@@ -76,5 +78,7 @@ public class HubEditService {
         if(responseDto.getMsg().equals(SUCCESS_MSG_EDIT_HUB)) responseDto.setMsg("UPNP IP");
 
         return responseDto;
+*/
+        return ResponseDto.builder().build();
     }
 }

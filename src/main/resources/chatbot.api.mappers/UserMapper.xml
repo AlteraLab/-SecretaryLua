@@ -12,7 +12,7 @@
     </select>
 
 
-    <!-- userId를 이용하여 userinfo get, optional 안씀 -->
+    <!-- userId 를 이용하여 userinfo get, optional 안씀 -->
     <select id="getUserByUserId" resultMap="UserInfoDto" parameterType="Long">
         SELECT * FROM users WHERE user_id = #{userId}
     </select>

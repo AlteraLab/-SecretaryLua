@@ -52,12 +52,14 @@ public interface HubMapper {
     void implicitDeleteHub(@Param("expireDate") Date expireDate);
 
 
-    // edit hub info about (external ip / port), (internal ip / port)
-    void editHubAboutIpAndPort(@Param("hubId") Long hubId,
-                               @Param("exIp") String exIp,
-                               @Param("inIp") String inIp,
-                               @Param("exPort") int exPort,
-                               @Param("inPort") int inPort);
+    // edit hub info
+    void editHub(@Param("macAddr") String macAddr,
+                 @Param("name") String hubName,
+                 @Param("searchId") String searchId,
+                 @Param("desc") String hubDescription,
+                 @Param("externalIp") String externalIp,
+                 @Param("externalPort") int externalPort,
+                 @Param("beforeIp") String beforeIp);
 
 
 

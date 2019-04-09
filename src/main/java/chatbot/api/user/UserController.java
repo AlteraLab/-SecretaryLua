@@ -37,19 +37,17 @@ public class UserController {
 
 
     // 메인 페이지에 보여질 사용 가능한 허브들에 대한 정보들을 반환하는 기능
-    //@GetMapping(value = "/{userId}")
     @GetMapping(value = "/user")
-    public ResponseDto kakaoAuthoriaztion(//@PathVariable("userId") Long userId
-                                          @AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         // 1. 유저 디비 createdAt / updatedAt 추가 후, 기존 기능들 정상적으로 수행되는지 확인
-        UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
-        //UserInfoDto userInfoDto = userMapper.getUser(userId).get();  // 실험용
+        //UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
+        UserInfoDto userInfoDto = userMapper.getUser(new Long(1)).get();
 
         // 2. 사용자가 사용할 수 있는 허브들에 대해서 hub + role 조인해서 데이터들 모두 메모리로 가져오기
         List<HubVo> hubsInfoList;
-        hubsInfoList = hubMapper.getHubsInfoByUserId(userPrincipal.getId());
-        //hubsInfoList = hubMapper.getHubsInfoByUserId(userId);
+        //hubsInfoList = hubMapper.getHubsInfoByUserId(userPrincipal.getId());
+        hubsInfoList = hubMapper.getHubsInfoByUserId(new Long(1));
 
         return ResponseDto.builder()
                 .msg("userInfoDto information")

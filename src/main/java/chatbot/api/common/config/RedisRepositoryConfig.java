@@ -1,11 +1,13 @@
 package chatbot.api.common.config;
 
+import chatbot.api.order.domain.MainOrder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -24,29 +26,42 @@ public class RedisRepositoryConfig {
     }
 
     @Bean
+    RedisTemplate<String, MainOrder> redisTemplate() {
+        RedisTemplate<String, MainOrder> redisTemplate = new RedisTemplate<String, MainOrder>();
+        redisTemplate.setConnectionFactory(jedisConnectionFactory());
+
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+
+        //redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(MainOrder.class));
+
+        redisTemplate.setHashKeySerializer(redisTemplate.getKeySerializer());
+        //redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+
+        redisTemplate.setHashValueSerializer(redisTemplate.getValueSerializer());
+        /*
+        // https://github.com/akihyro/try-spring-boot-with-redis/blob/master/src/main/java/akihyro/tryspringbootwithredis/RedisConfiguration.java
+        redisTemplate.setConnectionFactory(connectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
+        redisTemplate.setHashKeySerializer(redisTemplate.getKeySerializer());
+        redisTemplate.setHashValueSerializer(redisTemplate.getValueSerializer());
+         */
+        return redisTemplate;
+    }
+
+/*    @Bean
     RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(jedisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        //redisTemplate.setKeySerializer(new StringRedisSerializer());
+        //redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
-    }
+    }*/
     /*
-    private @Value("${spring.redis.host}") String redisHost;
-    private @Value("${spring.redis.port}") int redisPort;
-
-
-
-    // JedisConnectionFactory 반환
-    @Bean
-    JedisConnectionFactory jedisConnectionFactory() {
-        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
-        jedisConnectionFactory.setHostName(redisHost);
-        jedisConnectionFactory.setPort(redisPort);
-        jedisConnectionFactory.setUsePool(true);
-        return jedisConnectionFactory;
-    }
-
 
 
     @Bean

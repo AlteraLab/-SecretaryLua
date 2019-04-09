@@ -79,7 +79,7 @@ public class HubController {
 
         log.info(hub.toString());
         return hubRegisterService.register(userPrincipal.getId(), hub);
-        //return hubRegisterService.register(new Long(2), hub);
+        //return hubRegisterService.register(new Long(1), hub);
     }
 
 
@@ -180,11 +180,14 @@ public class HubController {
         if(userPrincipal.getId() != hub.getAdminId()) return responseDto;
         //if(userId != hub.getAdminSeq()) return responseDto;
 
+        return ResponseDto.builder().build();
+        /*
         return hubEditService.editer(hubInfoVo.getHubId(),
                                      hubInfoVo.getExternalIp(),
                                      hubInfoVo.getInternalIp(),
                                      hubInfoVo.getExternalPort(),
                                      hubInfoVo.getInternalPort());
+                                      */
     }
 
 

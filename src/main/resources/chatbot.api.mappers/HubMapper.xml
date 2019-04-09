@@ -91,14 +91,16 @@
 
 
     <!-- editHub -->
-    <update id="editHubAboutIpAndPort" parameterType="hashmap">
+    <update id="editHub" parameterType="hashmap">
 		UPDATE hub
 		SET
-		external_ip = #{exIp},
-		internal_ip = #{inIp},
-		external_port = #{exPort},
-		internal_port = #{inPort}
-		WHERE hub_id = #{hubId}
+        hub_name = #{name},
+        search_id = #{searchId},
+        hub_descript = #{desc},
+		external_ip = #{externalIp},
+		external_port = #{externalPort},
+		before_ip = #{beforeIp}
+		WHERE mac_addr = #{macAddr}
 	</update>
 
 

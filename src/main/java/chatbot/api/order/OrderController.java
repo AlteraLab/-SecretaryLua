@@ -20,12 +20,13 @@ public class OrderController {
 
     @PostMapping("/module/type")
     public ResponseDtoVerTwo callModuleType(@RequestBody RequestDto requestDto) {
+
         log.info(requestDto.toString());
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
         String devCategory = requestDto.getUserRequest().getUtterance();
         return orderResponseService.responserHubsAboutDevType(providerId, devCategory);
-    }
 
+    }
 
 
 
@@ -36,10 +37,12 @@ public class OrderController {
         String prividerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
         String hubSequence = requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", "");
         int hubSeq = Integer.parseInt(hubSequence);
+        System.out.println("hubSeq : " + hubSeq);
         log.info(requestDto.toString());
-        return orderResponseService.responserDevsAboutSpecificHub(prividerId, hubSeq);
+        return orderResponseService.responserDevsAboutSelectedHub(prividerId, hubSeq);
     }
 
+    ///////////////////////////////////////
 
 
     @PostMapping("/module/id")

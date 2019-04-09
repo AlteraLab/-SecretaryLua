@@ -1,30 +1,34 @@
 package chatbot.api.order.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
 @NoArgsConstructor
-public class SelectOrderVo implements Serializable {
+@AllArgsConstructor
+@Builder
+public class SelectOrderVo {
 
-    private String providerId;
+    // 전달 경로
+    private String externalIp;
 
-    private String devCategory;   // 디비에서 정보를 조회할 때 사용
-
-    private Long hubId;         // 디비에서 정보를 조회할 때 사용
-
-    private String externalIp;    // 데이터를 전송할 허브 경로
-
-    private int externalPort;  // 데이터를 전송할 허브 경로
+    private int externalPort;
 
 
-    private String devMacAddr;    // 디바이스 고유 번호
+    // 전달하는 데이터들
+    private String devMacAddr;
 
-    private String cmdCode;       // 명령 코드 번호
+    private int cmdCode;
 
-    private String cmdType;       // Dynamic or Static
+    private char cmdType;
 
-    private String dynamicInput;  // Dynamic Input
+
+    // step 4 때 저장하는 데이터, (만약 사용자가 선택한 명령이 동적 명령이라면)
+    private int dyCmdInput;
+
+    private String dyCmdQuestion;   // 해당 동적 명령이 사용자에게 보여줄 질문
+
+    private String dyCmdInputExam;  // 해당 동적 명령의 입력 예
 }

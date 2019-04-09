@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
@@ -40,31 +41,40 @@ public class HubRegisterService {
 
     private RestTemplate restTemplate;
 
-    /*
-                                 String macAddress,
-                                String hubName,
-                                String hubDescript,
-                                String hubSearchId,
-                                String externalIp,
-                                String internalIp,
-                                int externalPort,
-                                int internalPort
-     */
+
+
     @Transactional
     public ResponseDto register(Long userId, HubVo hubVo) {
 
-        //HubInfoDto hub = hubMapper.getHubInfoByMacAddr(hubVo.getMacAddr());
-  /*
-        HubInfoDto hub = hubMapper.getHubInfoByMacAddr(testVo.getMac());
-        if (!(hub == null)) {
-            return hubEditService.editer(hub.getHubId(),
-                                         hub.getExternalIp(),
-                                         hub.getInternalIp(),
-                                         hub.getExternalPort(),
-                                         hub.getInternalPort());
+        HubInfoDto hub = null;
+
+        // reactApp으로 부터 받은 beforeIp가 존재한다면, Ip가 바꼈다는 의미니까 hubEdit 실시
+        if(hubVo.getBeforeIp() != null) {
+
+            hub = hubMapper.getHubInfoByMacAddr(hubVo.getMacAddr());
+
+            // 허브 조회 결과 만약 허브가 없다면
+            try {
+                if(hub == null)  throw new Exception();
+            } catch (Exception e) {
+                log.info("해당 맥주소를 가진 허브가 없습니다.");
+                e.printStackTrace();
+                return ResponseDto.builder()
+                        .status(HttpStatus.EXPECTATION_FAILED)
+                        .build();
+            }
+
+            log.info("맥 주소 존재 O");
+            return hubEditService.editer(hubVo.getMacAddr(),
+                    hubVo.getName(),
+                    hubVo.getSearchId(),
+                    hubVo.getDesc(),
+                    hubVo.getExternalIp(),
+                    hubVo.getExternalPort(),
+                    hubVo.getBeforeIp());
         }
-*/
-        HubInfoDto hub = HubInfoDto.builder()
+
+        hub = HubInfoDto.builder()
                 .adminId(userId)
                 .hubName(hubVo.getName())
                 .hubDescript(hubVo.getDesc())
@@ -101,9 +111,6 @@ public class HubRegisterService {
                 return responseDto;
             }
 
-            boolean che = true;
-            System.out.println(String.valueOf(che));
-
             // hub 저장
             responseDto.setMsg(FAIL_MSG_REGIST_HUB_INTO_HUB_TABLE);
             hubMapper.save(hub);
@@ -113,7 +120,7 @@ public class HubRegisterService {
             role.setHubId(hub.getHubId());
             roleMapper.save(role);
 
-            String url = "http://203.250.32.29:" + hubVo.getExternalPort() + "/hub";
+/*            String url = "http://203.250.32.29:" + hubVo.getExternalPort() + "/hub";
             log.info(url);
 
             String resultByHub = restTemplate.postForObject(url, null, String.class);
@@ -125,7 +132,7 @@ public class HubRegisterService {
             if(resultByHub != "true") {
                 responseDto.setMsg(EXCEPTION_MSG_DURING_REGISTER);
                 throw new Exception();
-            }
+            }*/
 
             responseDto.setMsg(SUCCESS_MSG_REGIST_INTO_HUB_AND_ROLL);
             responseDto.setStatus(HttpStatus.OK);
