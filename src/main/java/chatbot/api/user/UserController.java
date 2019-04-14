@@ -40,14 +40,14 @@ public class UserController {
     @GetMapping(value = "/user")
     public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
-        // 1. 유저 디비 createdAt / updatedAt 추가 후, 기존 기능들 정상적으로 수행되는지 확인
-        //UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
-        UserInfoDto userInfoDto = userMapper.getUser(new Long(1)).get();
+        UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
+        //UserInfoDto userInfoDto = userMapper.getUser(new Long(1)).get();
 
-        // 2. 사용자가 사용할 수 있는 허브들에 대해서 hub + role 조인해서 데이터들 모두 메모리로 가져오기
         List<HubVo> hubsInfoList;
+        hubsInfoList = hubMapper.getHubsInfoByUserId(userInfoDto.getUserId());
         //hubsInfoList = hubMapper.getHubsInfoByUserId(userPrincipal.getId());
-        hubsInfoList = hubMapper.getHubsInfoByUserId(new Long(1));
+        // 바로 위, 일단 주석... 야밤에 코드 작성하니까 잘못 작성한듯...
+        //hubsInfoList = hubMapper.getHubsInfoByUserId(new Long(1));
 
         return ResponseDto.builder()
                 .msg("userInfoDto information")

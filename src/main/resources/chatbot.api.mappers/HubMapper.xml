@@ -135,9 +135,20 @@
     </select>
 
 
-
-    <!-- 사용자가 사용할 수 있는 허브들중에서 사용자가 요청한 장치 타입이 부착된 허브들을 조회 -->
-    <!-- 1. role.user_id = #{userId} , hub_name, external_ip, external_port-->
+    <select id="getUserHubsByUserId" resultMap="HubInfoDto" parameterType="Long">
+        SELECT
+        hub.hub_Id,
+        hub.hub_name,
+        hub.hub_descript,
+        hub.external_ip,
+        hub.external_port
+        FROM hub, (SELECT hub_id FROM hub_user WHERE user_id = #{userId}) AS owner
+        where hub.hub_id = owner.hub_id
+    </select>
+<!--
+    이거 쓸일 없을듯 ㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠ
+    &lt;!&ndash; 사용자가 사용할 수 있는 허브들중에서 사용자가 요청한 장치 타입이 부착된 허브들을 조회 &ndash;&gt;
+    &lt;!&ndash; 1. role.user_id = #{userId} , hub_name, external_ip, external_port&ndash;&gt;
     <select id="getHubInfoByDevCategory" resultMap="HubInfoDto" parameterType="hashmap">
       SELECT h.hub_id, h.hub_name, h.external_ip, h.external_port
       FROM dev AS d,
@@ -145,6 +156,7 @@
       (SELECT * FROM hub_user WHERE user_id = #{userId}) AS r WHERE hub.hub_id = r.hub_id) AS h
       WHERE d.hub_id = h.hub_id AND d.dev_category = #{devCategory}
     </select>
+-->
 
 
 

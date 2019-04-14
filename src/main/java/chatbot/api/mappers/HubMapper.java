@@ -44,6 +44,8 @@ public interface HubMapper {
     HubInfoDto getHubInfoByMacAddr(@Param("macAddr") String macAddr);
 
 
+    ArrayList<HubInfoDto> getUserHubsByUserId(@Param("userId") Long userId);
+
     // delete hub by hubSeq
     void deleteHub(Long hubSeq);
 
@@ -60,7 +62,4 @@ public interface HubMapper {
                  @Param("externalIp") String externalIp,
                  @Param("externalPort") int externalPort,
                  @Param("beforeIp") String beforeIp);
-
-
-
 }

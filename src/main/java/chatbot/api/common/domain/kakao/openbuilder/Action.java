@@ -3,14 +3,16 @@ package chatbot.api.common.domain.kakao.openbuilder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @Data
 @NoArgsConstructor
 public class Action {
 	private String name;
-	private Object clientExtra;
-	private Object params;
 	private String id;
-	private Object detailParams;
+	private Map<String, Object> clientExtra;
+	private Map<String, String> params;
+	private Map<String, Object> detailParams;
 }
 /*
 action": {

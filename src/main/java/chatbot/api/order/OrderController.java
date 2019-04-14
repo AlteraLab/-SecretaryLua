@@ -18,14 +18,13 @@ public class OrderController {
     private OrderResponseService orderResponseService;
 
 
-    @PostMapping("/module/type")
+    @PostMapping("/control/hubs")
     public ResponseDtoVerTwo callModuleType(@RequestBody RequestDto requestDto) {
 
         log.info(requestDto.toString());
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
         String devCategory = requestDto.getUserRequest().getUtterance();
-        return orderResponseService.responserHubsAboutDevType(providerId, devCategory);
-
+        return orderResponseService.responserHubs(providerId);
     }
 
 

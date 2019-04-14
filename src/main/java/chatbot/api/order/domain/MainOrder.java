@@ -20,19 +20,19 @@ public class MainOrder implements Serializable {
     private String providerId;
 
     // step 1 때 저장하는 데이터
-    private String devCategory;      // 모듈 목록을 조회할 때 쓰임
-    private ArrayList<HubOrderDto> hubOrderList;
+    private HubOrderDto[] hubOrderList;
     /*
     private int hubSeq;              // 디비에서 데이터를 뽑아왔을때 지정하는 시퀀스
                                      // 허브 목록을 보여줄 때 사용자에게 보여줄 데이터
     private Long hubId;              // 디비에 저장된 허브 정보의 시퀀스
     private String hubName;          // 허브 목록을 보여줄 때 사용자에게 보여줄 데이터
+    private String hubDescript;      // 허브 목록을 보여줄 때 사용자에게 보여줄 데이터
     private String explicitIp;       // 데이터를 보낼 경로
     private int explicitPort;        // 데이터를 보낼 경로
     */
 
     // step 2 때 저장하는 데이터
-    private ArrayList<DevOrderDto> devOrderList;
+    private DevOrderDto[] devOrderList;
     /*
     private int devSeq;             // 사용자에게 보여줄 데이터
     private String devName;         // 사용자에게 보여줄 데이터
@@ -43,7 +43,7 @@ public class MainOrder implements Serializable {
      */
 
     // step 3 때 저장하는 데이터
-    private ArrayList<CmdOrderDto> cmdOrderList;
+    private CmdOrderDto[] cmdOrderList;
     /*
     private int cmdSeq;    // 사용자에게 보여줄 데이터
     private int cmdCode;   // 사용자에게 보여줄 데이터
