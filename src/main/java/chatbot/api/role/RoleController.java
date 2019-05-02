@@ -26,6 +26,7 @@ public class RoleController {
     private RoleSelectService roleSelectService;
 
 
+
     // 관리자가 새로운 그룹 유저를 추가해주기 위해 호출하는 메소드
     // 일단은 invite 메시지 전송 기능을 생각하지 않고 기능 구현
     @PostMapping("/role")

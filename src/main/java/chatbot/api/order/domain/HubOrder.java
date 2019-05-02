@@ -11,13 +11,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HubOrderDto implements Serializable {
+public class HubOrder implements Serializable {
 
     private int hubSeq;
 
     private Long hubId;
-
-    private String hubName;
 
     private String explicitIp;
 

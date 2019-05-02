@@ -94,7 +94,7 @@ public class HubController {
 
 
 
-    // hub를 삭제해주는 메소드, 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블으 모듈들도 제거해주는 코드 작성
+    // hub를 삭제해주는 메소드, 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블의 모듈들도 제거해주는 코드 작성
     // 추후에 허브에 모듈이 붙으면 모듈들에 데이터를 제거하는 코드도 추가해야함.
     @DeleteMapping("/hub")
     public ResponseDto deleteHub(//@PathVariable("userId") Long userId,
@@ -191,7 +191,7 @@ public class HubController {
     }
 
 
-
+/*
     // 일단 만들었는데 안쓸수도 있음
     // get hubInfo<Long == hubSeq, String == hubName> by adminId, 수정 필요할듯...
     // 사용자가 허브 조회를 누르면 hubSeq와 hubName을 화면에 뿌려주는 메소드
@@ -222,5 +222,5 @@ public class HubController {
                 .status(HttpStatus.OK)
                 .data(hubsSeqAndName)
                 .build();
-    }
+    }*/
 }

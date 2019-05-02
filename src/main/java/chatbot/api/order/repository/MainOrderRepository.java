@@ -1,4 +1,4 @@
-package chatbot.api.order.Repository;
+package chatbot.api.order.repository;
 
 import chatbot.api.order.domain.MainOrder;
 

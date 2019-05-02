@@ -62,21 +62,18 @@ public class RoleRegisterService {
             // finish check list
 
 
-            // Init Create
-            role = new RoleDto().builder()
-                    .hubId(userRegisterVo.getHubId())
-                    .userId(user.getUserId())
-                    .role(ROLE_USER)
-                    .build();
-
-
             responseDto.setMsg(FAIL_MSG_REGIST_ROLE_INTO_ROLE_TABLE);
             roleMapper.save(role);
 
             responseDto.setMsg(SUCCESS_MSG_ADD_ROLE_USER);
             responseDto.setStatus(HttpStatus.CREATED);
-            responseDto.setData(role);
-
+            responseDto.setData(new Object(){
+                public RoleDto roleDto = RoleDto.builder()
+                        .hubId(userRegisterVo.getHubId())
+                        .userId(user.getUserId())
+                        .role(ROLE_USER)
+                        .build();
+            });
         } catch (Exception e) {
             log.info(EXCEPTION_MSG_DURING_REGISTER);
             e.printStackTrace();

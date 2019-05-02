@@ -1,30 +1,24 @@
 package chatbot.api.order.services;
 
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.QuickReply;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.simpleText.ComponentSimpleText;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.simpleText.SimpleText;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.SkillTemplate;
-import chatbot.api.common.services.KakaoBasicCardResponseService;
-import chatbot.api.common.services.KakaoSimpleTextResponseService;
+import chatbot.api.common.services.KakaoBasicCardService;
+import chatbot.api.common.services.KakaoSimpleTextService;
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.mappers.UserMapper;
-import chatbot.api.order.Repository.MainOrderRepositoryImpl;
-import chatbot.api.order.domain.DevOrderDto;
-import chatbot.api.order.domain.HubOrderDto;
-import chatbot.api.order.domain.MainOrder;
-import chatbot.api.order.domain.SelectOrderVo;
+import chatbot.api.order.domain.*;
+import chatbot.api.order.repository.MainOrderRepositoryImpl;
 import chatbot.api.skillHub.domain.HubInfoDto;
 import chatbot.api.user.domain.UserInfoDto;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 
+import static chatbot.api.order.utils.OrderConstans.*;
+
+// allargusconstru
 @Service
-@AllArgsConstructor
 @Slf4j
 public class OrderResponseService {
 
@@ -32,206 +26,278 @@ public class OrderResponseService {
 
     private UserMapper userMapper;
 
-    private KakaoBasicCardResponseService kakaoBasicCardResponseService;
+    private KakaoBasicCardService kakaoBasicCardService;
 
-    private KakaoSimpleTextResponseService kakaoSimpleTextResponseService;
+    private KakaoSimpleTextService kakaoSimpleTextService;
 
     private MainOrderRepositoryImpl mainOrderRepository;
 
+    private OrderSaveService orderSaveService;
+
     private RestTemplate restTemplate;
+
+    // 가상 데이터 세팅
+    private DevOrder[] devs;
+    private CmdOrder[] cmds;
+
+
+
+    public OrderResponseService(HubMapper hubmapper, UserMapper userMapper, KakaoBasicCardService kakaoBasicCardService, KakaoSimpleTextService kakaoSimpleTextService, MainOrderRepositoryImpl mainOrderRepository, OrderSaveService orderSaveService, RestTemplate restTemplate) {
+        this.hubmapper = hubmapper;
+        this.userMapper = userMapper;
+        this.kakaoBasicCardService = kakaoBasicCardService;
+        this.kakaoSimpleTextService = kakaoSimpleTextService;
+        this.mainOrderRepository = mainOrderRepository;
+        this.orderSaveService = orderSaveService;
+        this.restTemplate = restTemplate;
+
+        this.devs = new DevOrder[2];
+        this.cmds = new CmdOrder[9];
+
+        this.devs[0] = DevOrder.builder().devName("상원이").devIdentifier("AC 05").devMacAddr("12:12:12:12:12:12").build();
+        this.devs[1] = DevOrder.builder().devName("정윤이").devIdentifier("AC 04").devMacAddr("12:12:12:12:12:12").build();
+
+
+        this.cmds[0] = CmdOrder.builder().cmdName("on").description("에어컨 켜기").cmdCode(1).parentCode(-1).blockId(BLOCK_ID_CODE_LIST).build();
+        this.cmds[1] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(2).parentCode(-1).blockId(BLOCK_ID_EXIT).build();
+
+        this.cmds[2] = CmdOrder.builder().cmdName("시간 설정").description("에어컨 시간 설정").cmdCode(3).parentCode(1).blockId(BLOCK_ID_D_TIME_SET).build();
+        this.cmds[3] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(4).parentCode(1).blockId(BLOCK_ID_EXIT).build();
+
+        this.cmds[4] = CmdOrder.builder().cmdName("강약 조절").description("강약 조절 설정").cmdCode(5).parentCode(3).blockId(BLOCK_ID_D_BUTTON).btnList("강,중,약,자동").btnTitle("조절 버튼 목록입니다.").build();
+        this.cmds[5] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(6).parentCode(3).blockId(BLOCK_ID_EXIT).build();
+
+        this.cmds[6] = CmdOrder.builder().cmdName("온도 입력").description("온도 설정").cmdCode(7).parentCode(5).blockId(BLOCK_ID_D_DIRECT_INPUT).directTitle("온도를 입력하세요.").inputEx(26).build();
+        this.cmds[7] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(8).parentCode(5).blockId(BLOCK_ID_EXIT).build();
+
+        this.cmds[8] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(9).parentCode(7).blockId(BLOCK_ID_EXIT).build();
+    }
+
 
 
     // 사용자가 이용할 수 있는 허브들 리턴
     public ResponseDtoVerTwo responserHubs(String providerId) {
 
-        ResponseDtoVerTwo responseDtoVerTwo = new ResponseDtoVerTwo();
-
-        if(providerId == null) {
-            return responseDtoVerTwo = kakaoBasicCardResponseService.responserRequestPreSignUp();
+        if (mainOrderRepository.find(providerId) != null) {
+            // 밑에 대신 redis에 있는 데이터를 삭제하는 편이 낳을듯
+            // return kakaoSimpleTextService.responserShortMsg("이미 진행중인 명령이 존재합니다.");
         }
+
+        if (providerId == null) {
+            return kakaoBasicCardService.responserRequestPreSignUp();
+        }
+
 
         UserInfoDto user = userMapper.getUserByProviderId(providerId).get();
-        log.info(user.toString());
-        if(user == null) {
-            return responseDtoVerTwo = kakaoSimpleTextResponseService.responserShortMsg("등록되지 않은 사용자 입니다.");
+        if (user == null) {
+            return kakaoSimpleTextService.responserShortMsg("등록되지 않은 사용자 입니다.");
         }
 
-        if(!(providerId.equals(user.getProviderId()))) {
-            return responseDtoVerTwo = kakaoSimpleTextResponseService.responserShortMsg("아이디가 동일하지 않습니다.");
+        if (!(providerId.equals(user.getProviderId()))) {
+            return kakaoSimpleTextService.responserShortMsg("동일한 사용자가 아닙니다.");
         }
-        
+
         // 명령 시나리오대로 코드 작성
 
-        // 1. 데이터베이스에서 사용자가 사용할 수 있는 허브목록 Get
+        // 데이터베이스에서 사용자가 사용할 수 있는 허브목록 Get
         ArrayList<HubInfoDto> hubs = hubmapper.getUserHubsByUserId(user.getUserId());
-        log.info(hubs.toString());
-        if(hubs == null) {
-            return responseDtoVerTwo = kakaoSimpleTextResponseService.responserShortMsg("사용 가능한 허브가 없습니다.");
+        if (hubs == null) {
+            return kakaoSimpleTextService.responserShortMsg("사용 가능한 허브가 없습니다.");
         }
 
-        // 2. "응답" 꾸미기
-        SimpleText text = new SimpleText();
-        StringBuffer responseMsg = new StringBuffer("사용할 수 있는 허브 목록 입니다.\n\n");
-        responseMsg.append("허브 번호  :  허브 이름 : 허브 설명\n\n");
-        for(int i = 0; i < hubs.size(); i++) {
-            responseMsg.append((i + 1) + " : " + hubs.get(i).getHubName() + " : " + hubs.get(i).getHubDescript() + "\n");
-        }
-        responseMsg.append("\n버튼을 클릭해주세요.");
-        text.setText(responseMsg.toString());
+        // redis에 데이터 저장
+        orderSaveService.saverHubOrders(providerId, hubs);
 
-        ComponentSimpleText simpleText = new ComponentSimpleText();
-        simpleText.setSimpleText(text);
+        // 만약 사용가능한 허브가 1개 라면, 허브로 Resttemplate를 때린다.
+        if (hubs.size() == 1) {
+            String url = new String("http://" + hubs.get(0).getExternalIp() + ":" + hubs.get(0).getExternalPort());
+            System.out.println("URL >> " + url);
+            //DevOrder [] devs = restTemplate.getForObject(url, DevOrder[].class);
 
-        ArrayList<Object> outputs = new ArrayList<Object>();
-        outputs.add(simpleText);
+            MainOrder reMainOrder = mainOrderRepository.find(providerId);
+            reMainOrder.setSelectOrder(SelectOrder.builder()
+                    .externalIp(hubs.get(0).getExternalIp())
+                    .externalPort(hubs.get(0).getExternalPort())
+                    .build());
+            mainOrderRepository.save(reMainOrder);
 
-        // 3. "버튼" 꾸미기
-        ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
-        QuickReply[] quickReply = new QuickReply[hubs.size()];
-        for (int i = 0; i < hubs.size(); i++) {
-            
-            QuickReply quick = QuickReply.builder()
-                    .label(Integer.toString(i + 1))
-                    .action("block")
-                    .messageText("허브 " + (i + 1) + "번")
-                    .blockId("5c7670efe821274ba78984c4")
-                    .build();
+            if(devs.length == 1) {
+                // 여기서도 마찬가지로 devs[0].getDevMacAddr() 을 이용해서 DB에서 Cmds를 가져와야 한다.
+                // ********************
+                // CmdOrder[] cmds = null;
 
+                reMainOrder.getSelectOrder().setDevMacAddr(devs[0].getDevMacAddr());
+                mainOrderRepository.save(reMainOrder);
+                orderSaveService.saverCmdOrders(providerId, cmds);
 
-            try {
-                quickReply[i] = (QuickReply) quick.clone();
-                quickReplies.add(quickReply[i]);
-            } catch (Exception e) {
-                e.printStackTrace();
+                return kakaoBasicCardService.makerCmdsCard(providerId, -1);
             }
+
+            orderSaveService.saverDevOrders(providerId, devs);
+            return kakaoBasicCardService.makerDevsCard(devs);
         }
 
-        SkillTemplate template = new SkillTemplate(outputs, quickReplies);
-
-        responseDtoVerTwo.setVersion("2.0");
-        responseDtoVerTwo.setTemplate(template);
-
-
-        // mainOrder (유지되어야 할 데이터를 담음) In-Memory에 저장
-        MainOrder mainOrder = MainOrder.builder()
-                .providerId(providerId)
-                .build();
-
-        // mainOrder 데이터 set
-        HubOrderDto[] hubOrders = new HubOrderDto[hubs.size()];
-        for(int i = 0; i < hubs.size(); i++) {
-            HubOrderDto hubOrderDto = HubOrderDto.builder()
-                    .hubSeq(i + 1)
-                    .hubId(hubs.get(i).getHubId())
-                    .explicitIp(hubs.get(i).getExternalIp())
-                    .explicitPort(hubs.get(i).getExternalPort())
-                    .build();
-            hubOrders[i] = hubOrderDto;
-        }
-        mainOrder.setHubOrderList(hubOrders);
-        log.info("MainOrders : " + mainOrder.toString());
-
-        // 저장
-        mainOrderRepository.save(mainOrder);
-
-        // 5. 사용자에게 응답.
-        return responseDtoVerTwo;
+        return kakaoBasicCardService.makerHubsCard(hubs);
     }
 
 
 
-
-
     // 사용자가 발화한 허브 번호를 파싱해서 매개변수로 받는다.
-    // 사용자 측에 해당 허브가 사용할 수 있는 모듈들 중에서 이전에 발화했던 모듈 타입들을 리스트로 뽑아준다.
-    public ResponseDtoVerTwo responserDevsAboutSelectedHub(String providerId, int hubSeq) {
+    public ResponseDtoVerTwo responserDevs(String providerId, int hubSeq) {
 
-        ResponseDtoVerTwo responseDtoVerTwo = new ResponseDtoVerTwo();
+        MainOrder reMainOrder = mainOrderRepository.find(providerId);
 
-        // redis에서 providerId를 key 값으로해서 데이터를 가져온다.
-        MainOrder mainOrder = mainOrderRepository.find(providerId);
-        log.info(mainOrder.toString());
+        reMainOrder.setSelectOrder(SelectOrder.builder()
+                .externalIp(reMainOrder.getHubOrderList()[hubSeq - 1].getExplicitIp())
+                .externalPort(reMainOrder.getHubOrderList()[hubSeq - 1].getExplicitPort())
+                .build());
 
-        // 전달할 데이터 경로 셋팅
-        mainOrder.setSelectOrderVo(SelectOrderVo.builder()
-                                .externalIp(mainOrder.getHubOrderList()[(hubSeq - 1)].getExplicitIp())
-                                .externalPort(mainOrder.getHubOrderList()[(hubSeq - 1)].getExplicitPort())
-                                .build());
-        log.info("SelectOrderVo : " + mainOrder.getSelectOrderVo());
-        log.info("사용자가 뽑은놈 : " + mainOrder.getHubOrderList()[(hubSeq - 1)].toString());
+        mainOrderRepository.save(reMainOrder);
 
-        // 0. 허브로 restTemplate 를 날려서, 사용가능한 장치들에 대한 데이터를 가져와야 한다.
-        String url = new String("http://" + mainOrder.getSelectOrderVo().getExternalIp() + mainOrder.getSelectOrderVo().getExternalPort());
-        DevOrderDto[] devs = restTemplate.getForObject(url, DevOrderDto[].class);
+        String url = new String("http://" + reMainOrder.getSelectOrder().getExternalIp() + reMainOrder.getSelectOrder().getExternalPort());
+        //DevOrder[] devs = restTemplate.getForObject(url, DevOrder[].class);
 
-        // 0-1. devs를 redis에 저장하는 코드 작성.
-       for(int i = 0; i < devs.length; i++) {
-           devs[i].setDevSeq(i + 1);
-           log.info(i + 1 + "번 : " + devs[i].toString());
-       }
-        mainOrder.setDevOrderList(devs);
-        log.info("Devs : " + devs.toString());
-        log.info("MainOrders : " + mainOrder.toString());
-        log.info("mainOrder.getDevOrderList() : " + mainOrder.getDevOrderList().toString());
+        // devs를 redis에 저장하는 코드 작성.
+        orderSaveService.saverDevOrders(providerId, devs);
 
-        // 1. 응답 꾸미기
-        /*
-        devSeq / devName / devIdentifier
-         */
-        SimpleText text = new SimpleText();
-        StringBuffer responseMsg = new StringBuffer("사용할 수 있는 모듈 목록 입니다.");
-        responseMsg.append("모듈 번호  :  모듈 이름  :  식별명\n\n");
-        for (int i = 0; i < devs.length; i++) {
-            responseMsg.append((i + 1) + " : " + devs[i].getDevName() + " : " + devs[i].getDevIdentifier());
+        if(devs.length == 1) {
+            // 여기서도 마찬가지로 devs[0].getDevMacAddr() 을 이용해서 DB에서 Cmds를 가져와야 한다.
+            // ********************
+            // CmdOrder[] cmds = null;
+            reMainOrder.getSelectOrder().setDevMacAddr(devs[0].getDevMacAddr());
+            mainOrderRepository.save(reMainOrder);
+            orderSaveService.saverCmdOrders(providerId, cmds);
+
+            return kakaoBasicCardService.makerCmdsCard(providerId, -1);
         }
-        responseMsg.append("\n버튼을 클릭해주세요.");
-        text.setText(responseMsg.toString());
 
-        ComponentSimpleText simpleText = new ComponentSimpleText();
-        simpleText.setSimpleText(text);
-
-        ArrayList<Object> outputs = new ArrayList<Object>();
-        outputs.add(simpleText);
+        return kakaoBasicCardService.makerDevsCard(devs);
+    }
 
 
 
-        // 2. 버튼 꾸미기
-        ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
-        QuickReply[] quickReply = new QuickReply[devs.length];
-        for(int i = 0; i < devs.length; i++) {
-            QuickReply quick = QuickReply.builder()
-                    .label(Integer.toString(i + 1))
-                    .action("message")
-                    .messageText("모듈" + (i + 1) + "번")
-                    .build();
+    // 사용자가 발화한 장치 번호를 파싱해서 매개변수로 받는다.
+    // 모듈 선택 시점에 최초에는 responserCmds 를 실행해서 최상위 노드들의 명령 코드들을 반환한다.
+    // 모듈 선택한 시점에 한 번만 쓰이는 메소드.
+    public ResponseDtoVerTwo responserCmds(String providerId, int devSeq) {
 
-            try {
-                quickReply[i] = (QuickReply) quick.clone();
-                quickReplies.add(quickReply[i]);
-            } catch (Exception e) {
-                e.printStackTrace();
+        MainOrder reMainOrder = mainOrderRepository.find(providerId);
+        reMainOrder.getSelectOrder().setDevMacAddr(reMainOrder.getDevOrderList()[devSeq - 1].getDevMacAddr());
+        mainOrderRepository.save(reMainOrder);
+
+        // 필수 구현 : DevIdentifier를 이용해서 데이터베이스에서 사용가능한 장비의 명령 정보들을 불러왔다고 치자.
+        // 나중에 DB Schema 설계 이후 mapper 작성
+        // DB에서 Cmds를 가져와야 한다.
+        //**************************************
+
+        // cmds를 redis에 저장하는 코드 작성.
+        orderSaveService.saverCmdOrders(providerId, cmds);
+
+        return kakaoBasicCardService.makerCmdsCard(providerId, -1);
+    }
+
+
+
+    // 모듈 선택 시점에 최초에는 responserCmds 를 실행해서 최상위 노드들의 명령 코드들을 반환한다.
+    // 그러나 그 이후에는 자식 노드들의 명령 코드들을 반환할 때는 아래의 메소드인 responserChildCmds 메소드가 쓰인다.
+    public ResponseDtoVerTwo responserChildCmds(String providerId, int selectedCode, String strCheck) {
+
+        MainOrder reMainOrder = mainOrderRepository.find(providerId);
+
+        // 만약 버튼 블록을 통해서 버튼을 클릭했다면, strCheck == "버튼", 이고 그게 아니라면 ""일것이다.
+        // 즉, strCheck가 "버튼" 이라면 selectedCode를 parentCode로 다시 파싱할 필요 없음
+        CmdOrder[] cmds = reMainOrder.getCmdOrderList();
+        int parentCode = -100;
+
+        if (strCheck == "") {
+            // 핵심 코드 : 최근에 선택된 명령어의 부모 명령어를 이용해서 사용자가 실제로 선택한 명령어의 실제 코드를 아는 코드
+            int cnt = 0;
+            for (int i = 0; i < cmds.length; i++) {
+                if (cmds[i].getParentCode() == reMainOrder.getCurrentParentCode()) {
+                    cnt++;
+                    if (cnt == selectedCode) {
+                        parentCode = cmds[i].getCmdCode();   // 사용자가 선택한 명령어의 실제 코드
+                        // 실제 선턱된 코드가 다음 parentCode 가 된다.
+                        log.info("break >> " + parentCode);
+                        break;
+                    }
+                }
+            }
+        } else if (strCheck == "버튼") {
+            parentCode = selectedCode; // strCheck가 "버튼" 일때는 selectedCode 가 이미 parentCode 이므로 값 그대로 대입한다.
+        }
+
+        // selectOrder에 데이터 삽입하는 코드 작성
+        /*
+
+         */
+
+        return kakaoBasicCardService.makerCmdsCard(providerId, parentCode);
+    }
+
+
+
+    public ResponseDtoVerTwo responserButtonCmds(String providerId, int selectedCode) {
+
+        MainOrder reMainOrder = mainOrderRepository.find(providerId);
+        CmdOrder[] cmds = reMainOrder.getCmdOrderList();
+        int parentCode = -100;
+        int cnt = 0;
+        for (int i = 0; i < cmds.length; i++) {
+            if (cmds[i].getParentCode() == reMainOrder.getCurrentParentCode()) {
+                cnt++;
+                if (cnt == selectedCode) {
+                    parentCode = cmds[i].getCmdCode();   // 사용자가 선택한 명령어의 실제 코드
+                    // 실제 선턱된 코드가 다음 parentCode 가 된다.
+                    log.info("break >> " + parentCode);
+                    break;
+                }
             }
         }
 
-        SkillTemplate template = new SkillTemplate(outputs, quickReplies);
+        reMainOrder.setCurrentParentCode(parentCode);
+        mainOrderRepository.save(reMainOrder);
 
-        responseDtoVerTwo.setVersion("2.0");
-        responseDtoVerTwo.setTemplate(template);
-
-
-
-        // 3. redis 로 부터 mainOrder의 값을 가져온다.
+        return kakaoBasicCardService.makerButtonCmdsCard(providerId, parentCode);
+    }
 
 
 
-        // 4. mainOrder 데이터 set
+    public ResponseDtoVerTwo responserDirectInput(String providerId, int selectedCode) {
+
+        MainOrder reMainOrder = mainOrderRepository.find(providerId);
+        CmdOrder[] cmds = reMainOrder.getCmdOrderList();
+        int parentCode = -100;
+        int cnt = 0;
+        for (int i = 0; i < cmds.length; i++) {
+            if (cmds[i].getParentCode() == reMainOrder.getCurrentParentCode()) {
+                cnt++;
+                if (cnt == selectedCode) {
+                    parentCode = cmds[i].getCmdCode();   // 사용자가 선택한 명령어의 실제 코드
+                    // 실제 선턱된 코드가 다음 parentCode 가 된다.
+                    log.info("break >> " + parentCode);
+                    break;
+                }
+            }
+        }
+
+        reMainOrder.setCurrentParentCode(parentCode);
+        mainOrderRepository.save(reMainOrder);
+
+        return kakaoSimpleTextService.makerDirectInputCard(providerId, parentCode);
+    }
 
 
 
-        // 5. redis에 mainOrder 데이터 저장
+    public ResponseDtoVerTwo responserChildCmdsAfterDirInput(String providerId, int dirInUtterance) {
+
+        MainOrder reMainOrder = mainOrderRepository.find(providerId);
+        int parentCode = reMainOrder.getCurrentParentCode();
+
+        // 여기서 dirInUtterance 를 허브에 전송할 selectcode 객체에 저장시켜줄 필요가 있음.
+        // 이건 나중에 구현하기
 
 
-
-        return ResponseDtoVerTwo.builder().build();
+        return kakaoBasicCardService.makerCmdsCard(providerId, parentCode);
     }
 }

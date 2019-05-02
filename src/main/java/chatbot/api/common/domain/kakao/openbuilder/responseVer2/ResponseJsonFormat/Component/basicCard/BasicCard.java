@@ -19,9 +19,9 @@ public class BasicCard {
 
     private Thumbnail thumbnail;
 
-    private Profile profile;
+    private Profile profile; // Profile 미지원
 
-    private Object social;
+    private Object social;   // Social 미지원
 
     private ArrayList<Button> buttons;
 }

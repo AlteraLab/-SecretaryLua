@@ -5,18 +5,24 @@ import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTw
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.simpleText.ComponentSimpleText;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.simpleText.SimpleText;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.SkillTemplate;
+import chatbot.api.order.domain.CmdOrder;
+import chatbot.api.order.domain.MainOrder;
+import chatbot.api.order.repository.MainOrderRepository;
+import chatbot.api.order.repository.MainOrderRepositoryImpl;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
 @Service
+@AllArgsConstructor
 @Slf4j
-public class KakaoSimpleTextResponseService {
+public class KakaoSimpleTextService {
+
+    private MainOrderRepositoryImpl mainOrderRepository;
 
 
-
-    // 짧은 메시지 responser
     public ResponseDtoVerTwo responserShortMsg(String msg) {
 
         SimpleText simpleTextVo = new SimpleText();
@@ -31,12 +37,46 @@ public class KakaoSimpleTextResponseService {
         SkillTemplate template = new SkillTemplate();
         template.setOutputs(outputs);
 
-        ResponseDtoVerTwo responseDtoVerTwo = ResponseDtoVerTwo.builder()
+        return new ResponseDtoVerTwo().builder()
                 .version("2.0")
                 .template(template)
                 .build();
+    }
 
-        return responseDtoVerTwo;
+
+
+    public ResponseDtoVerTwo makerDirectInputCard(String providerId, int parentCode) {
+
+        MainOrder reMainOrder = mainOrderRepository.find(providerId);
+        CmdOrder [] cmds = reMainOrder.getCmdOrderList();
+        CmdOrder directInputCmd = null;
+
+        for(int i = 0; i < cmds.length; i++) {
+            if(parentCode == cmds[i].getCmdCode()) {
+                directInputCmd = cmds[i];
+            }
+        }
+
+        log.info("직접 입력 버튼 코드 >> " + directInputCmd);
+
+        String msg = directInputCmd.getDirectTitle() + "\n\n아래 예시에 맞춰 입력해주세요.\n\nex) " + directInputCmd.getInputEx();
+
+        SimpleText simpleTextVo = new SimpleText();
+        simpleTextVo.setText(msg);
+
+        ComponentSimpleText simpleText = new ComponentSimpleText();
+        simpleText.setSimpleText(simpleTextVo);
+
+        ArrayList<Object> outputs = new ArrayList<>();
+        outputs.add(simpleText);
+
+        SkillTemplate template = new SkillTemplate();
+        template.setOutputs(outputs);
+
+        return new ResponseDtoVerTwo().builder()
+                .version("2.0")
+                .template(template)
+                .build();
     }
 
 

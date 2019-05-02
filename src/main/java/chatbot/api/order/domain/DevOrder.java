@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DevOrderDto implements Serializable {
+public class DevOrder implements Serializable {
 
     private int devSeq;             // 사용자에게 보여줄 데이터
 

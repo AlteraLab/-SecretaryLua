@@ -4,7 +4,7 @@ package chatbot.api.user;
 import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.common.domain.kakao.openbuilder.RequestDto;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
-import chatbot.api.common.services.KakaoBasicCardResponseService;
+import chatbot.api.common.services.KakaoBasicCardService;
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.skillHub.domain.HubVo;
 import chatbot.api.user.domain.UserInfoDto;
@@ -32,7 +32,7 @@ public class UserController {
     private HubMapper hubMapper;
 
     @Autowired
-    private KakaoBasicCardResponseService kakaoBasicCardResponseService;
+    private KakaoBasicCardService kakaoBasicCardService;
 
 
 
@@ -60,6 +60,7 @@ public class UserController {
     }
 
 
+
     // 유효한 토큰인지 체크
     @GetMapping("/userToken")
     public ResponseDto checkValidToken(@AuthenticationPrincipal UserPrincipal UserPrincipal) {
@@ -80,6 +81,7 @@ public class UserController {
     }
 
 
+
     // 이메일로 사용자 조회
     @GetMapping("/user/{email}")
     public ResponseDto getUserByEmail(@PathVariable(value = "email") String email) {
@@ -87,10 +89,9 @@ public class UserController {
         UserInfoDto user = userMapper.getUserByEmail(email);
         if (user == null) return ResponseDto.builder()
                 .msg(FAIL_MSG_SELECT_BY_EMAIL)
-                .status(HttpStatus.NO_CONTENT)
+                .status(HttpStatus.EXPECTATION_FAILED)
                 .data(null)
                 .build();
-        // NO_CONTENT : 요청에 대해서 보내줄 수 있는 콘텐츠가 없지만, 헤더는 의미있을 수 있다.
 
         // log
         log.info(user.toString());
@@ -120,7 +121,7 @@ public class UserController {
         }*/
 
         // 2-2. 확인 결과 없는 id 값이면, "등록 하세요" 실시!
-        return kakaoBasicCardResponseService.responserRequestJoin(requestDto.getUserRequest().getUser().getId());
+        return kakaoBasicCardService.responserRequestJoin(requestDto.getUserRequest().getUser().getId());
     }
 }
 

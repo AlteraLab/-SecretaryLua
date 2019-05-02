@@ -1,4 +1,4 @@
-package chatbot.api.order.Repository;
+package chatbot.api.order.repository;
 
 import chatbot.api.order.domain.MainOrder;
 import org.springframework.data.redis.core.HashOperations;
@@ -24,7 +24,7 @@ public class MainOrderRepositoryImpl implements MainOrderRepository {
 
     @Override
     public void save(MainOrder mainOrder) {
-        this.hashOperations.put(this.KEY, mainOrder.getProviderId(), mainOrder);
+        this.hashOperations.put(this.KEY, mainOrder.getHProviderId(), mainOrder);
     }
 
     @Override
