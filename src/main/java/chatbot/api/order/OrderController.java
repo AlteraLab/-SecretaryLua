@@ -3,6 +3,7 @@ package chatbot.api.order;
 import chatbot.api.common.domain.kakao.openbuilder.RequestDto;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
 import chatbot.api.common.services.KakaoSimpleTextService;
+import chatbot.api.order.domain.CmdOrder;
 import chatbot.api.order.domain.MainOrder;
 import chatbot.api.order.repository.MainOrderRepositoryImpl;
 import chatbot.api.order.services.OrderResponseService;
@@ -67,13 +68,12 @@ public class OrderController {
     }
 
 
-
     // http://203.250.32.29:8083/control/code/list
     @PostMapping("/control/code/list")
     public ResponseDtoVerTwo controlCodeList(@RequestBody RequestDto requestDto) {
 
         log.info("============ controlCodeList ============");
-        log.info("\n============ TEST TEST TEST TEST ============\n");
+/*        log.info("\n============ TEST TEST TEST TEST ============\n");
         MainOrder testMainOrder = mainOrderRepository.find(requestDto.getUserRequest().getUser().getProperties().getAppUserId());
         log.info("DevMacAddr    >> " + testMainOrder.getSelectOrder().getDevMacAddr());
         log.info("ExternalIp    >> " + testMainOrder.getSelectOrder().getExternalIp());
@@ -86,7 +86,7 @@ public class OrderController {
         for(int i = 0; i < testMainOrder.getCmdOrderList().length; i++) {
             log.info("Cmd[" + (i + 1) + "] >> " + testMainOrder.getCmdOrderList()[i]);
         }
-        log.info("\n============ TEST TEST TEST TEST ============\n");
+        log.info("\n============ TEST TEST TEST TEST ============\n");*/
 
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
         log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
@@ -97,7 +97,7 @@ public class OrderController {
         // 문제는 버튼 블럭에서 버튼을 선택했을때, 그 값이 parentCode가 되면 안된다.
         String utterance = requestDto.getUserRequest().getUtterance();
         String strCheck = "";
-        if(utterance.contains("버튼")) {
+        if (utterance.contains("버튼")) {
             MainOrder reMainOrder = mainOrderRepository.find(providerId);
             selectedCode = reMainOrder.getCurrentParentCode();
             strCheck = "버튼";
@@ -108,9 +108,9 @@ public class OrderController {
 
         log.info("selectedCode >> " + selectedCode);
 
+
         return orderResponseService.responserChildCmds(providerId, selectedCode, strCheck);
     }
-
 
 
     // http://203.250.32.29:8083/control/dev/time
@@ -121,7 +121,8 @@ public class OrderController {
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
         log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
         log.info(requestDto.toString());
-        int selectedCode = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));;
+        int selectedCode = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        ;
         log.info("selectedCode >> " + selectedCode);
 
         return orderResponseService.responserChildCmds(providerId, selectedCode, "");
@@ -136,12 +137,12 @@ public class OrderController {
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
         log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
         log.info(requestDto.toString());
-        int selectedCode = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));;
+        int selectedCode = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        ;
         log.info("selectedCode >> " + selectedCode);
 
         return orderResponseService.responserButtonCmds(providerId, selectedCode);
     }
-
 
 
     // http://203.250.32.29:8083/control/dev/directInput
@@ -152,12 +153,12 @@ public class OrderController {
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
         log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
         log.info(requestDto.toString());
-        int selectedCode = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));;
+        int selectedCode = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        ;
         log.info("selectedCode >> " + selectedCode);
 
         return orderResponseService.responserDirectInput(providerId, selectedCode);
     }
-
 
 
     // http://203.250.32.29:8083/control/dev/directInput/context
@@ -169,12 +170,12 @@ public class OrderController {
         log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
         log.info(requestDto.toString());
 
-        int dirInUtterance = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));;
+        int dirInUtterance = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        ;
         log.info("dirInUtterance >> " + dirInUtterance);
 
         return orderResponseService.responserChildCmdsAfterDirInput(providerId, dirInUtterance);
     }
-
 
 
     // http://203.250.32.29:8083/control/exit
@@ -185,13 +186,27 @@ public class OrderController {
         log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
         log.info(requestDto.toString());
 
-        String utterance = requestDto.getUserRequest().getUtterance();
-        int selectedCode = -100;
-        if(!utterance.equals("명령 전송")) {
-            selectedCode = Integer.parseInt(utterance.replaceAll("[^0-9]", ""));;
-        }
-        log.info("selectedCode >> " + selectedCode);
+        // 명령을 허브로 전송한다.
 
-        return kakaoSimpleTextService.responserShortMsg("명령을 전송하였습니다.");    
+        // 명령을 제거한다.
+
+        // "시바" 버튼이 달린 메시지를 전송한다.
+        return kakaoSimpleTextService.responserTransferCompleteText();
+    }
+
+
+    // http://203.250.32.29:8083/control/main
+    @PostMapping("/control/main")
+    public ResponseDtoVerTwo controlMain(@RequestBody RequestDto requestDto) {
+
+        log.info("============ controlMain ============");
+        log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
+        log.info(requestDto.toString());
+
+        // redis에 있는 빌딩된 명령을 제거한다.
+
+        // 그리고 사용자에게 "시바" 버튼이 달린
+
+        return kakaoSimpleTextService.responserCancleCompleteText();
     }
 }

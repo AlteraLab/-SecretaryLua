@@ -28,7 +28,9 @@ public class KakaoBasicCardService {
 
     private MainOrderRepositoryImpl mainOrderRepository;
 
+    private KakaoSimpleTextService kakaoSimpleTextService;
 
+/*
     // 사용 가능한 허브가 한 개 이상인 경우 허브 리스트 카드를 만들고 반환
     public ResponseDtoVerTwo makerHubsCard(ArrayList<HubInfoDto> hubs) {
 
@@ -130,35 +132,40 @@ public class KakaoBasicCardService {
     // parentCode : 최근에 실행한 코드의 부모 코드 정보를 알 수 있다.
     public ResponseDtoVerTwo makerCmdsCard(String providerId, int parentCode) {
 
+        // 최근 실행한 명령 코드 redis에 저장. 사용자에게 반환할 명령의 목록을 찾기 위해 쓰인다.
         MainOrder reMainOrder = mainOrderRepository.find(providerId);
         reMainOrder.setCurrentParentCode(parentCode);
         mainOrderRepository.save(reMainOrder);
 
+        // 반환할 명령의 목록을 찾는 코드.
         CmdOrder[] cmds = reMainOrder.getCmdOrderList();
-
+        CmdOrder[] returnCmds = null;
         int cnt = 0;
         for (int i = 0; i < cmds.length; i++) {
             if (parentCode == cmds[i].getParentCode()) {
                 cnt++;
             }
         }
-
-        CmdOrder[] returnCmds = new CmdOrder[cnt];
+        if(cnt == 0) {
+            // 만약 하위에 반활할 명령이 없다면. "전송" 버튼만 만들어서 사용자에게 보여준다.
+            // returnCmds = new CmdOrder[1];       // 전송 버튼을 만들 객체 동적 할당.
+            return kakaoSimpleTextService.makerTransferBtnText();
+        } else {
+            returnCmds = new CmdOrder[cnt + 1]; // 반환할 명령 + 전송 버튼의 배열 개수 만큼 동적 할당
+        }
         cnt = 0;
         for (int i = 0; i < cmds.length; i++) {
-            if (parentCode == cmds[i].getParentCode()) {
+            if (parentCode == cmds[i].getParentCode()) {   // 반환할 명령 코드들을 찾는 조건식
                 returnCmds[cnt] = cmds[i];
                 cnt++;
             }
         }
-        log.info("1. returnCmds >> " + returnCmds);
-
 
         // 카드 만들기
         SimpleText text = new SimpleText();
         StringBuffer responseMsg = new StringBuffer("사용할 수 있는 명령 목록 입니다.\n\n");
         responseMsg.append("(명령 번호).  (명령 이름)\n\n");
-        for (int i = 0; i < returnCmds.length; i++) {
+        for (int i = 0; i < returnCmds.length - 1; i++) {
             responseMsg.append((i + 1) + ". " + returnCmds[i].getCmdName() + "\n");
         }
         responseMsg.append("\n버튼을 클릭해주세요.");
@@ -172,8 +179,9 @@ public class KakaoBasicCardService {
 
         // 버튼 꾸미기
         ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
-        QuickReply[] quickReply = new QuickReply[returnCmds.length + 1];
-        for (int i = 0; i < returnCmds.length; i++) {
+        QuickReply[] quickReply = new QuickReply[returnCmds.length];
+        cnt = 0;
+        for (int i = 0; i < returnCmds.length - 1; i++) {
             QuickReply quick = QuickReply.builder()
                     .label(Integer.toString(i + 1))
                     .messageText("명령 " + (i + 1) + "번")
@@ -188,6 +196,7 @@ public class KakaoBasicCardService {
                 e.printStackTrace();
             }
         }
+
         QuickReply quick = QuickReply.builder()
                 .label("전송")
                 .messageText("명령 전송")
@@ -275,7 +284,7 @@ public class KakaoBasicCardService {
                 .build();
     }
 
-
+*/
 
     public ResponseDtoVerTwo responserRequestJoin(String id) {
         ArrayList<Button> buttons = new ArrayList<Button>();

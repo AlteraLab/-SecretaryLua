@@ -59,18 +59,18 @@ public class OrderResponseService {
 
 
         this.cmds[0] = CmdOrder.builder().cmdName("on").description("에어컨 켜기").cmdCode(1).parentCode(-1).blockId(BLOCK_ID_CODE_LIST).build();
-        this.cmds[1] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(2).parentCode(-1).blockId(BLOCK_ID_EXIT).build();
+        this.cmds[1] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(2).parentCode(-1).blockId(BLOCK_ID_CODE_LIST).build();
 
         this.cmds[2] = CmdOrder.builder().cmdName("시간 설정").description("에어컨 시간 설정").cmdCode(3).parentCode(1).blockId(BLOCK_ID_D_TIME_SET).build();
-        this.cmds[3] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(4).parentCode(1).blockId(BLOCK_ID_EXIT).build();
+        this.cmds[3] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(4).parentCode(1).blockId(BLOCK_ID_CODE_LIST).build();
 
         this.cmds[4] = CmdOrder.builder().cmdName("강약 조절").description("강약 조절 설정").cmdCode(5).parentCode(3).blockId(BLOCK_ID_D_BUTTON).btnList("강,중,약,자동").btnTitle("조절 버튼 목록입니다.").build();
-        this.cmds[5] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(6).parentCode(3).blockId(BLOCK_ID_EXIT).build();
+        this.cmds[5] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(6).parentCode(3).blockId(BLOCK_ID_CODE_LIST).build();
 
         this.cmds[6] = CmdOrder.builder().cmdName("온도 입력").description("온도 설정").cmdCode(7).parentCode(5).blockId(BLOCK_ID_D_DIRECT_INPUT).directTitle("온도를 입력하세요.").inputEx(26).build();
-        this.cmds[7] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(8).parentCode(5).blockId(BLOCK_ID_EXIT).build();
+        this.cmds[7] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(8).parentCode(5).blockId(BLOCK_ID_CODE_LIST).build();
 
-        this.cmds[8] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(9).parentCode(7).blockId(BLOCK_ID_EXIT).build();
+        this.cmds[8] = CmdOrder.builder().cmdName("off").description("에어컨 끄기").cmdCode(9).parentCode(7).blockId(BLOCK_ID_CODE_LIST).build();
     }
 
 
@@ -130,14 +130,14 @@ public class OrderResponseService {
                 mainOrderRepository.save(reMainOrder);
                 orderSaveService.saverCmdOrders(providerId, cmds);
 
-                return kakaoBasicCardService.makerCmdsCard(providerId, -1);
+                return kakaoSimpleTextService.makerCmdsCard(providerId, -1);
             }
 
             orderSaveService.saverDevOrders(providerId, devs);
-            return kakaoBasicCardService.makerDevsCard(devs);
+            return kakaoSimpleTextService.makerDevsCard(devs);
         }
 
-        return kakaoBasicCardService.makerHubsCard(hubs);
+        return kakaoSimpleTextService.makerHubsCard(hubs);
     }
 
 
@@ -168,10 +168,10 @@ public class OrderResponseService {
             mainOrderRepository.save(reMainOrder);
             orderSaveService.saverCmdOrders(providerId, cmds);
 
-            return kakaoBasicCardService.makerCmdsCard(providerId, -1);
+            return kakaoSimpleTextService.makerCmdsCard(providerId, -1);
         }
 
-        return kakaoBasicCardService.makerDevsCard(devs);
+        return kakaoSimpleTextService.makerDevsCard(devs);
     }
 
 
@@ -193,7 +193,7 @@ public class OrderResponseService {
         // cmds를 redis에 저장하는 코드 작성.
         orderSaveService.saverCmdOrders(providerId, cmds);
 
-        return kakaoBasicCardService.makerCmdsCard(providerId, -1);
+        return kakaoSimpleTextService.makerCmdsCard(providerId, -1);
     }
 
 
@@ -232,7 +232,7 @@ public class OrderResponseService {
 
          */
 
-        return kakaoBasicCardService.makerCmdsCard(providerId, parentCode);
+        return kakaoSimpleTextService.makerCmdsCard(providerId, parentCode);
     }
 
 
@@ -258,7 +258,7 @@ public class OrderResponseService {
         reMainOrder.setCurrentParentCode(parentCode);
         mainOrderRepository.save(reMainOrder);
 
-        return kakaoBasicCardService.makerButtonCmdsCard(providerId, parentCode);
+        return kakaoSimpleTextService.makerButtonCmdsCard(providerId, parentCode);
     }
 
 
@@ -284,7 +284,7 @@ public class OrderResponseService {
         reMainOrder.setCurrentParentCode(parentCode);
         mainOrderRepository.save(reMainOrder);
 
-        return kakaoSimpleTextService.makerDirectInputCard(providerId, parentCode);
+        return kakaoSimpleTextService.makerDirectInputText(providerId, parentCode);
     }
 
 
@@ -298,6 +298,6 @@ public class OrderResponseService {
         // 이건 나중에 구현하기
 
 
-        return kakaoBasicCardService.makerCmdsCard(providerId, parentCode);
+        return kakaoSimpleTextService.makerCmdsCard(providerId, parentCode);
     }
 }
