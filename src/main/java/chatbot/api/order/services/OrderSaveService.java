@@ -45,7 +45,7 @@ public class OrderSaveService {
         log.info("MainOrders : " + mainOrder.toString());
 
         // redis 에 저장
-        mainOrderRepository.save(mainOrder);
+        mainOrderRepository.update(mainOrder);
     }
 
 
@@ -62,7 +62,7 @@ public class OrderSaveService {
         reMainOrder.setDevOrderList(devs);
         log.info(reMainOrder.toString());
 
-        mainOrderRepository.save(reMainOrder);
+        mainOrderRepository.update(reMainOrder);
     }
 
 

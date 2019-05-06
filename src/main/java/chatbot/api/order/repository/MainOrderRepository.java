@@ -6,5 +6,9 @@ public interface MainOrderRepository {
 
     void save(MainOrder mainOrder);
 
+    void update(MainOrder reMainOrder);
+
+    void delete(String providerId);
+
     MainOrder find(String providerId);
 }

@@ -5,11 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-public class SelectOrder {
+@AllArgsConstructor
+@NoArgsConstructor
+public class SelectOrder implements Serializable {
 
     // 전달 경로
     private String externalIp;
@@ -19,6 +21,7 @@ public class SelectOrder {
     private String devMacAddr;
 
 
-    // 전달하는 데이터들
-    private SelectCmdOrder[] cmds;
+    private SelectCmdOrder[] cmds; // 전달하는 데이터들
+
+    private int curIndex;
 }

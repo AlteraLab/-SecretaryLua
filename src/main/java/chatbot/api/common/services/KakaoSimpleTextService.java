@@ -165,13 +165,11 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo makerTransferCompleteCard() {
+    public ResponseDtoVerTwo makerTransferCompleteCard(String msg) {
 
-        StringBuffer msg = new StringBuffer("명령이 전송되었습니다.\n\n");
-        msg.append("또 다른 명령을 수행하고 싶으시다면 아래 슬롯을 올려 \"시바\" 버튼을 누르세요.");
 
         SimpleText simpleTextVo = new SimpleText();
-        simpleTextVo.setText(msg.toString());
+        simpleTextVo.setText(msg);
 
         ComponentSimpleText simpleText = new ComponentSimpleText();
         simpleText.setSimpleText(simpleTextVo);
@@ -321,7 +319,7 @@ public class KakaoSimpleTextService {
         SimpleText text = new SimpleText();
         StringBuffer responseMsg = new StringBuffer("사용할 수 있는 모듈 목록 입니다.\n\n");
         for (int i = 0; i < devs.length; i++) {
-            responseMsg.append((i + 1) + ". " + devs[i].getDevName() + "\n");
+            responseMsg.append((i + 1) + ". " + devs[i].getDevMacAddr() + "\n");
         }
         responseMsg.append("\n버튼을 클릭해주세요.");
         text.setText(responseMsg.toString());
