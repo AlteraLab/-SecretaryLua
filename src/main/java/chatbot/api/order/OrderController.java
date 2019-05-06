@@ -3,7 +3,6 @@ package chatbot.api.order;
 import chatbot.api.common.domain.kakao.openbuilder.RequestDto;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
 import chatbot.api.common.services.KakaoSimpleTextService;
-import chatbot.api.order.domain.CmdOrder;
 import chatbot.api.order.domain.MainOrder;
 import chatbot.api.order.repository.MainOrderRepositoryImpl;
 import chatbot.api.order.services.OrderResponseService;
@@ -29,9 +28,9 @@ public class OrderController {
 
     // "시바" 를 발화했을때 호출되는 메서드
     @PostMapping("/control/hubs")
-    public ResponseDtoVerTwo callHubs(@RequestBody RequestDto requestDto) {
+    public ResponseDtoVerTwo controlHubs(@RequestBody RequestDto requestDto) {
 
-        log.info("============ callHubs ============");
+        log.info("============ ControlHubs ============");
         log.info(requestDto.toString());
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
         return orderResponseService.responserHubs(providerId);
@@ -40,9 +39,9 @@ public class OrderController {
 
     // hub를 선택했을때 호출되는 메서드
     @PostMapping("/control/hub/id")
-    public ResponseDtoVerTwo callHubId(@RequestBody RequestDto requestDto) {
+    public ResponseDtoVerTwo controlHubId(@RequestBody RequestDto requestDto) {
 
-        log.info("============ callHubId ============");
+        log.info("============ ControlHubId ============");
         // In-Memory에 사용자의 appUserId (provider Id)가 없다면, "명령 절차를 준수하세요!" 라는 메시지 전송
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
         String hubSequence = requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", "");
@@ -55,9 +54,9 @@ public class OrderController {
 
     // module을 선택했을때 호출되는 메서드
     @PostMapping("/control/dev/id")
-    public ResponseDtoVerTwo callModuleId(@RequestBody RequestDto requestDto) {
+    public ResponseDtoVerTwo controlModuleId(@RequestBody RequestDto requestDto) {
 
-        log.info("============ callModuleId ============");
+        log.info("============ ControlModuleId ============");
         // In-Memory에 사용자의 appUserId (provider Id)가 없다면, "명령 절차를 준수하세요!" 라는 메시지 전송
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
         String devSequence = requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", "");
@@ -122,7 +121,7 @@ public class OrderController {
         log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
         log.info(requestDto.toString());
         int selectedCode = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
-        ;
+
         log.info("selectedCode >> " + selectedCode);
 
         return orderResponseService.responserChildCmds(providerId, selectedCode, "");
@@ -154,7 +153,7 @@ public class OrderController {
         log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
         log.info(requestDto.toString());
         int selectedCode = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
-        ;
+
         log.info("selectedCode >> " + selectedCode);
 
         return orderResponseService.responserDirectInput(providerId, selectedCode);
@@ -171,16 +170,16 @@ public class OrderController {
         log.info(requestDto.toString());
 
         int dirInUtterance = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
-        ;
+
         log.info("dirInUtterance >> " + dirInUtterance);
 
         return orderResponseService.responserChildCmdsAfterDirInput(providerId, dirInUtterance);
     }
 
 
-    // http://203.250.32.29:8083/control/exit
-    @PostMapping("/control/exit")
-    public ResponseDtoVerTwo controlExit(@RequestBody RequestDto requestDto) {
+    // http://203.250.32.29:8083/control/select
+    @PostMapping("/control/select")
+    public ResponseDtoVerTwo controlSendSelect(@RequestBody RequestDto requestDto) {
 
         log.info("============ controlExit ============");
         log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
@@ -191,22 +190,43 @@ public class OrderController {
         // 명령을 제거한다.
 
         // "시바" 버튼이 달린 메시지를 전송한다.
-        return kakaoSimpleTextService.responserTransferCompleteText();
+        return kakaoSimpleTextService.makerTransferSelectCard();
     }
 
 
-    // http://203.250.32.29:8083/control/main
-    @PostMapping("/control/main")
-    public ResponseDtoVerTwo controlMain(@RequestBody RequestDto requestDto) {
+    // http://203.250.32.29:8083/control/transferResult
+    @PostMapping("/control/transferResult")
+    public ResponseDtoVerTwo controlTransferResult(@RequestBody RequestDto requestDto) {
 
-        log.info("============ controlMain ============");
+        log.info("============ controlTransferResult ============");
         log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
         log.info(requestDto.toString());
 
-        // redis에 있는 빌딩된 명령을 제거한다.
+        String utterance = requestDto.getUserRequest().getUtterance();
 
-        // 그리고 사용자에게 "시바" 버튼이 달린
+        if(utterance.equals("명령 전송")) {
+            // 명령 전송
 
-        return kakaoSimpleTextService.responserCancleCompleteText();
+            // redis에 있는 빌딩된 명령을 제거한다.
+
+            return kakaoSimpleTextService.makerTransferCompleteCard();
+        }
+
+        // 사용자가 취소 명령을 눌렀다면!!!!!!!!!!!!!
+        // 취소 선택 버튼 3가지 경우의 수를 리턴한다.
+        return kakaoSimpleTextService.makerCancleSelectCard();
+    }
+
+
+
+    @PostMapping("/control/cancleComplete")
+    public ResponseDtoVerTwo controlCancleComplete(@RequestBody RequestDto requestDto) {
+
+        log.info("============ controlCancleComplete ============");
+        log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
+        log.info(requestDto.toString());
+
+        // redis에 있는 모든 데이터 삭제
+        return kakaoSimpleTextService.makerCancleCompleteCard();
     }
 }

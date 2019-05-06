@@ -8,7 +8,6 @@ import chatbot.api.common.domain.kakao.openbuilder.responseVer2.SkillTemplate;
 import chatbot.api.order.domain.CmdOrder;
 import chatbot.api.order.domain.DevOrder;
 import chatbot.api.order.domain.MainOrder;
-import chatbot.api.order.repository.MainOrderRepository;
 import chatbot.api.order.repository.MainOrderRepositoryImpl;
 import chatbot.api.skillHub.domain.HubInfoDto;
 import lombok.AllArgsConstructor;
@@ -106,20 +105,56 @@ public class KakaoSimpleTextService {
                 .label("전송")
                 .messageText("명령 전송")
                 .action("block")
-                .blockId(BLOCK_ID_EXIT)
+                .blockId(BLOCK_ID_SEND_SELECT)
                 .build();
 
+
+
+        quickReplies.add(transferBtn);
+        template.setQuickReplies(quickReplies);
+
+        return new ResponseDtoVerTwo().builder()
+                .version("2.0")
+                .template(template)
+                .build();
+    }
+
+
+
+    public ResponseDtoVerTwo makerTransferSelectCard() {
+
+        String msg = "명령을 전송하시겠습니까?";
+        SimpleText simpleTextVo = new SimpleText();
+        simpleTextVo.setText(msg);
+
+        ComponentSimpleText simpleText = new ComponentSimpleText();
+        simpleText.setSimpleText(simpleTextVo);
+
+        ArrayList<Object> outputs = new ArrayList<>();
+        outputs.add(simpleText);
+
+        SkillTemplate template = new SkillTemplate();
+        template.setOutputs(outputs);
+
+        ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
+
+        QuickReply transferBtn = QuickReply.builder()
+                .label("예")
+                .messageText("명령 전송")
+                .action("block")
+                .blockId(BLOCK_ID_TRANSFER_RESULT)
+                .build();
 
         QuickReply cancleBtn = QuickReply.builder()
-                .label("취소")
+                .label("아니오")
                 .messageText("명령 취소")
                 .action("block")
-                .blockId(BLOCK_ID_MAIN)
+                .blockId(BLOCK_ID_TRANSFER_RESULT)
                 .build();
-
 
         quickReplies.add(transferBtn);
         quickReplies.add(cancleBtn);
+
         template.setQuickReplies(quickReplies);
 
         return new ResponseDtoVerTwo().builder()
@@ -130,11 +165,48 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo responserTransferCompleteText() {
+    public ResponseDtoVerTwo makerTransferCompleteCard() {
 
-        String msg = "명령을 전송하였습니다.\n\n또 다른 명령을 내리실려면 \"시바\" 버튼을 클릭하세요.";
+        StringBuffer msg = new StringBuffer("명령이 전송되었습니다.\n\n");
+        msg.append("또 다른 명령을 수행하고 싶으시다면 아래 슬롯을 올려 \"시바\" 버튼을 누르세요.");
+
         SimpleText simpleTextVo = new SimpleText();
-        simpleTextVo.setText(msg);
+        simpleTextVo.setText(msg.toString());
+
+        ComponentSimpleText simpleText = new ComponentSimpleText();
+        simpleText.setSimpleText(simpleTextVo);
+
+        ArrayList<Object> outputs = new ArrayList<>();
+        outputs.add(simpleText);
+
+        SkillTemplate template = new SkillTemplate();
+        template.setOutputs(outputs);
+
+        return new ResponseDtoVerTwo().builder()
+                .version("2.0")
+                .template(template)
+                .build();
+    }
+
+
+
+    public ResponseDtoVerTwo makerCancleSelectCard() {
+
+        StringBuffer msg = new StringBuffer("명령을 취소하였습니다.\n\n");
+
+        msg.append("1. 허브 재선택\n");
+        msg.append("2. 명령 재선택\n");
+        msg.append("3. 취소\n\n");
+
+        msg.append("1. 허브 재선택\n모든 명령을 취소하고 사용하고자 하는 허브까지 모두 다시 선택합니다.\n\n");
+        msg.append("2. 명령 재선택\n선택한 허브와 모듈은 그대로 입니다. 전송하고자 하는 명령만 다시 선택합니다.\n\n");
+        msg.append("3. 취소\n허브, 모듈, 명령에 대한 내용 모두 취소합니다.\n\n");
+
+        msg.append("선택해주세요.\n");
+
+
+        SimpleText simpleTextVo = new SimpleText();
+        simpleTextVo.setText(msg.toString());
 
         ComponentSimpleText simpleText = new ComponentSimpleText();
         simpleText.setSimpleText(simpleTextVo);
@@ -147,14 +219,30 @@ public class KakaoSimpleTextService {
 
         ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
 
-        QuickReply transferBtn = QuickReply.builder()
-                .label("시바")
-                .action("message")
+        QuickReply cancleBtnToControlHubs = QuickReply.builder()
+                .label("1")
                 .messageText("시바")
+                .action("message")
                 .build();
 
+        QuickReply cancleBtnToCodeList = QuickReply.builder()
+                .label("2")
+                .messageText("명령 재선택")
+                .action("block")
+                .blockId(BLOCK_ID_CODE_LIST)
+                .build();
 
-        quickReplies.add(transferBtn);
+        QuickReply cancleBtn = QuickReply.builder()
+                .label("3")
+                .messageText("취소")
+                .action("block")
+                .blockId(BLOCK_ID_CANCLE_COMPLETE)
+                .build();
+
+        quickReplies.add(cancleBtnToControlHubs);
+        quickReplies.add(cancleBtnToCodeList);
+        quickReplies.add(cancleBtn);
+
         template.setQuickReplies(quickReplies);
 
         return new ResponseDtoVerTwo().builder()
@@ -165,9 +253,9 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo responserCancleCompleteText() {
+    public ResponseDtoVerTwo makerCancleCompleteCard() {
 
-        String msg = "명령을 취소하였습니다.\n\n또 다른 명령을 내리실려면 \"시바\" 버튼을 클릭하세요.";
+        String msg = "모든 명령을 취소하였습니다.\n\n또 다른 명령을 내리실려면 슬롯을 올려 \"시바\" 버튼을 클릭하세요.";
         SimpleText simpleTextVo = new SimpleText();
         simpleTextVo.setText(msg);
 
@@ -179,18 +267,6 @@ public class KakaoSimpleTextService {
 
         SkillTemplate template = new SkillTemplate();
         template.setOutputs(outputs);
-
-        ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
-
-        QuickReply transferBtn = QuickReply.builder()
-                .label("시바")
-                .action("message")
-                .messageText("시바")
-                .build();
-
-
-        quickReplies.add(transferBtn);
-        template.setQuickReplies(quickReplies);
 
         return new ResponseDtoVerTwo().builder()
                 .version("2.0")
@@ -205,11 +281,8 @@ public class KakaoSimpleTextService {
 
         SimpleText text = new SimpleText();
         StringBuffer responseMsg = new StringBuffer("사용할 수 있는 허브 목록 입니다.\n\n");
-        //responseMsg.append("(허브 번호).  (허브 이름) :: (허브 설명)\n\n");
-        //responseMsg.append("(허브 번호). (허브 이름)\n\n");
 
         for (int i = 0; i < hubs.size(); i++) {
-            //responseMsg.append((i + 1) + ". " + hubs.get(i).getHubName() + " :: " + hubs.get(i).getHubDescript() + "\n");
             responseMsg.append((i + 1) + ". " + hubs.get(i).getHubName() + "\n");
         }
         responseMsg.append("\n버튼을 클릭해주세요.");
@@ -247,10 +320,7 @@ public class KakaoSimpleTextService {
 
         SimpleText text = new SimpleText();
         StringBuffer responseMsg = new StringBuffer("사용할 수 있는 모듈 목록 입니다.\n\n");
-        //responseMsg.append("(모듈 번호).  (모듈 이름)  ::  (식별명)\n\n");
-        //responseMsg.append("(모듈 번호).  (모듈 이름)\n\n");
         for (int i = 0; i < devs.length; i++) {
-            //responseMsg.append((i + 1) + ". " + devs[i].getDevName() + " :: " + devs[i].getDevIdentifier() + "\n");
             responseMsg.append((i + 1) + ". " + devs[i].getDevName() + "\n");
         }
         responseMsg.append("\n버튼을 클릭해주세요.");
@@ -320,7 +390,6 @@ public class KakaoSimpleTextService {
         // 카드 만들기
         SimpleText text = new SimpleText();
         StringBuffer responseMsg = new StringBuffer("사용할 수 있는 명령 목록 입니다.\n\n");
-        //responseMsg.append("(명령 번호).  (명령 이름)\n\n");
         for (int i = 0; i < returnCmds.length - 2; i++) {
             responseMsg.append((i + 1) + ". " + returnCmds[i].getCmdName() + "\n");
         }
@@ -350,18 +419,10 @@ public class KakaoSimpleTextService {
                 .label("전송")
                 .messageText("명령 전송")
                 .action("block")
-                .blockId(BLOCK_ID_EXIT)
-                .build();
-
-        QuickReply cancleBtn = QuickReply.builder()
-                .label("취소")
-                .action("block")
-                .blockId(BLOCK_ID_MAIN)
-                .messageText("취소")
+                .blockId(BLOCK_ID_SEND_SELECT)
                 .build();
 
         quickReplies.add(transferBtn);
-        quickReplies.add(cancleBtn);
 
         SkillTemplate template = new SkillTemplate(outputs, quickReplies);
 
@@ -396,7 +457,7 @@ public class KakaoSimpleTextService {
 
         // 카드 만들기
         SimpleText text = new SimpleText();
-        StringBuffer responseMsg = new StringBuffer(btnCmd.getBtnTitle());
+        StringBuffer responseMsg = new StringBuffer(btnCmd.getBtnTitle() + "\n\n");
         //responseMsg.append("(버튼 번호). (버튼 이름)\n\n");
 
         for (int i = 0; i < btnNames.length; i++) {
