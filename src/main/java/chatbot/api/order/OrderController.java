@@ -4,6 +4,7 @@ import chatbot.api.common.domain.kakao.openbuilder.RequestDto;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
 import chatbot.api.common.services.KakaoSimpleTextService;
 import chatbot.api.order.domain.MainOrder;
+import chatbot.api.order.domain.Response.DevControlResult;
 import chatbot.api.order.domain.Response.ResponseDevInfo;
 import chatbot.api.order.domain.SelectCmdOrder;
 import chatbot.api.order.repository.MainOrderRepositoryImpl;
@@ -259,14 +260,15 @@ public class OrderController {
             String url = new String("http://" + externalIp + ":" + externalPort + "/dev/" + devMacAddr);
             log.info("전달 URL >> " + url);
 
-
-            Boolean result = restTemplate.postForObject(url, new Object(){public SelectCmdOrder[] cmd = cmds;}, Boolean.class);
+            log.info("전달할 명령어 >> " + cmds);
+            DevControlResult result = restTemplate.postForObject(url, new Object(){public SelectCmdOrder[] cmd = cmds;}, DevControlResult.class);
+            //log.info("전달 결과 >> " + result);
             //restTemplate.postForObject(url, cmds, null);
             //Boolean result = true;
             // 명령을 전송했으니 redis에 있는 빌딩된 명령을 제거한다.
             mainOrderRepository.delete(providerId);
             StringBuffer msg = new StringBuffer("");
-            if(result == true) {
+            if(result.isStatus() == true) {
                 msg.append("명령이 전송되었습니다.\n\n");
                 msg.append("또 다른 명령을 수행하고 싶으시다면 아래 슬롯을 올려 \"시바\" 버튼을 누르세요.");
             } else {
@@ -310,7 +312,7 @@ public class OrderController {
         SelectCmdOrder[] cmds = new SelectCmdOrder[10];
         for(int i = 0; i < cmds.length; i++) {
             cmds[i] = new SelectCmdOrder(i + 1, i + 1);
-            log.info(cmds[i].getCmdCode() + " " + cmds[i].getData());
+            log.info(cmds[i].getCmd_code() + " " + cmds[i].getData());
         }
 
         return new Object(){

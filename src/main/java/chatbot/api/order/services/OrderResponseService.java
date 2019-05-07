@@ -113,7 +113,7 @@ public class OrderResponseService {
             String url = new String("http://" + hubs.get(0).getExternalIp() + ":" + hubs.get(0).getExternalPort() + "/dev");
             log.info("URL >> " + url);
             ResponseDevInfo responseDevInfo = restTemplate.getForObject(url, ResponseDevInfo.class);
-
+            log.info("ResponseDevInfo >> " + responseDevInfo);
             // devs를 redis에 저장하는 코드 작성.
             MainOrder reMainOrder = mainOrderRepository.find(providerId);
             reMainOrder.setSelectOrder(SelectOrder.builder()
@@ -170,6 +170,9 @@ public class OrderResponseService {
         String url = new String("http://" + reMainOrder.getSelectOrder().getExternalIp() + ":" + reMainOrder.getSelectOrder().getExternalPort() + "/dev");
         log.info("URL >> " + url);
         ResponseDevInfo responseDevInfo = restTemplate.getForObject(url, ResponseDevInfo.class);
+        log.info("RestTemplate >>> dev를 받아옴. ");
+        log.info("status >>> " + responseDevInfo.isStatus());
+        log.info("devs >>> " + responseDevInfo.getDevInfo());
 
         // devs를 redis에 저장하는 코드 작성.
         orderSaveService.saverDevOrders(providerId, responseDevInfo.getDevInfo());

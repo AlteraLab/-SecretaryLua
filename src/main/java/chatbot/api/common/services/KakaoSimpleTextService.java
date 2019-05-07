@@ -167,7 +167,6 @@ public class KakaoSimpleTextService {
 
     public ResponseDtoVerTwo makerTransferCompleteCard(String msg) {
 
-
         SimpleText simpleTextVo = new SimpleText();
         simpleTextVo.setText(msg);
 

@@ -120,7 +120,7 @@ public class HubRegisterService {
             role.setHubId(hub.getHubId());
             roleMapper.save(role);
 
-/*            String url = "http://203.250.32.29:" + hubVo.getExternalPort() + "/hub";
+            String url = "http://"+ hubVo.getExternalIp()+":" + hubVo.getExternalPort() + "/hub";
             log.info(url);
 
             String resultByHub = restTemplate.postForObject(url, null, String.class);
@@ -132,7 +132,7 @@ public class HubRegisterService {
             if(resultByHub != "true") {
                 responseDto.setMsg(EXCEPTION_MSG_DURING_REGISTER);
                 throw new Exception();
-            }*/
+            }
 
             responseDto.setMsg(SUCCESS_MSG_REGIST_INTO_HUB_AND_ROLL);
             responseDto.setStatus(HttpStatus.OK);
