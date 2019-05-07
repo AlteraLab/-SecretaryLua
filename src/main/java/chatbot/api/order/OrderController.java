@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -238,7 +239,7 @@ public class OrderController {
     // http://203.250.32.29:8083/control/transferResult
     @PostMapping("/control/transferResult")
     public ResponseDtoVerTwo controlTransferResult(@RequestBody RequestDto requestDto) {
-    
+
         log.info("============ controlTransferResult ============");
 
         log.info(requestDto.getUserRequest().getBlock().getName() + " >> " + requestDto.getUserRequest().getBlock().getId());
@@ -258,7 +259,8 @@ public class OrderController {
             String url = new String("http://" + externalIp + ":" + externalPort + "/dev/" + devMacAddr);
             log.info("전달 URL >> " + url);
 
-            Boolean result = restTemplate.postForObject(url, cmds, Boolean.class);
+
+            Boolean result = restTemplate.postForObject(url, new Object(){public SelectCmdOrder[] cmd = cmds;}, Boolean.class);
             //restTemplate.postForObject(url, cmds, null);
             //Boolean result = true;
             // 명령을 전송했으니 redis에 있는 빌딩된 명령을 제거한다.
@@ -300,5 +302,19 @@ public class OrderController {
     @PostMapping("/control/test")
     public void controlTest(@RequestBody ResponseDevInfo responseDevInfo) {
         log.info(responseDevInfo.toString());
+    }
+
+    @GetMapping("/control/test/2")
+    public Object controltTest2() {
+
+        SelectCmdOrder[] cmds = new SelectCmdOrder[10];
+        for(int i = 0; i < cmds.length; i++) {
+            cmds[i] = new SelectCmdOrder(i + 1, i + 1);
+            log.info(cmds[i].getCmdCode() + " " + cmds[i].getData());
+        }
+
+        return new Object(){
+            public SelectCmdOrder[] cmd = cmds;
+        };
     }
 }
