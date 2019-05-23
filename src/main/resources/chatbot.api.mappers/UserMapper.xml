@@ -85,8 +85,8 @@
         <result property="email" column="email"/>
         <result property="profileImage" column="profile_img"/>
         <!--
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>-->
+        <result property="joinedAt" column="joined_at"/>
+        -->
     </resultMap>
 
 
@@ -96,8 +96,8 @@
         <parameter property="name"/>
         <parameter property="email"/>
         <parameter property="profileImage"/>
-
-        <!-- <parameter property="createdAt"/>
-        <parameter property="updatedAt"/>-->
+        <!--
+        <parameter property="joinedAt"/>
+        -->
     </parameterMap>
 </mapper>

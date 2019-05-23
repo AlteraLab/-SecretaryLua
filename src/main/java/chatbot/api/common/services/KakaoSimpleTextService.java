@@ -1,29 +1,28 @@
 package chatbot.api.common.services;
 
+import chatbot.api.build.domain.*;
+import chatbot.api.build.repository.BuildRepositoryImpl;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.QuickReply;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.simpleText.ComponentSimpleText;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.simpleText.SimpleText;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.simpleText.ComponentSimpleText;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.simpleText.SimpleText;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.SkillTemplate;
-import chatbot.api.order.domain.CmdOrder;
-import chatbot.api.order.domain.DevOrder;
-import chatbot.api.order.domain.MainOrder;
-import chatbot.api.order.repository.MainOrderRepositoryImpl;
-import chatbot.api.skillHub.domain.HubInfoDto;
+import chatbot.api.skillhub.domain.HubInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.web.util.RedirectUrlBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
-import static chatbot.api.order.utils.OrderConstans.*;
+import static chatbot.api.build.utils.CmdBuildConstants.*;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class KakaoSimpleTextService {
 
-    private MainOrderRepositoryImpl mainOrderRepository;
+    private BuildRepositoryImpl buildRepository;
 
 
     public ResponseDtoVerTwo responserShortMsg(String msg) {
@@ -50,19 +49,20 @@ public class KakaoSimpleTextService {
 
     public ResponseDtoVerTwo makerDirectInputText(String providerId, int parentCode) {
 
-        MainOrder reMainOrder = mainOrderRepository.find(providerId);
-        CmdOrder [] cmds = reMainOrder.getCmdOrderList();
-        CmdOrder directInputCmd = null;
+        Build reBuild = buildRepository.find(providerId);
+        ArrayList<BtnDto> btns = reBuild.getBtns();
+        BtnDto directInputBtnDto = null;
 
-        for(int i = 0; i < cmds.length; i++) {
-            if(parentCode == cmds[i].getCmdCode()) {
-                directInputCmd = cmds[i];
-            }
+        for(int i = 0; i < btns.size(); i++) {
+            //   if(parentCode == btnDtos.get(i).getCode()) {
+            //       directInputBtnDto = btnDtos.get(i);
+            // }
         }
 
-        log.info("직접 입력 버튼 코드 >> " + directInputCmd);
+        log.info("직접 입력 버튼 코드 >> " + directInputBtnDto);
 
-        String msg = directInputCmd.getDirectTitle() + "\n\n아래 예시에 맞춰 입력해주세요.\n\nex) " + directInputCmd.getInputEx();
+        //String msg = directInputCmd.getDirectTitle() + "\n\n아래 예시에 맞춰 입력해주세요.\n\nex) " + directInputCmd.getInputEx();
+        String msg = "\n\n아래 예시에 맞춰 입력해주세요.\n\nex) ";
 
         SimpleText simpleTextVo = new SimpleText();
         simpleTextVo.setText(msg);
@@ -276,6 +276,8 @@ public class KakaoSimpleTextService {
     // 사용 가능한 허브가 한 개 이상인 경우 허브 리스트 카드를 만들고 반환
     public ResponseDtoVerTwo makerHubsCard(ArrayList<HubInfoDto> hubs) {
 
+        log.info("================== makerHubsCard 시작 ==================");
+
         SimpleText text = new SimpleText();
         StringBuffer responseMsg = new StringBuffer("사용할 수 있는 허브 목록 입니다.\n\n");
 
@@ -298,12 +300,14 @@ public class KakaoSimpleTextService {
                     .label(Integer.toString(i + 1))
                     .action("block")
                     .messageText("허브 " + (i + 1) + "번")
-                    .blockId(BLOCK_ID_SELECT_HUB)
+                    .blockId(BLOCK_ID_RETURN_HRDWRS)
                     .build();
                 quickReplies.add(quick);
         }
 
         SkillTemplate template = new SkillTemplate(outputs, quickReplies);
+
+        log.info("================== makerHubsCard 끝 ==================");
 
         return new ResponseDtoVerTwo().builder()
                 .version("2.0")
@@ -313,14 +317,16 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo makerDevsCard(DevOrder[] devs) {
+    public ResponseDtoVerTwo makerHrdwrsCard(ArrayList<HrdwrDto> hrdwrs) {
+
+        log.info("================== makerHrdwrsCard 시작 ==================");
 
         SimpleText text = new SimpleText();
-        StringBuffer responseMsg = new StringBuffer("사용할 수 있는 모듈 목록 입니다.\n\n");
-        for (int i = 0; i < devs.length; i++) {
-            responseMsg.append((i + 1) + ". " + devs[i].getDevMacAddr() + "\n");
+        StringBuffer responseMsg = new StringBuffer("사용할 수 있는 하드웨어 목록 입니다.\n\n");
+        for (int i = 0; i < hrdwrs.size(); i++) {
+            responseMsg.append((i + 1) + ". " + hrdwrs.get(i).getUserDefinedName() + "\n");
         }
-        responseMsg.append("\n버튼을 클릭해주세요.");
+        responseMsg.append("\n하드웨어를 선택해주세요.");
         text.setText(responseMsg.toString());
 
         ComponentSimpleText simpleText = new ComponentSimpleText();
@@ -331,17 +337,20 @@ public class KakaoSimpleTextService {
 
         // 2. 버튼 꾸미기
         ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
-        for (int i = 0; i < devs.length; i++) {
+        for (int i = 0; i < hrdwrs.size(); i++) {
             QuickReply quick = QuickReply.builder()
                     .label(Integer.toString(i + 1))
-                    .messageText("모듈 " + (i + 1) + "번")
+                    .messageText("하드웨어 " + (i + 1) + "번")
+                    //.messageText("모듈 " + (i + 1) + "번")
                     .action("block")
-                    .blockId(BLOCK_ID_SELECT_DEV)
+                    .blockId(BLOCK_ID_RETURN_BTNS)
                     .build();
              quickReplies.add(quick);
         }
 
         SkillTemplate template = new SkillTemplate(outputs, quickReplies);
+
+        log.info("================== makerHrdwrsCard 끝    ==================");
 
         return new ResponseDtoVerTwo().builder()
                 .version("2.0")
@@ -351,46 +360,24 @@ public class KakaoSimpleTextService {
 
 
 
-    // providerId : redis에서 cmds 정보를 가져올 수 있다.
-    // parentCode : 최근에 실행한 코드의 부모 코드 정보를 알 수 있다.
-    public ResponseDtoVerTwo makerCmdsCard(String providerId, int parentCode) {
+    public ResponseDtoVerTwo makerBtnsCard(String providerId) {
 
-        // 최근 실행한 명령 코드 redis에 저장. 사용자에게 반환할 명령의 목록을 찾기 위해 쓰인다.
-        MainOrder reMainOrder = mainOrderRepository.find(providerId);
-        reMainOrder.setCurrentParentCode(parentCode);
-        mainOrderRepository.save(reMainOrder);
+        log.info("================== makerBtnsCard 시작 ==================");
 
-        // 반환할 명령의 목록을 찾는 코드.
-        CmdOrder[] cmds = reMainOrder.getCmdOrderList();
-        CmdOrder[] returnCmds = null;
-        int cnt = 0;
-        for (int i = 0; i < cmds.length; i++) {
-            if (parentCode == cmds[i].getParentCode()) {
-                cnt++;
-            }
-        }
-        if(cnt == 0) {
-            // 만약 하위에 반활할 명령이 없다면. "전송" 버튼만 만들어서 사용자에게 보여준다.
-            // returnCmds = new CmdOrder[1];       // 전송 버튼을 만들 객체 동적 할당.
-            return this.makerTransferBtnText();
-        } else {
-            returnCmds = new CmdOrder[cnt + 2]; // 반환할 명령 + 전송 버튼의 배열 개수 만큼 동적 할당
-        }
-        cnt = 0;
-        for (int i = 0; i < cmds.length; i++) {
-            if (parentCode == cmds[i].getParentCode()) {   // 반환할 명령 코드들을 찾는 조건식
-                returnCmds[cnt] = cmds[i];
-                cnt++;
-            }
-        }
+        Build reBuild = buildRepository.find(providerId);
+
+        BoxDto curBox = reBuild.getBox();
+        ArrayList<BtnDto> btns = reBuild.getBtns();
+        ArrayList<DerivationDto> derivations = reBuild.getDerivations();
+
 
         // 카드 만들기
         SimpleText text = new SimpleText();
-        StringBuffer responseMsg = new StringBuffer("사용할 수 있는 명령 목록 입니다.\n\n");
-        for (int i = 0; i < returnCmds.length - 2; i++) {
-            responseMsg.append((i + 1) + ". " + returnCmds[i].getCmdName() + "\n");
+        StringBuffer responseMsg = new StringBuffer(curBox.getPreText() + "\n\n");
+        for (int i = 0; i < btns.size(); i++) {
+            responseMsg.append((i + 1) + ". " + btns.get(i).getBtnName() + "\n");
         }
-        responseMsg.append("\n버튼을 클릭해주세요.");
+        responseMsg.append("\n" + curBox.getPostText());
         text.setText(responseMsg.toString());
 
         ComponentSimpleText simpleText = new ComponentSimpleText();
@@ -401,12 +388,12 @@ public class KakaoSimpleTextService {
 
         // 버튼 꾸미기
         ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
-        for (int i = 0; i < returnCmds.length - 2; i++) {
+        for (int i = 0; i < btns.size(); i++) {
             QuickReply quick = QuickReply.builder()
                     .label(Integer.toString(i + 1))
-                    .messageText("명령 " + (i + 1) + "번")
+                    .messageText("버튼 " + (i + 1) + "번")
                     .action("block")
-                    .blockId(returnCmds[i].getBlockId())
+                    .blockId(btns.get(i).getBlockId())
                     .build();
 
             quickReplies.add(quick);
@@ -423,6 +410,8 @@ public class KakaoSimpleTextService {
 
         SkillTemplate template = new SkillTemplate(outputs, quickReplies);
 
+        log.info("================== makerBtnsCard 끝    ==================");
+
         return new ResponseDtoVerTwo().builder()
                 .version("2.0")
                 .template(template)
@@ -433,23 +422,15 @@ public class KakaoSimpleTextService {
 
     public ResponseDtoVerTwo makerButtonCmdsCard(String providerId, int parentCode) {
 
-        MainOrder reMainOrder = mainOrderRepository.find(providerId);
-        CmdOrder[] cmds = reMainOrder.getCmdOrderList();
-        CmdOrder btnCmd = null;
+        /*
+        Build reBuild = buildRepository.find(providerId);
+        ArrayList<Cmd> cmds = reBuild.getCmds();
+        Cmd btnCmd = null;
 
-        for (int i = 0; i < cmds.length; i++) {
-            if (parentCode == cmds[i].getCmdCode()) {
-                btnCmd = cmds[i];
+        for (int i = 0; i < cmds.size(); i++) {
+            if (parentCode == cmds.get(i).getCode()) {
+                btnCmd = cmds.get(i);
             }
-        }
-
-        log.info("버튼 리스트 " + btnCmd.getBtnList());
-
-        String[] btnNames = btnCmd.getBtnList().split(",");
-
-        // 잘 분리되었는지 확인
-        for (int i = 0; i < btnNames.length; i++) {
-            System.out.println(i + " " + btnNames[i]);
         }
 
         // 카드 만들기
@@ -494,6 +475,8 @@ public class KakaoSimpleTextService {
                 .version("2.0")
                 .template(template)
                 .build();
+        */
+        return null;
     }
 
 

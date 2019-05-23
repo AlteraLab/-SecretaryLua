@@ -1,7 +1,7 @@
 package chatbot.api.mappers;
 
-import chatbot.api.skillHub.domain.HubInfoDto;
-import chatbot.api.skillHub.domain.HubVo;
+import chatbot.api.skillhub.domain.HubInfoDto;
+import chatbot.api.skillhub.domain.HubVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;

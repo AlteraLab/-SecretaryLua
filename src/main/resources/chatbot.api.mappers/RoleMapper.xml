@@ -55,12 +55,14 @@
     <resultMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDto">
         <result property="hubId" column="hub_id"/>
         <result property="userId" column="user_id"/>
+        <!-- role_type-->
         <result property="role" column="role"/>
     </resultMap>
 
     <parameterMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDto">
         <parameter property="hubId"/>
         <parameter property="userId"/>
+        <!-- role_type-->
         <parameter property="role"/>
     </parameterMap>
 

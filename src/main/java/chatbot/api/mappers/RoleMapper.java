@@ -15,7 +15,7 @@ public interface RoleMapper {
     void save(RoleDto hubUser);
 
 
-    // heqSeq 와 useSeq 데이터를 인자로 받음
+    // heqSeq 와 userSeq 데이터를 인자로 받음
     // -> 추가하려는 사용자가 이미 해당 허브를 사용하고 있는지 조회
     RoleDto getRoleInfo(@Param("hubId") Long hubId, @Param("userId") Long userId);
 

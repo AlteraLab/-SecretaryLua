@@ -8,7 +8,7 @@
 
 
     <!-- hub 레코드 추가, useGeneratedKeys를 사용하면 데이터를 저장할때 keyproperty 컬럼 값이 초기화된 값을 알 수 있다. -->
-    <insert id="save" useGeneratedKeys="true" keyProperty="hubId" parameterType="chatbot.api.skillHub.domain.HubInfoDto">
+    <insert id="save" useGeneratedKeys="true" keyProperty="hubId" parameterType="chatbot.api.skillhub.domain.HubInfoDto">
         INSERT INTO hub
         (
         hub_id,
@@ -160,7 +160,7 @@
 
 
 
-    <resultMap id="HubInfoDto" type="chatbot.api.skillHub.domain.HubInfoDto">
+    <resultMap id="HubInfoDto" type="chatbot.api.skillhub.domain.HubInfoDto">
         <result property="hubId" column="hub_id"/>
         <result property="adminId" column="admin_id"/>
         <result property="hubName" column="hub_name"/>
@@ -179,7 +179,7 @@
     </resultMap>
 
 
-    <resultMap id="HubVo" type="chatbot.api.skillHub.domain.HubVo">
+    <resultMap id="HubVo" type="chatbot.api.skillhub.domain.HubVo">
         <result property="hubId" column="hub_id"/>
         <result property="adminId" column="admin_id"/>
         <result property="name" column="hub_name"/>
@@ -199,7 +199,7 @@
     </resultMap>
 
 
-    <parameterMap id="HubInfoDto" type="chatbot.api.skillHub.domain.HubInfoDto">
+    <parameterMap id="HubInfoDto" type="chatbot.api.skillhub.domain.HubInfoDto">
         <parameter property="hubId"/>
         <parameter property="adminId"/>
         <parameter property="hubName"/>

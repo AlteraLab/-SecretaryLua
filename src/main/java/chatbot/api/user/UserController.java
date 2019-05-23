@@ -6,7 +6,7 @@ import chatbot.api.common.domain.kakao.openbuilder.RequestDto;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
 import chatbot.api.common.services.KakaoBasicCardService;
 import chatbot.api.mappers.HubMapper;
-import chatbot.api.skillHub.domain.HubVo;
+import chatbot.api.skillhub.domain.HubVo;
 import chatbot.api.user.domain.UserInfoDto;
 import chatbot.api.common.security.UserPrincipal;
 import chatbot.api.mappers.UserMapper;
@@ -40,15 +40,16 @@ public class UserController {
     @GetMapping(value = "/user")
     public ResponseDto kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
+        log.info("userPrincipal >> " + userPrincipal.getId() + " ::: " + userMapper.getUser(userPrincipal.getId()).get());
         UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
         //UserInfoDto userInfoDto = userMapper.getUser(new Long(1)).get();
 
         List<HubVo> hubsInfoList;
         hubsInfoList = hubMapper.getHubsInfoByUserId(userInfoDto.getUserId());
-        //hubsInfoList = hubMapper.getHubsInfoByUserId(userPrincipal.getId());
         // 바로 위, 일단 주석... 야밤에 코드 작성하니까 잘못 작성한듯...
         //hubsInfoList = hubMapper.getHubsInfoByUserId(new Long(1));
 
+        log.info("Return Return Return Return Return Return  ");
         return ResponseDto.builder()
                 .msg("userInfoDto information")
                 .status(HttpStatus.OK)

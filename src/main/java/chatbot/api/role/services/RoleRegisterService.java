@@ -4,7 +4,7 @@ import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.mappers.RoleMapper;
 import chatbot.api.mappers.UserMapper;
-import chatbot.api.skillHub.domain.HubInfoDto;
+import chatbot.api.skillhub.domain.HubInfoDto;
 import chatbot.api.role.domain.RoleDto;
 import chatbot.api.user.domain.UserInfoDto;
 import chatbot.api.user.domain.UserRegisterVo;
@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import static chatbot.api.role.utils.RoleConstants.*;
-import static chatbot.api.skillHub.utils.HubConstants.*;
+import static chatbot.api.skillhub.utils.HubConstants.*;
 import static chatbot.api.user.utils.UserConstants.FAIL_MSG_SELECT_BY_EMAIL;
 
 

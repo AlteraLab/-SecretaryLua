@@ -1,6 +1,6 @@
 package chatbot.api.common.config;
 
-import chatbot.api.order.domain.MainOrder;
+import chatbot.api.build.domain.Build;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,30 +14,29 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableRedisRepositories
 public class RedisRepositoryConfig {
 
-    private @Value("${spring.redis.host}") String redisHost;
-    private @Value("${spring.redis.port}") int redisPort;
+    private @Value("${spring.redis.host}")
+    String redisHost;
+    private @Value("${spring.redis.port}")
+    int redisPort;
 
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
         JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
         jedisConnectionFactory.setHostName(redisHost);
         jedisConnectionFactory.setPort(redisPort);
+        jedisConnectionFactory.setTimeout(6000);
         return jedisConnectionFactory;
     }
 
     @Bean
-    RedisTemplate<String, MainOrder> redisTemplate() {
-        RedisTemplate<String, MainOrder> redisTemplate = new RedisTemplate<String, MainOrder>();
+    RedisTemplate<String, Build> redisTemplate() {
+        RedisTemplate<String, Build> redisTemplate = new RedisTemplate<String, Build>();
         redisTemplate.setConnectionFactory(jedisConnectionFactory());
 
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-
-        //redisTemplate.setValueSerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(MainOrder.class));
-
+        //redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(MainOrder.class));
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Build.class));
         redisTemplate.setHashKeySerializer(redisTemplate.getKeySerializer());
-        //redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-
         redisTemplate.setHashValueSerializer(redisTemplate.getValueSerializer());
         /*
         // https://github.com/akihyro/try-spring-boot-with-redis/blob/master/src/main/java/akihyro/tryspringbootwithredis/RedisConfiguration.java
@@ -49,7 +48,7 @@ public class RedisRepositoryConfig {
          */
         return redisTemplate;
     }
-
+}
 /*    @Bean
     RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
@@ -88,4 +87,3 @@ public class RedisRepositoryConfig {
         return template;
     }
     */
-}

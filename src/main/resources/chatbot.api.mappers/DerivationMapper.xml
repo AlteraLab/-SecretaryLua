@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.DerivationMapper">
+
+    <!-- Box Id를 이용하여 파생 테이블에서 event code와 lower box id 값을 알아낸다. -->
+    <select id="getDerivationByBoxId" resultMap="DerivationDto" parameterType="Long">
+        SELECT
+        d.event_code,
+        d.lower_box_id
+        FROM derivation AS d
+        WHERE d.upper_box_id = #{upperBoxId}
+    </select>
+
+
+
+
+    <resultMap id="DerivationDto" type="chatbot.api.build.domain.DerivationDto">
+        <result property="derivationCode" column="derivation_code"/>
+        <result property="upperBoxId" column="upper_box_id"/>
+        <result property="btnUppedBoxId" column="btn_upper_box_id"/>
+        <result property="timeUpperBoxId" column="time_upper_box_id"/>
+        <result property="inputUpperBoxId" column="input_upper_box_id"/>
+        <result property="eventCode" column="event_code"/>
+        <result property="lowerBoxId" column="lower_box_id"/>
+    </resultMap>
+
+    <parameterMap id="DerivationDto" type="chatbot.api.build.domain.DerivationDto">
+        <parameter property="derivationCode"/>
+        <parameter property="upperBoxId"/>
+        <parameter property="btnUppedBoxId"/>
+        <parameter property="timeUpperBoxId"/>
+        <parameter property="inputUpperBoxId"/>
+        <parameter property="eventCode"/>
+        <parameter property="lowerBoxId"/>
+    </parameterMap>
+</mapper>

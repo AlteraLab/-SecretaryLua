@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.HrdwrMapper">
+
+    <!-- UserDefinedName 을 이용해서 사용자가 선택한 하드웨어의 Auth Key 를 알아낸다. -->
+    <select id="getAuthKeyByUserDefinedName" resultType="String" parameterType="String">
+        SELECT h.auth_key
+        FROM   hrdwr AS h
+        WHERE  h.user_defined_name = #{userDefinedName}
+    </select>
+
+
+
+    <resultMap id="HrdwrDto" type="chatbot.api.build.domain.HrdwrDto">
+        <result property="authKey" column="auth_key"/>
+        <result property="hrdwrName" column="hrdwr_name"/>
+        <result property="category" column="catetory"/>
+        <result property="hrdwrType" column="hrdwr_type"/>
+        <result property="userDefinedName" column="user_defined_name"/>
+    </resultMap>
+
+    <parameterMap id="HrdwrDto" type="chatbot.api.build.domain.HrdwrDto">
+        <parameter property="authKey"/>
+        <parameter property="hrdwrName"/>
+        <parameter property="category"/>
+        <parameter property="hrdwrType"/>
+        <parameter property="userDefinedName"/>
+    </parameterMap>
+</mapper>

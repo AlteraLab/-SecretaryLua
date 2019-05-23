@@ -1,11 +1,10 @@
 package chatbot.api.common.services;
 
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.basicCard.BasicCard;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.basicCard.Button;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.basicCard.ComponentBasicCard;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.basicCard.BasicCard;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.basicCard.Button;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.basicCard.ComponentBasicCard;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.SkillTemplate;
-import chatbot.api.order.repository.MainOrderRepositoryImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,8 +16,6 @@ import java.util.ArrayList;
 @Slf4j
 @AllArgsConstructor
 public class KakaoBasicCardService {
-
-    private MainOrderRepositoryImpl mainOrderRepository;
 
     private KakaoSimpleTextService kakaoSimpleTextService;
 

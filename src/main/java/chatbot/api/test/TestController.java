@@ -1,17 +1,42 @@
 package chatbot.api.test;
 
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.basicCard.ComponentBasicCard;
+import chatbot.api.build.domain.BoxDto;
+
+import chatbot.api.build.domain.BtnDto;
+import chatbot.api.build.domain.DerivationDto;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.basicCard.ComponentBasicCard;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.basicCard.BasicCard;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.basicCard.Button;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.basicCard.BasicCard;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.basicCard.Button;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.SkillTemplate;
+import chatbot.api.mappers.BoxMapper;
+import chatbot.api.mappers.BtnMapper;
+import chatbot.api.mappers.DerivationMapper;
+import chatbot.api.mappers.HrdwrMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 
+
+@Slf4j
 @RestController
 public class TestController {
+
+    @Autowired
+    private BoxMapper boxMapper;
+
+    @Autowired
+    private BtnMapper btnMapper;
+
+    @Autowired
+    private DerivationMapper derivationMapper;
+
+    @Autowired
+    private HrdwrMapper hrdwrMapper;
+
 
     @PostMapping("/test")
     public ResponseDtoVerTwo testMethod() {
@@ -49,5 +74,35 @@ public class TestController {
 
 
         return responseDtoVerTwo;
+    }
+
+
+
+    @PostMapping("/test/authKey")
+    public Object testGetBoxByAuthKey() {
+        log.info("시작");
+
+        // authKey = "AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH";
+        String authKey = hrdwrMapper.getAuthKeyByUserDefinedName("LG AC01");
+        log.info("INFO >> " + authKey);
+
+        BoxDto boxSam = boxMapper.getEntryBoxByAuthKey(authKey);
+        log.info("INFO >> " + boxSam.toString());
+
+        ArrayList<BtnDto> btnsSam = btnMapper.getBtnsByBoxId(boxSam.getBoxId());
+        log.info("INFO >> " + btnsSam.toString());
+
+        ArrayList<DerivationDto> derivationsSam = derivationMapper.getDerivationByBoxId(boxSam.getBoxId());
+        log.info("INFO >> " + derivationsSam.toString());
+
+        BoxDto bbb = boxMapper.getEntryBoxByUsrDfinName("LG AC01");
+        log.info("INFO >> " + bbb.toString());
+
+        return new Object(){
+            public BoxDto box = boxSam;
+            public ArrayList<BtnDto> btns = btnsSam;
+            public ArrayList<DerivationDto> derivations = derivationsSam;
+            public BoxDto BOX = bbb;
+        };
     }
 }

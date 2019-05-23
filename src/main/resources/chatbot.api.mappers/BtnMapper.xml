@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.BtnMapper">
+
+    <!-- 해당 박스에 꾸며질 버튼들을 조회한다. -->
+    <select id="getBtnsByBoxId" resultMap="BtnDto" parameterType="Long">
+        SELECT *
+        FROM btn
+        WHERE box_id = #{boxId}
+    </select>
+
+
+
+    <resultMap id="BtnDto" type="chatbot.api.build.domain.BtnDto">
+        <result property="boxId" column="box_id"/>
+        <result property="eventCode" column="event_code"/>
+        <result property="btnName" column="btn_name"/>
+        <result property="blockId" column="block_id"/>
+    </resultMap>
+
+    <parameterMap id="BtnDto" type="chatbot.api.build.domain.BtnDto">
+        <parameter property="boxId"/>
+        <parameter property="eventCode"/>
+        <parameter property="btnName"/>
+        <parameter property="blockId"/>
+    </parameterMap>
+</mapper>

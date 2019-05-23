@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.BoxMapper">
+
+    <!-- 하드웨어 Auth Key 를 이용하여 Entry Box 를 조회한다. -->
+    <select id="getEntryBoxByAuthKey" resultMap="BoxDto" parameterType="String">
+        SELECT *
+        FROM box
+        WHERE auth_key = #{authKey}
+    </select>
+
+
+    <select id="getEntryBoxByUsrDfinName" resultMap="BoxDto" parameterType="String">
+        SELECT
+        b.box_id,
+        b.pre_text,
+        b.post_text,
+        b.box_type
+        FROM   (box AS b INNER JOIN (SELECT auth_key FROM hrdwr WHERE user_defined_name = #{usrDfinName}) AS h
+               ON b.auth_key = h.auth_key)
+    </select>
+
+    <resultMap id="BoxDto" type="chatbot.api.build.domain.BoxDto">
+        <result property="boxId" column="box_id"/>
+        <result property="authKey" column="auth_key"/>
+        <result property="preText" column="pre_text"/>
+        <result property="postText" column="post_text"/>
+        <result property="boxType" column="box_type"/>
+    </resultMap>
+
+    <parameterMap id="BoxDto" type="chatbot.api.build.domain.BoxDto">
+        <parameter property="boxId"/>
+        <parameter property="authKey"/>
+        <parameter property="preText"/>
+        <parameter property="postText"/>
+        <parameter property="boxType"/>
+    </parameterMap>
+</mapper>

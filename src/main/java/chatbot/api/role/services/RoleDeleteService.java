@@ -4,7 +4,7 @@ import chatbot.api.common.domain.ResponseDto;
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.mappers.RoleMapper;
 import chatbot.api.role.domain.RoleDto;
-import chatbot.api.skillHub.domain.HubInfoDto;
+import chatbot.api.skillhub.domain.HubInfoDto;
 import chatbot.api.user.domain.UserRegisterVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import static chatbot.api.role.utils.RoleConstants.*;
-import static chatbot.api.skillHub.utils.HubConstants.ROLE_USER;
+import static chatbot.api.skillhub.utils.HubConstants.ROLE_USER;
 
 @Service
 @Slf4j
