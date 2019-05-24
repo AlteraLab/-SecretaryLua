@@ -86,22 +86,11 @@ public class TestController {
         String authKey = hrdwrMapper.getAuthKeyByUserDefinedName("LG AC01");
         log.info("INFO >> " + authKey);
 
-        BoxDto boxSam = boxMapper.getEntryBoxByAuthKey(authKey);
-        log.info("INFO >> " + boxSam.toString());
-
-        ArrayList<BtnDto> btnsSam = btnMapper.getBtnsByBoxId(boxSam.getBoxId());
-        log.info("INFO >> " + btnsSam.toString());
-
-        ArrayList<DerivationDto> derivationsSam = derivationMapper.getDerivationByBoxId(boxSam.getBoxId());
-        log.info("INFO >> " + derivationsSam.toString());
 
         BoxDto bbb = boxMapper.getEntryBoxByUsrDfinName("LG AC01");
         log.info("INFO >> " + bbb.toString());
 
         return new Object(){
-            public BoxDto box = boxSam;
-            public ArrayList<BtnDto> btns = btnsSam;
-            public ArrayList<DerivationDto> derivations = derivationsSam;
             public BoxDto BOX = bbb;
         };
     }

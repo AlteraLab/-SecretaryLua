@@ -5,14 +5,6 @@
 
 <mapper namespace="chatbot.api.mappers.BoxMapper">
 
-    <!-- 하드웨어 Auth Key 를 이용하여 Entry Box 를 조회한다. -->
-    <select id="getEntryBoxByAuthKey" resultMap="BoxDto" parameterType="String">
-        SELECT *
-        FROM box
-        WHERE auth_key = #{authKey}
-    </select>
-
-
     <select id="getEntryBoxByUsrDfinName" resultMap="BoxDto" parameterType="String">
         SELECT
         b.box_id,
@@ -22,6 +14,20 @@
         FROM   (box AS b INNER JOIN (SELECT auth_key FROM hrdwr WHERE user_defined_name = #{usrDfinName}) AS h
                ON b.auth_key = h.auth_key)
     </select>
+
+
+    <!-- Box Id 를 이용해서 box 데이터를 조회 -->
+    <select id="getBoxByBoxId" resultMap="BoxDto" parameterType="Long">
+        SELECT
+        b.box_id,
+        b.pre_text,
+        b.post_text,
+        b.box_type
+        FROM box AS b
+        WHERE box_id = #{boxId}
+    </select>
+
+
 
     <resultMap id="BoxDto" type="chatbot.api.build.domain.BoxDto">
         <result property="boxId" column="box_id"/>

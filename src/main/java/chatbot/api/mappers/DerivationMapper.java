@@ -11,5 +11,7 @@ import java.util.ArrayList;
 @Repository
 public interface DerivationMapper {
 
-    ArrayList<DerivationDto> getDerivationByBoxId(@Param("upperBoxId") Long upperBoxId);
+    ArrayList<DerivationDto> getDerivationByUpperBoxId(@Param("upperBoxId") Long upperBoxId);
+
+    Long getLowerBoxIdFromUpperTimeBoxId(@Param("upperTimeBoxId") Long upperTimeBoxId);
 }

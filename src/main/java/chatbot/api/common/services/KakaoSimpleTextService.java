@@ -10,12 +10,11 @@ import chatbot.api.common.domain.kakao.openbuilder.responseVer2.SkillTemplate;
 import chatbot.api.skillhub.domain.HubInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.web.util.RedirectUrlBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
-import static chatbot.api.build.utils.CmdBuildConstants.*;
+import static chatbot.api.build.utils.BuildConstants.*;
 
 @Service
 @AllArgsConstructor
@@ -26,43 +25,6 @@ public class KakaoSimpleTextService {
 
 
     public ResponseDtoVerTwo responserShortMsg(String msg) {
-
-        SimpleText simpleTextVo = new SimpleText();
-        simpleTextVo.setText(msg);
-
-        ComponentSimpleText simpleText = new ComponentSimpleText();
-        simpleText.setSimpleText(simpleTextVo);
-
-        ArrayList<Object> outputs = new ArrayList<>();
-        outputs.add(simpleText);
-
-        SkillTemplate template = new SkillTemplate();
-        template.setOutputs(outputs);
-
-        return new ResponseDtoVerTwo().builder()
-                .version("2.0")
-                .template(template)
-                .build();
-    }
-
-
-
-    public ResponseDtoVerTwo makerDirectInputText(String providerId, int parentCode) {
-
-        Build reBuild = buildRepository.find(providerId);
-        ArrayList<BtnDto> btns = reBuild.getBtns();
-        BtnDto directInputBtnDto = null;
-
-        for(int i = 0; i < btns.size(); i++) {
-            //   if(parentCode == btnDtos.get(i).getCode()) {
-            //       directInputBtnDto = btnDtos.get(i);
-            // }
-        }
-
-        log.info("직접 입력 버튼 코드 >> " + directInputBtnDto);
-
-        //String msg = directInputCmd.getDirectTitle() + "\n\n아래 예시에 맞춰 입력해주세요.\n\nex) " + directInputCmd.getInputEx();
-        String msg = "\n\n아래 예시에 맞춰 입력해주세요.\n\nex) ";
 
         SimpleText simpleTextVo = new SimpleText();
         simpleTextVo.setText(msg);
@@ -105,10 +67,8 @@ public class KakaoSimpleTextService {
                 .label("전송")
                 .messageText("명령 전송")
                 .action("block")
-                .blockId(BLOCK_ID_SEND_SELECT)
+                .blockId(BLOCK_ID_BUILDED_CODES)
                 .build();
-
-
 
         quickReplies.add(transferBtn);
         template.setQuickReplies(quickReplies);
@@ -226,7 +186,7 @@ public class KakaoSimpleTextService {
                 .label("2")
                 .messageText("명령 재선택")
                 .action("block")
-                .blockId(BLOCK_ID_CODE_LIST)
+                .blockId(BLOCK_ID_BTN_TEXTBOX)
                 .build();
 
         QuickReply cancleBtn = QuickReply.builder()
@@ -368,8 +328,6 @@ public class KakaoSimpleTextService {
 
         BoxDto curBox = reBuild.getBox();
         ArrayList<BtnDto> btns = reBuild.getBtns();
-        ArrayList<DerivationDto> derivations = reBuild.getDerivations();
-
 
         // 카드 만들기
         SimpleText text = new SimpleText();
@@ -403,7 +361,7 @@ public class KakaoSimpleTextService {
                 .label("전송")
                 .messageText("명령 전송")
                 .action("block")
-                .blockId(BLOCK_ID_SEND_SELECT)
+                .blockId(BLOCK_ID_BUILDED_CODES)
                 .build();
 
         quickReplies.add(transferBtn);
@@ -420,70 +378,16 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo makerButtonCmdsCard(String providerId, int parentCode) {
+    public ResponseDtoVerTwo makerInputCard(String providerId) {
 
-        /*
+        log.info("================== makerInputCard 시작    ==================");
+
+
         Build reBuild = buildRepository.find(providerId);
-        ArrayList<Cmd> cmds = reBuild.getCmds();
-        Cmd btnCmd = null;
+        BoxDto inputBox = reBuild.getBox();
+        log.info("INFO >> Box_Type == 3 -> Input Box 의 타입 : " + inputBox.getBoxType());
 
-        for (int i = 0; i < cmds.size(); i++) {
-            if (parentCode == cmds.get(i).getCode()) {
-                btnCmd = cmds.get(i);
-            }
-        }
-
-        // 카드 만들기
-        SimpleText text = new SimpleText();
-        StringBuffer responseMsg = new StringBuffer(btnCmd.getBtnTitle() + "\n\n");
-        //responseMsg.append("(버튼 번호). (버튼 이름)\n\n");
-
-        for (int i = 0; i < btnNames.length; i++) {
-            responseMsg.append((i + 1) + ". " + btnNames[i] + "\n");
-        }
-        responseMsg.append("\n버튼을 클릭해주세요.");
-        text.setText(responseMsg.toString());
-
-        ComponentSimpleText simpleText = new ComponentSimpleText();
-        simpleText.setSimpleText(text);
-
-        ArrayList<Object> outputs = new ArrayList<Object>();
-        outputs.add(simpleText);
-
-        // 버튼 꾸미기
-        ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
-        QuickReply[] quickReply = new QuickReply[btnNames.length];
-        for (int i = 0; i < btnNames.length; i++) {
-            QuickReply quick = QuickReply.builder()
-                    .label(Integer.toString(i + 1))
-                    .messageText("버튼 " + (i + 1) + "번")
-                    .action("block")
-                    .blockId(BLOCK_ID_CODE_LIST)
-                    .build();
-            try {
-                quickReply[i] = (QuickReply) quick.clone();
-                quickReplies.add(quickReply[i]);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        SkillTemplate template = new SkillTemplate(outputs, quickReplies);
-
-        return new ResponseDtoVerTwo().builder()
-                .version("2.0")
-                .template(template)
-                .build();
-        */
-        return null;
-    }
-
-
-
-
-    // quick replies test
-    public ResponseDtoVerTwo test(String msg) {
+        String msg = inputBox.getPreText() + "\n\n" + inputBox.getPostText();
 
         SimpleText simpleTextVo = new SimpleText();
         simpleTextVo.setText(msg);
@@ -497,32 +401,15 @@ public class KakaoSimpleTextService {
         SkillTemplate template = new SkillTemplate();
         template.setOutputs(outputs);
 
-        ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
+        log.info("================== makerInputCard 끝    ==================");
 
-        int i = 7;
-        QuickReply[] quickReply = new QuickReply[i];
-        for(int j = 0; j < 7; j++) {
-            QuickReply quick = QuickReply.builder()
-                    .label(Integer.toString(j + 1))
-                    .action("message")
-                    .messageText("허브 " + (j + 1) + "번")
-                    .build();
-
-            try {
-                quickReply[j] = (QuickReply) quick.clone();
-                quickReplies.add(quickReply[j]);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        log.info(quickReplies.toString());
-        template.setQuickReplies(quickReplies);
-
-        ResponseDtoVerTwo responseDtoVerTwo = ResponseDtoVerTwo.builder()
+        return new ResponseDtoVerTwo().builder()
                 .version("2.0")
                 .template(template)
                 .build();
-
-        return responseDtoVerTwo;
     }
+
+
+
+
 }
