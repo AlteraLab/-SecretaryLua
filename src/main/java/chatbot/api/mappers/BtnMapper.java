@@ -11,5 +11,5 @@ import java.util.ArrayList;
 @Repository
 public interface BtnMapper {
 
-    ArrayList<BtnDto> getBtnsByBoxId(@Param("boxId") Long boxId);
+    ArrayList<BtnDto> getBtnsByBoxIdAndAuthKey(@Param("boxId") Long boxId, @Param("authKey") String authKey);
 }

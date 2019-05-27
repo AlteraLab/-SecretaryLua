@@ -30,6 +30,7 @@
         <result property="inputUpperBoxId" column="input_upper_box_id"/>
         <result property="eventCode" column="event_code"/>
         <result property="lowerBoxId" column="lower_box_id"/>
+        <result property="authKey" column="auth_key"/>
     </resultMap>
 
     <parameterMap id="DerivationDto" type="chatbot.api.build.domain.DerivationDto">
@@ -40,5 +41,6 @@
         <parameter property="inputUpperBoxId"/>
         <parameter property="eventCode"/>
         <parameter property="lowerBoxId"/>
+        <parameter property="authKey"/>
     </parameterMap>
 </mapper>

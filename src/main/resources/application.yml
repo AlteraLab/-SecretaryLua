@@ -11,7 +11,7 @@ spring:
   redis:
     host: 192.168.99.100
     port: 6379
-    timeout: 60000ms
+    defaultExpireTime: 300
 
   datasource:
     url: jdbc:mariadb://192.168.99.100:3307/skill_server

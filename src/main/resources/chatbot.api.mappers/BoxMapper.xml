@@ -5,26 +5,25 @@
 
 <mapper namespace="chatbot.api.mappers.BoxMapper">
 
-    <select id="getEntryBoxByUsrDfinName" resultMap="BoxDto" parameterType="String">
-        SELECT
-        b.box_id,
-        b.pre_text,
-        b.post_text,
-        b.box_type
-        FROM   (box AS b INNER JOIN (SELECT auth_key FROM hrdwr WHERE user_defined_name = #{usrDfinName}) AS h
-               ON b.auth_key = h.auth_key)
+    <!-- Entry Box 중에서 box_id가 1인 레코드를 조회  -->
+    <select id="getEntryBoxByAuthKey" resultMap="BoxDto" parameterType="hashmap">
+        SELECT *
+        FROM   box
+        WHERE  auth_key = #{authKey} AND box_id = #{boxId}
     </select>
 
 
     <!-- Box Id 를 이용해서 box 데이터를 조회 -->
-    <select id="getBoxByBoxId" resultMap="BoxDto" parameterType="Long">
+    <select id="getBoxByBoxIdAndAuthKey" resultMap="BoxDto" parameterType="hashmap">
         SELECT
         b.box_id,
+        b.auth_key,
         b.pre_text,
         b.post_text,
         b.box_type
         FROM box AS b
         WHERE box_id = #{boxId}
+        AND   auth_key = #{authKey}
     </select>
 
 

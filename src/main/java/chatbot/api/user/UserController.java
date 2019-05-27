@@ -49,7 +49,6 @@ public class UserController {
         // 바로 위, 일단 주석... 야밤에 코드 작성하니까 잘못 작성한듯...
         //hubsInfoList = hubMapper.getHubsInfoByUserId(new Long(1));
 
-        log.info("Return Return Return Return Return Return  ");
         return ResponseDto.builder()
                 .msg("userInfoDto information")
                 .status(HttpStatus.OK)

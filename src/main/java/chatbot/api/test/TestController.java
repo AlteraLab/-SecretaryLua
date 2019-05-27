@@ -76,8 +76,7 @@ public class TestController {
         return responseDtoVerTwo;
     }
 
-
-
+    /*
     @PostMapping("/test/authKey")
     public Object testGetBoxByAuthKey() {
         log.info("시작");
@@ -87,11 +86,12 @@ public class TestController {
         log.info("INFO >> " + authKey);
 
 
-        BoxDto bbb = boxMapper.getEntryBoxByUsrDfinName("LG AC01");
-        log.info("INFO >> " + bbb.toString());
+        //BoxDto bbb = boxMapper.getEntryBoxByUsrDfinName("LG AC01");
+       // log.info("INFO >> " + bbb.toString());
 
         return new Object(){
             public BoxDto BOX = bbb;
         };
     }
+    */
 }

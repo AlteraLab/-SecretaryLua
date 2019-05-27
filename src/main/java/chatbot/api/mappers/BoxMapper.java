@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BoxMapper {
 
-    BoxDto getEntryBoxByUsrDfinName(@Param("usrDfinName") String userDefinedName);
+    BoxDto getEntryBoxByAuthKey(@Param("authKey") String authKey, @Param("boxId") Long boxId);
 
-    BoxDto getBoxByBoxId(@Param("boxId") Long boxId);
+    BoxDto getBoxByBoxIdAndAuthKey(@Param("boxId") Long boxId, @Param("authKey") String authKey);
 }
