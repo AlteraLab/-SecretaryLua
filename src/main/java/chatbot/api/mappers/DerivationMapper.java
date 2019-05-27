@@ -1,6 +1,6 @@
 package chatbot.api.mappers;
 
-import chatbot.api.build.domain.DerivationDto;
+import chatbot.api.buildcode.domain.DerivationDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;

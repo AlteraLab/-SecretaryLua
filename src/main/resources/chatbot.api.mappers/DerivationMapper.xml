@@ -22,7 +22,7 @@
         WHERE  d.upper_box_id = #{upperTimeBoxId}
     </select>
 
-    <resultMap id="DerivationDto" type="chatbot.api.build.domain.DerivationDto">
+    <resultMap id="DerivationDto" type="chatbot.api.buildcode.domain.DerivationDto">
         <result property="derivationCode" column="derivation_code"/>
         <result property="upperBoxId" column="upper_box_id"/>
         <result property="btnUppedBoxId" column="btn_upper_box_id"/>
@@ -33,7 +33,7 @@
         <result property="authKey" column="auth_key"/>
     </resultMap>
 
-    <parameterMap id="DerivationDto" type="chatbot.api.build.domain.DerivationDto">
+    <parameterMap id="DerivationDto" type="chatbot.api.buildcode.domain.DerivationDto">
         <parameter property="derivationCode"/>
         <parameter property="upperBoxId"/>
         <parameter property="btnUppedBoxId"/>

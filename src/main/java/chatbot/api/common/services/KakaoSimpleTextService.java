@@ -1,7 +1,7 @@
 package chatbot.api.common.services;
 
-import chatbot.api.build.domain.*;
-import chatbot.api.build.repository.BuildRepositoryImpl;
+import chatbot.api.buildcode.domain.*;
+import chatbot.api.buildcode.repository.BuildRepositoryImpl;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.QuickReply;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.simpleText.ComponentSimpleText;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
-import static chatbot.api.build.utils.BuildConstants.*;
+import static chatbot.api.buildcode.utils.BuildConstants.*;
 
 @Service
 @AllArgsConstructor
