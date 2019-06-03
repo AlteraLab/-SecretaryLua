@@ -2,7 +2,7 @@ package chatbot.api.buildcode.services;
 
 import chatbot.api.buildcode.domain.*;
 import chatbot.api.buildcode.domain.response.ResponseHrdwrInfo;
-import chatbot.api.buildcode.repository.BuildRepositoryImpl;
+import chatbot.api.buildcode.repository.BuildRepository;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
 import chatbot.api.common.services.KakaoBasicCardService;
 import chatbot.api.common.services.KakaoSimpleTextService;
@@ -36,7 +36,7 @@ public class TextBoxResponseService {
 
     private KakaoSimpleTextService kakaoSimpleTextService;
 
-    private BuildRepositoryImpl buildRepository;
+    private BuildRepository buildRepository;
 
     private BuildSaveService buildSaveService;
 
@@ -46,7 +46,7 @@ public class TextBoxResponseService {
     // 가상 데이터
   //  private HrdwrDto[] hrdwrs;
 
-    public TextBoxResponseService(HubMapper hubmapper, UserMapper userMapper, KakaoBasicCardService kakaoBasicCardService, KakaoSimpleTextService kakaoSimpleTextService, BuildRepositoryImpl buildRepository, BuildSaveService buildSaveService, RestTemplate restTemplate, BoxMapper boxMapper, BtnMapper btnMapper, DerivationMapper derivationMapper, HrdwrMapper hrdwrMapper) {
+    public TextBoxResponseService(HubMapper hubmapper, UserMapper userMapper, KakaoBasicCardService kakaoBasicCardService, KakaoSimpleTextService kakaoSimpleTextService, BuildRepository buildRepository, BuildSaveService buildSaveService, RestTemplate restTemplate, BoxMapper boxMapper, BtnMapper btnMapper, DerivationMapper derivationMapper, HrdwrMapper hrdwrMapper) {
         this.hubmapper = hubmapper;
         this.userMapper = userMapper;
         this.boxMapper = boxMapper;

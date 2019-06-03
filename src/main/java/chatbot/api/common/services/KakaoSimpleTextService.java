@@ -1,7 +1,7 @@
 package chatbot.api.common.services;
 
 import chatbot.api.buildcode.domain.*;
-import chatbot.api.buildcode.repository.BuildRepositoryImpl;
+import chatbot.api.buildcode.repository.BuildRepository;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.QuickReply;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.simpleText.ComponentSimpleText;
@@ -21,7 +21,7 @@ import static chatbot.api.buildcode.utils.BuildConstants.*;
 @Slf4j
 public class KakaoSimpleTextService {
 
-    private BuildRepositoryImpl buildRepository;
+    private BuildRepository buildRepository;
 
 
     public ResponseDtoVerTwo responserShortMsg(String msg) {
@@ -408,8 +408,4 @@ public class KakaoSimpleTextService {
                 .template(template)
                 .build();
     }
-
-
-
-
 }

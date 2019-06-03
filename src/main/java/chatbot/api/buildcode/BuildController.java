@@ -4,7 +4,7 @@ import chatbot.api.buildcode.domain.Build;
 import chatbot.api.buildcode.domain.Path;
 import chatbot.api.buildcode.domain.SelectedBtn;
 import chatbot.api.buildcode.domain.response.HrdwrControlResult;
-import chatbot.api.buildcode.repository.BuildRepositoryImpl;
+import chatbot.api.buildcode.repository.BuildRepository;
 import chatbot.api.buildcode.services.TextBoxResponseService;
 import chatbot.api.common.domain.kakao.openbuilder.RequestDto;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
@@ -34,7 +34,7 @@ public class BuildController {
     private RestTemplate restTemplate;
 
     @Autowired
-    private BuildRepositoryImpl buildRepository;
+    private BuildRepository buildRepository;
 
 
     // 사용자가 "시바"를 입력했을 때 호출되는 메소드

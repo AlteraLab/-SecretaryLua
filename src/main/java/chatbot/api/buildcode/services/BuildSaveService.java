@@ -1,7 +1,7 @@
 package chatbot.api.buildcode.services;
 
 import chatbot.api.buildcode.domain.*;
-import chatbot.api.buildcode.repository.BuildRepositoryImpl;
+import chatbot.api.buildcode.repository.BuildRepository;
 import chatbot.api.skillhub.domain.HubInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 @Slf4j
 public class BuildSaveService {
 
-    private BuildRepositoryImpl buildRepository;
+    private BuildRepository buildRepository;
 
 
 
