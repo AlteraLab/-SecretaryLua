@@ -1,9 +1,9 @@
 package chatbot.api.skillhub.services;
 
-import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.common.domain.ResponseDTO;
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.mappers.RoleMapper;
-import chatbot.api.role.domain.RoleDto;
+import chatbot.api.role.domain.RoleDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,9 +27,9 @@ public class HubDeleteService {
     // admin이 해당 허브에 대한 정보 모두 삭제
     // 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블으 모듈들도 제거해주는 코드 작성
     @Transactional
-    public ResponseDto explicitDeleterByAdmin(RoleDto role) {
+    public ResponseDTO explicitDeleterByAdmin(RoleDTO role) {
 
-        ResponseDto responseDto = new ResponseDto().builder()
+        ResponseDTO responseDto = new ResponseDTO().builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
 
@@ -62,9 +62,9 @@ public class HubDeleteService {
 
 
     // 허브에 대한 일반 유저가 스스로 허브에 대한 권한을 스스로 ㄹ제거
-    public ResponseDto explicitDeleterByUser(RoleDto role) {
+    public ResponseDTO explicitDeleterByUser(RoleDTO role) {
 
-        ResponseDto responseDto = ResponseDto.builder()
+        ResponseDTO responseDto = ResponseDTO.builder()
                 .status(HttpStatus.ACCEPTED)
                 .build();
 

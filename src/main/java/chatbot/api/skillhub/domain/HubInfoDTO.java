@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Data
 @Builder
 @NoArgsConstructor @AllArgsConstructor
-public class HubInfoDto {
+public class HubInfoDTO {
 
     private Long hubId;
 

@@ -1,8 +1,8 @@
 package chatbot.api.skillhub;
 
 import chatbot.api.mappers.RoleMapper;
-import chatbot.api.role.domain.RoleDto;
-import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.role.domain.RoleDTO;
+import chatbot.api.common.domain.ResponseDTO;
 import chatbot.api.common.security.UserPrincipal;
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.skillhub.domain.*;
@@ -55,14 +55,39 @@ public class HubController {
 
 
 
+    // UPnP 수행 이후, 할당 받은 Ip가 이전 Ip와 다르다면 스킬 서버로 데이터를 전송
+    // Ip 수정 실시
+    /*
+    PUT http://localhost:8083/hub/upnpIp HTTP/1.1
+    Content-Type: application/json
+    {
+        "mac_addr": "12:34:56:78:90:12",
+        "external_ip": "203.250.32.29",
+        "external_port": 540000
+    }
+    */
+    @PutMapping("/hub/upnpIp")
+    public ResponseDTO updateUpnpIp(@RequestBody HubVO hubInfoVo) {
+        System.out.println("\n");
+        log.info("Info -> Update Upnp Ip");
+        log.info("MAC -> " + hubInfoVo.getMacAddr() + ", IP -> " + hubInfoVo.getExternalIp() + ", Port -> " + hubInfoVo.getExternalPort());
+        return hubEditService.editerHubUpnpIp(hubInfoVo);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+
+
     // 특정 유저가 컨트롤 할 수 있는 허브 모두 조회하는 메소드
     // 이거 왜있는지 모르겠음... 나중에 교준이한테 물어보기..
     @GetMapping("/hub")
-    public ResponseDto getSpecificUserHub(@AuthenticationPrincipal UserPrincipal userPrincipal){
+    public ResponseDTO getSpecificUserHub(@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
-        Optional<HubInfoDto> hubs = hubMapper.getUserHub(userPrincipal.getId());
+        Optional<HubInfoDTO> hubs = hubMapper.getUserHub(userPrincipal.getId());
 
-        return ResponseDto.builder()
+        return ResponseDTO.builder()
                 .msg("success")
                 .status(HttpStatus.OK)
                 .data(hubs)
@@ -70,12 +95,11 @@ public class HubController {
     }
 
 
-
     // 허브 등록 순서 : hub 등록 -> hub_user 등록
     //@PostMapping("/hub/{userId}")
     @PostMapping("/hub")
-    public ResponseDto registHub(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                 @Valid @RequestBody HubVo hub) {
+    public ResponseDTO registHub(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                 @Valid @RequestBody HubVO hub) {
 
         log.info(hub.toString());
         return hubRegisterService.register(userPrincipal.getId(), hub);
@@ -83,49 +107,38 @@ public class HubController {
     }
 
 
-
-    // UPnP 수행 이후, 할당 받은 Ip가 이전 Ip와 다르다면 스킬 서버로 데이터를 전송
-    // Ip 수정 실시
-    @PutMapping("/hub/upnpIp")
-    public ResponseDto updateUpnpIp(@RequestBody HubVo hubInfoVo) {
-        log.info(hubInfoVo.toString());
-        return hubEditService.editerHubUPnPIp(hubInfoVo, hubEditService);
-    }
-
-
-
     // hub를 삭제해주는 메소드, 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블의 모듈들도 제거해주는 코드 작성
     // 추후에 허브에 모듈이 붙으면 모듈들에 데이터를 제거하는 코드도 추가해야함.
     @DeleteMapping("/hub")
-    public ResponseDto deleteHub(//@PathVariable("userId") Long userId,
+    public ResponseDTO deleteHub(//@PathVariable("userId") Long userId,
                                  @AuthenticationPrincipal UserPrincipal userPrincipal,
-                                 @RequestBody HubVo hubInfoVo) {
+                                 @RequestBody HubVO hubInfoVo) {
 
-        RoleDto role = new RoleDto().builder()
+        RoleDTO role = new RoleDTO().builder()
                 //.userSeq(userId)
                 .userId(userPrincipal.getId())
                 .hubId(hubInfoVo.getHubId())
                 .build();
 
-        ResponseDto responseDto = new ResponseDto().builder()
+        ResponseDTO responseDto = new ResponseDTO().builder()
                 .status(HttpStatus.ACCEPTED)
                 .build();
 
 
-        HubInfoDto hub = hubMapper.getHubInfo(hubInfoVo.getHubId());
-        if(hub == null) {
+        HubInfoDTO hub = hubMapper.getHubInfo(hubInfoVo.getHubId());
+        if (hub == null) {
             responseDto.setMsg(FAIL_MSG_BECAUSE_NO_EXIST);
             return responseDto;
         }
 
         // ROLE_USER   VS   ROLE_ADMIN
 //        if(!userId.equals(hub.getAdminSeq())) {     // ROLE_USER
-        if(!userPrincipal.getId().equals(hub.getAdminId())) {     // ROLE_USER
+        if (!userPrincipal.getId().equals(hub.getAdminId())) {     // ROLE_USER
 
             // 1. 해당 유저가 ROLE_USER 인지 확인
             //RoleDto roleUser = roleMapper.getRoleInfo(hubInfoVo.getHubSequence(), userId);
-            RoleDto roleUser = roleMapper.getRoleInfo(hubInfoVo.getHubId(), userPrincipal.getId());
-            if(roleUser == null) {
+            RoleDTO roleUser = roleMapper.getRoleInfo(hubInfoVo.getHubId(), userPrincipal.getId());
+            if (roleUser == null) {
                 responseDto.setMsg(FAIL_MSG_NO_ROLE_USER_AND_ROLE_ADMIN);
                 responseDto.setStatus(HttpStatus.NO_CONTENT);
                 return responseDto;
@@ -145,7 +158,7 @@ public class HubController {
             String url = "http://" + hub.getExternalIp() + "/" + hub.getExternalPort() + "/ip";
             ResponseEntity<String> resultAboutDelIp = deleteIpInHub.exchange(url, HttpMethod.DELETE, null, String.class);
 
-            if(resultAboutDelIp.equals("fail")) {
+            if (resultAboutDelIp.equals("fail")) {
                 responseDto.setMsg(FAIL_MSG_DELETE_HUB_BECAUSE_FAIL_RESTTEMPLATE);
                 responseDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
                 return responseDto;
@@ -155,9 +168,8 @@ public class HubController {
             return hubDeleteService.explicitDeleterByAdmin(role);
         }
     }
-
-
-
+}
+/*
     // hub edit, admin만 수행 가능
     @PutMapping("/hub")
     public ResponseDto editHub(//@PathVariable("userId") Long userId,
@@ -181,15 +193,15 @@ public class HubController {
         //if(userId != hub.getAdminSeq()) return responseDto;
 
         return ResponseDto.builder().build();
-        /*
+
         return hubEditService.editer(hubInfoVo.getHubId(),
                                      hubInfoVo.getExternalIp(),
                                      hubInfoVo.getInternalIp(),
                                      hubInfoVo.getExternalPort(),
                                      hubInfoVo.getInternalPort());
-                                      */
-    }
 
+
+*/
 
 /*
     // 일단 만들었는데 안쓸수도 있음
@@ -223,4 +235,3 @@ public class HubController {
                 .data(hubsSeqAndName)
                 .build();
     }*/
-}

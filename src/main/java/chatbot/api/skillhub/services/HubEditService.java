@@ -1,9 +1,9 @@
 package chatbot.api.skillhub.services;
 
-import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.common.domain.ResponseDTO;
 import chatbot.api.mappers.HubMapper;
-import chatbot.api.skillhub.domain.HubInfoDto;
-import chatbot.api.skillhub.domain.HubVo;
+import chatbot.api.skillhub.domain.HubInfoDTO;
+import chatbot.api.skillhub.domain.HubVO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,8 +22,33 @@ public class HubEditService {
     private HubMapper hubMapper;
 
 
+    // 허브가 연결된 장소가 변경되었을 때, DB에 허브의 공용 IP 주소를 수정하는 기능
+    public ResponseDTO editerHubUpnpIp(HubVO hubInfoVo) {
+        System.out.println("\n");
+        log.info("Info -> Update Upnp Ip Mehtod -> Editer Hub Upnp Ip");
 
-    public ResponseDto editer(String macAddr,
+        HubInfoDTO hub = hubMapper.getHubInfoByMacAddr(hubInfoVo.getMacAddr());
+        if(hub == null) {
+            log.info("Hub == NULL");
+            return ResponseDTO.builder()
+                    .msg(FAIL_MSG_BECAUSE_NO_EXIST)
+                    .status(HttpStatus.OK)
+                    .build();
+        }
+
+        hubMapper.editHubIp(hubInfoVo.getMacAddr(),
+                hubInfoVo.getExternalIp(),
+                hubInfoVo.getExternalPort());
+
+        return ResponseDTO.builder()
+                .msg(SUCCESS_MSG_EDIT_HUB)
+                .status(HttpStatus.OK)
+                .build();
+    }
+
+
+
+    public ResponseDTO editer(String macAddr,
                               String hubName,
                               String searchId,
                               String desc,
@@ -32,7 +57,7 @@ public class HubEditService {
                               String beforeIp) {
 
 
-        ResponseDto responseDto = ResponseDto.builder()
+        ResponseDTO responseDto = ResponseDTO.builder()
                 .data(null)
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
@@ -56,29 +81,5 @@ public class HubEditService {
         } finally {
             return responseDto;
         }
-    }
-
-
-
-    public ResponseDto editerHubUPnPIp(HubVo hubInfoVo, HubEditService hubEditService) {
-
-        HubInfoDto hub = hubMapper.getHubInfoByMacAddr(hubInfoVo.getMacAddr());
-        if(hub.equals(null)) return ResponseDto.builder()
-                .msg(FAIL_MSG_BECAUSE_NO_EXIST)
-                .status(HttpStatus.OK)
-                .build();
-
-/*
-        ResponseDto responseDto = hubEditService.editer(hub.getHubId(),
-                                                        hubInfoVo.getExternalIp(),
-                                                        hubInfoVo.getInternalIp(),
-                                                        hubInfoVo.getExternalPort(),
-                                                        hubInfoVo.getInternalPort());
-
-        if(responseDto.getMsg().equals(SUCCESS_MSG_EDIT_HUB)) responseDto.setMsg("UPNP IP");
-
-        return responseDto;
-*/
-        return ResponseDto.builder().build();
     }
 }

@@ -15,7 +15,7 @@
 
 
 
-    <resultMap id="BtnDto" type="chatbot.api.buildcode.domain.BtnDto">
+    <resultMap id="BtnDto" type="chatbot.api.buildcode.domain.BtnDTO">
         <result property="boxId" column="box_id"/>
         <result property="authKey" column="auth_key"/>
         <result property="eventCode" column="event_code"/>
@@ -23,7 +23,7 @@
         <result property="blockId" column="block_id"/>
     </resultMap>
 
-    <parameterMap id="BtnDto" type="chatbot.api.buildcode.domain.BtnDto">
+    <parameterMap id="BtnDto" type="chatbot.api.buildcode.domain.BtnDTO">
         <parameter property="boxId"/>
         <parameter property="authKey"/>
         <parameter property="eventCode"/>

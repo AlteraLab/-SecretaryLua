@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class RequestDto {
+public class RequestDTO {
 	private Intent intent;
 	private UserRequest userRequest;
 	private ChatBot bot;

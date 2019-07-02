@@ -1,6 +1,6 @@
 package chatbot.api.common.services;
 
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.basicCard.BasicCard;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.basicCard.Button;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.basicCard.ComponentBasicCard;
@@ -21,7 +21,7 @@ public class KakaoBasicCardService {
 
 
 
-    public ResponseDtoVerTwo responserRequestJoin(String id) {
+    public ResponseVerTwoDTO responserRequestJoin(String id) {
         ArrayList<Button> buttons = new ArrayList<Button>();
         buttons.add(Button.builder()
                 .action("webLink")
@@ -46,18 +46,18 @@ public class KakaoBasicCardService {
         SkillTemplate template = new SkillTemplate();
         template.setOutputs(outputs);
 
-        ResponseDtoVerTwo responseDtoVerTwo = ResponseDtoVerTwo.builder()
+        ResponseVerTwoDTO responseVerTwoDTO = ResponseVerTwoDTO.builder()
                 .version("2.0")
                 .template(template)
                 .build();
 
-        return responseDtoVerTwo;
+        return responseVerTwoDTO;
     }
 
 
     // 사용자가 발화를 넘겼을때 appUserId가 null 일때 회원가입 링크를 response 해준다.
     // 아직 구현 안해줌.
-    public ResponseDtoVerTwo responserRequestPreSignUp() {
+    public ResponseVerTwoDTO responserRequestPreSignUp() {
 
         ArrayList<Button> buttons = new ArrayList<Button>();
         buttons.add(Button.builder()
@@ -84,12 +84,12 @@ public class KakaoBasicCardService {
         SkillTemplate template = new SkillTemplate();
         template.setOutputs(outputs);
 
-        ResponseDtoVerTwo responseDtoVerTwo = ResponseDtoVerTwo.builder()
+        ResponseVerTwoDTO responseVerTwoDTO = ResponseVerTwoDTO.builder()
                 .version("2.0")
                 .template(template)
                 .build();
 
-        return responseDtoVerTwo;
+        return responseVerTwoDTO;
     }
 }
 

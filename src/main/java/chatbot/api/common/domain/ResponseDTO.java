@@ -1,17 +1,19 @@
 package chatbot.api.common.domain;
 
-import java.time.LocalDateTime;
-
 import org.springframework.http.HttpStatus;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class OrderDto {
+@AllArgsConstructor
+@Builder
+public class ResponseDTO {
 	private String msg;
+	private String title;
 	private HttpStatus status;
-	private Object dataset;
-	private LocalDateTime orderDateTime;
+	private Object data;
 }

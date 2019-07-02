@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BtnDto implements Serializable {
+public class BtnDTO implements Serializable {
 
     private int btnSeq;     // DB 에 저장되는 데이터 아님.
 

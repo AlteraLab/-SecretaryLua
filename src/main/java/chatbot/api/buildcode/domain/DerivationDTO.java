@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DerivationDto implements Serializable {
+public class DerivationDTO implements Serializable {
 
     private Long derivationCode;    // PK
 

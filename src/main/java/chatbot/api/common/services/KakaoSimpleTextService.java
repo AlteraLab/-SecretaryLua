@@ -3,11 +3,11 @@ package chatbot.api.common.services;
 import chatbot.api.buildcode.domain.*;
 import chatbot.api.buildcode.repository.BuildRepository;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.QuickReply;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.simpleText.ComponentSimpleText;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.simpleText.SimpleText;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.SkillTemplate;
-import chatbot.api.skillhub.domain.HubInfoDto;
+import chatbot.api.skillhub.domain.HubInfoDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class KakaoSimpleTextService {
     private BuildRepository buildRepository;
 
 
-    public ResponseDtoVerTwo responserShortMsg(String msg) {
+    public ResponseVerTwoDTO responserShortMsg(String msg) {
 
         SimpleText simpleTextVo = new SimpleText();
         simpleTextVo.setText(msg);
@@ -38,7 +38,7 @@ public class KakaoSimpleTextService {
         SkillTemplate template = new SkillTemplate();
         template.setOutputs(outputs);
 
-        return new ResponseDtoVerTwo().builder()
+        return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(template)
                 .build();
@@ -46,7 +46,7 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo makerTransferBtnText() {
+    public ResponseVerTwoDTO makerTransferBtnText() {
 
         String msg = "하위 명령이 없습니다. \n\n버튼을 누르면 명령을 전송합니다.";
         SimpleText simpleTextVo = new SimpleText();
@@ -73,7 +73,7 @@ public class KakaoSimpleTextService {
         quickReplies.add(transferBtn);
         template.setQuickReplies(quickReplies);
 
-        return new ResponseDtoVerTwo().builder()
+        return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(template)
                 .build();
@@ -81,7 +81,7 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo makerTransferSelectCard() {
+    public ResponseVerTwoDTO makerTransferSelectCard() {
 
         String msg = "명령을 전송하시겠습니까?";
         SimpleText simpleTextVo = new SimpleText();
@@ -117,7 +117,7 @@ public class KakaoSimpleTextService {
 
         template.setQuickReplies(quickReplies);
 
-        return new ResponseDtoVerTwo().builder()
+        return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(template)
                 .build();
@@ -125,7 +125,7 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo makerTransferCompleteCard(String msg) {
+    public ResponseVerTwoDTO makerTransferCompleteCard(String msg) {
 
         SimpleText simpleTextVo = new SimpleText();
         simpleTextVo.setText(msg);
@@ -139,7 +139,7 @@ public class KakaoSimpleTextService {
         SkillTemplate template = new SkillTemplate();
         template.setOutputs(outputs);
 
-        return new ResponseDtoVerTwo().builder()
+        return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(template)
                 .build();
@@ -147,7 +147,7 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo makerCancleSelectCard() {
+    public ResponseVerTwoDTO makerCancleSelectCard() {
 
         StringBuffer msg = new StringBuffer("명령을 취소하였습니다.\n\n");
 
@@ -202,7 +202,7 @@ public class KakaoSimpleTextService {
 
         template.setQuickReplies(quickReplies);
 
-        return new ResponseDtoVerTwo().builder()
+        return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(template)
                 .build();
@@ -210,7 +210,7 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo makerCancleCompleteCard() {
+    public ResponseVerTwoDTO makerCancleCompleteCard() {
 
         String msg = "모든 명령을 취소하였습니다.\n\n또 다른 명령을 내리실려면 슬롯을 올려 \"시바\" 버튼을 클릭하세요.";
         SimpleText simpleTextVo = new SimpleText();
@@ -225,7 +225,7 @@ public class KakaoSimpleTextService {
         SkillTemplate template = new SkillTemplate();
         template.setOutputs(outputs);
 
-        return new ResponseDtoVerTwo().builder()
+        return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(template)
                 .build();
@@ -234,7 +234,7 @@ public class KakaoSimpleTextService {
 
 
     // 사용 가능한 허브가 한 개 이상인 경우 허브 리스트 카드를 만들고 반환
-    public ResponseDtoVerTwo makerHubsCard(ArrayList<HubInfoDto> hubs) {
+    public ResponseVerTwoDTO makerHubsCard(ArrayList<HubInfoDTO> hubs) {
 
         log.info("================== makerHubsCard 시작 ==================");
 
@@ -269,7 +269,7 @@ public class KakaoSimpleTextService {
 
         log.info("================== makerHubsCard 끝 ==================");
 
-        return new ResponseDtoVerTwo().builder()
+        return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(template)
                 .build();
@@ -277,7 +277,7 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo makerHrdwrsCard(ArrayList<HrdwrDto> hrdwrs) {
+    public ResponseVerTwoDTO makerHrdwrsCard(ArrayList<HrdwrDTO> hrdwrs) {
 
         log.info("================== makerHrdwrsCard 시작 ==================");
 
@@ -312,7 +312,7 @@ public class KakaoSimpleTextService {
 
         log.info("================== makerHrdwrsCard 끝    ==================");
 
-        return new ResponseDtoVerTwo().builder()
+        return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(template)
                 .build();
@@ -320,14 +320,14 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo makerBtnsCard(String providerId) {
+    public ResponseVerTwoDTO makerBtnsCard(String providerId) {
 
         log.info("================== makerBtnsCard 시작 ==================");
 
         Build reBuild = buildRepository.find(providerId);
 
-        BoxDto curBox = reBuild.getBox();
-        ArrayList<BtnDto> btns = reBuild.getBtns();
+        BoxDTO curBox = reBuild.getBox();
+        ArrayList<BtnDTO> btns = reBuild.getBtns();
 
         // 카드 만들기
         SimpleText text = new SimpleText();
@@ -370,7 +370,7 @@ public class KakaoSimpleTextService {
 
         log.info("================== makerBtnsCard 끝    ==================");
 
-        return new ResponseDtoVerTwo().builder()
+        return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(template)
                 .build();
@@ -378,13 +378,13 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseDtoVerTwo makerInputCard(String providerId) {
+    public ResponseVerTwoDTO makerInputCard(String providerId) {
 
         log.info("================== makerInputCard 시작    ==================");
 
 
         Build reBuild = buildRepository.find(providerId);
-        BoxDto inputBox = reBuild.getBox();
+        BoxDTO inputBox = reBuild.getBox();
         log.info("INFO >> Box_Type == 3 -> Input Box 의 타입 : " + inputBox.getBoxType());
 
         String msg = inputBox.getPreText() + "\n\n" + inputBox.getPostText();
@@ -403,7 +403,7 @@ public class KakaoSimpleTextService {
 
         log.info("================== makerInputCard 끝    ==================");
 
-        return new ResponseDtoVerTwo().builder()
+        return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(template)
                 .build();

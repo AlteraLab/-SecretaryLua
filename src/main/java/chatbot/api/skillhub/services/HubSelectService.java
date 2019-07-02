@@ -1,7 +1,7 @@
 package chatbot.api.skillhub.services;
 
 import chatbot.api.mappers.HubMapper;
-import chatbot.api.skillhub.domain.HubInfoDto;
+import chatbot.api.skillhub.domain.HubInfoDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +16,9 @@ public class HubSelectService {
 
 
     // get hubs by adminId
-    public List<HubInfoDto> getHubsInfoByadminId(Long adminId) {
+    public List<HubInfoDTO> getHubsInfoByadminId(Long adminId) {
 
-        List<HubInfoDto> hubsInfoList = null;
+        List<HubInfoDTO> hubsInfoList = null;
 
         try {
             hubsInfoList = hub.getHubInfoByAdminId(adminId);

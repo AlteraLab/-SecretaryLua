@@ -28,7 +28,7 @@
 
 
 
-    <resultMap id="BoxDto" type="chatbot.api.buildcode.domain.BoxDto">
+    <resultMap id="BoxDto" type="chatbot.api.buildcode.domain.BoxDTO">
         <result property="boxId" column="box_id"/>
         <result property="authKey" column="auth_key"/>
         <result property="preText" column="pre_text"/>
@@ -36,7 +36,7 @@
         <result property="boxType" column="box_type"/>
     </resultMap>
 
-    <parameterMap id="BoxDto" type="chatbot.api.buildcode.domain.BoxDto">
+    <parameterMap id="BoxDto" type="chatbot.api.buildcode.domain.BoxDTO">
         <parameter property="boxId"/>
         <parameter property="authKey"/>
         <parameter property="preText"/>

@@ -6,12 +6,14 @@ import chatbot.api.buildcode.domain.SelectedBtn;
 import chatbot.api.buildcode.domain.response.HrdwrControlResult;
 import chatbot.api.buildcode.repository.BuildRepository;
 import chatbot.api.buildcode.services.TextBoxResponseService;
-import chatbot.api.common.domain.kakao.openbuilder.RequestDto;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
+import chatbot.api.common.domain.ResponseDTO;
+import chatbot.api.common.domain.kakao.openbuilder.RequestDTO;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
 import chatbot.api.common.services.KakaoSimpleTextService;
 import chatbot.api.common.services.TimeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,22 +41,27 @@ public class BuildController {
 
     // 사용자가 "시바"를 입력했을 때 호출되는 메소드
     @PostMapping("/build/hubs")
-    public ResponseDtoVerTwo buildHubs(@RequestBody RequestDto requestDto) {
+    public ResponseVerTwoDTO buildHubs(@RequestBody RequestDTO requestDto) {
 
         log.info("==================== build Hubs 시작 ====================");
         log.info(requestDto.toString());
         log.info("INFO >> Utterance -> " + requestDto.getUserRequest().getUtterance());
 
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
-
         return textBoxResponseService.responserHubsBox(providerId);
     }
 
+    @PostMapping("/TEST")
+    public ResponseDTO TestMethod(@RequestBody RequestDTO requestDto) {
 
+        log.info("==================== Test Method 시작 ====================");
+        log.info(requestDto.toString());
+        return ResponseDTO.builder().data(null).status(HttpStatus.OK).build();
+    }
 
     // 사용자가 hub를 선택했을 때 호출되는 메소드
     @PostMapping("/build/hub")
-    public ResponseDtoVerTwo buildHub(@RequestBody RequestDto requestDto) {
+    public ResponseVerTwoDTO buildHub(@RequestBody RequestDTO requestDto) {
 
         log.info("==================== build Hub 시작 ====================");
         log.info(requestDto.toString());
@@ -69,7 +76,7 @@ public class BuildController {
 
     // 사용자가 하드웨어를 선택했을 때 호출되는 메소드. 선택한 하드웨어의 Entry Box 에 속한 버튼들을 리턴
     @PostMapping("/build/hrdwr")
-    public ResponseDtoVerTwo buildHrdwr(@RequestBody RequestDto requestDto) {
+    public ResponseVerTwoDTO buildHrdwr(@RequestBody RequestDTO requestDto) {
 
         log.info("==================== build Hrdwr 시작 ====================");
         log.info(requestDto.toString());
@@ -84,7 +91,7 @@ public class BuildController {
 
     // 사용자가 선택한 버튼이 btn 타입 버튼일 때!!
     @PostMapping("/build/btn")
-    public ResponseDtoVerTwo buildBtn(@RequestBody RequestDto requestDto) {
+    public ResponseVerTwoDTO buildBtn(@RequestBody RequestDTO requestDto) {
 
         log.info("==================== build Btn 시작 ====================");
         log.info("사용자가 선택한 버튼의 블록 아이디 속성값이 \"BTN_TEXTBOX\"일 때, 호출되는 메소드 입니다.");
@@ -100,7 +107,7 @@ public class BuildController {
 
 
     @PostMapping("/build/time")
-    public ResponseDtoVerTwo buildTime(@RequestBody RequestDto requestDto) {
+    public ResponseVerTwoDTO buildTime(@RequestBody RequestDTO requestDto) {
 
         log.info("==================== build Time 시작 ====================");
         log.info("사용자가 선택한 버튼의 블록 아이디 속성값이 \"TIME_TEXTBOX\"일 때, 호출되는 메소드 입니다.");
@@ -122,7 +129,7 @@ public class BuildController {
 
 
     @PostMapping("/build/input")
-    public ResponseDtoVerTwo buildInput(@RequestBody RequestDto requestDto) {
+    public ResponseVerTwoDTO buildInput(@RequestBody RequestDTO requestDto) {
 
         log.info("==================== build Input 시작 ====================");
         log.info("사용자가 선택한 버튼의 블록 아이디 속성값이 \"INPUT_TEXTBOX\"일 때, 호출되는 메소드 입니다.");
@@ -138,7 +145,7 @@ public class BuildController {
 
 
     @PostMapping("/build/input/context")
-    public ResponseDtoVerTwo buildInputContext(@RequestBody RequestDto requestDto) {
+    public ResponseVerTwoDTO buildInputContext(@RequestBody RequestDTO requestDto) {
 
         log.info("==================== build Input Context 시작 ====================");
         log.info("사용자가 선택한 버튼의 블록 아이디 속성값이 \"INPUT_TEXTBOX_CONTEXT\"일 때, 호출되는 메소드 입니다.");
@@ -154,7 +161,7 @@ public class BuildController {
 
 
     @PostMapping("/complete/builded/codes")
-    public ResponseDtoVerTwo transferCompleteBuildedCodes(@RequestBody RequestDto requestDto) {
+    public ResponseVerTwoDTO transferCompleteBuildedCodes(@RequestBody RequestDTO requestDto) {
 
         log.info("==================== Transfer Complete Builded Codes 시작 ====================");
         log.info("사용자가 선택한 버튼이 \"예\" 버튼 이여서, 빌드된 코드를 전송할 때 호출되는 메소드 입니다.");
@@ -185,7 +192,10 @@ public class BuildController {
 
 
             // 밑에 임시 주석
-            HrdwrControlResult result = restTemplate.postForObject(url, new Object(){public SelectedBtn[] cmd = arrBtns;}, HrdwrControlResult.class);
+            HrdwrControlResult result = restTemplate.postForObject(url, new Object(){
+                    public String requester_id = reBuild.getHProviderId();
+                    public SelectedBtn[] cmd = arrBtns;
+                }, HrdwrControlResult.class);
             //HrdwrControlResult result = new HrdwrControlResult();
             result.setStatus(true);
             log.info("INFO >> Result 결과 -> " + result.toString());
@@ -210,7 +220,7 @@ public class BuildController {
 
 
     @PostMapping("/builed/codes")
-    public ResponseDtoVerTwo transferCodes(@RequestBody RequestDto requestDto) {
+    public ResponseVerTwoDTO transferCodes(@RequestBody RequestDTO requestDto) {
 
         log.info("============ Transfer Codes 시작 ============");
         log.info("중간에 \"전송\" 버튼을 눌렀을때, 빌딩된 명령을 전송하는 메소드");

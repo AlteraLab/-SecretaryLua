@@ -5,7 +5,6 @@ import chatbot.api.user.domain.UserInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -13,7 +12,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.util.Collection;
 import java.util.Map;
 
-@AllArgsConstructor
+//@AllArgsConstructor  문제의 주범...
 @Builder
 @Data
 public class UserPrincipal implements UserDetails, OAuth2User {

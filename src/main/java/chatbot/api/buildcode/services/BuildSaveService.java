@@ -2,7 +2,7 @@ package chatbot.api.buildcode.services;
 
 import chatbot.api.buildcode.domain.*;
 import chatbot.api.buildcode.repository.BuildRepository;
-import chatbot.api.skillhub.domain.HubInfoDto;
+import chatbot.api.skillhub.domain.HubInfoDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class BuildSaveService {
 
 
 
-    public void saverHubs(String providerId, ArrayList<HubInfoDto> hubs) {
+    public void saverHubs(String providerId, ArrayList<HubInfoDTO> hubs) {
 
         log.info("=============== Saver Hubs 시작 ===============");
 
@@ -48,7 +48,7 @@ public class BuildSaveService {
 
 
 
-    public void saverHrdwrs(String providerId, HrdwrDto[] hrdwrs) {
+    public void saverHrdwrs(String providerId, HrdwrDTO[] hrdwrs) {
 
         log.info("=============== Saver Hrdwrs 시작 ===============");
 
@@ -60,8 +60,8 @@ public class BuildSaveService {
             log.info(i + 1 + "번 : " + hrdwrs[i].toString());
         }
 
-        reBuild.setHrdwrs(new ArrayList<HrdwrDto>());
-        for(HrdwrDto tempHrdwr : hrdwrs) {
+        reBuild.setHrdwrs(new ArrayList<HrdwrDTO>());
+        for(HrdwrDTO tempHrdwr : hrdwrs) {
             reBuild.getHrdwrs().add(tempHrdwr);
         }
 
@@ -72,7 +72,7 @@ public class BuildSaveService {
 
 
 
-    public void saverBtns(String providerId, ArrayList<BtnDto> btns) {
+    public void saverBtns(String providerId, ArrayList<BtnDTO> btns) {
 
         log.info("=============== Saver Btns 시작 ===============");
 
@@ -91,7 +91,7 @@ public class BuildSaveService {
 
 
 
-    public void saverDerivation(String providerId, ArrayList<DerivationDto> derivations) {
+    public void saverDerivation(String providerId, ArrayList<DerivationDTO> derivations) {
 
         log.info("=============== Saver Derivations 시작 ===============");
 
@@ -109,7 +109,7 @@ public class BuildSaveService {
 
 
 
-    public void saverBox(String providerId, BoxDto box) {
+    public void saverBox(String providerId, BoxDTO box) {
 
         log.info("=============== Saver Box 시작 ===============");
         log.info("INFO >> BOX 데이터 확인 -> " + box.toString());

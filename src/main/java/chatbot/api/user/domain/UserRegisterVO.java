@@ -3,7 +3,7 @@ package chatbot.api.user.domain;
 import lombok.Data;
 
 @Data
-public class UserRegisterVo {
+public class UserRegisterVO {
 
     // 삭제
     private Long userId;        // 삭제할 유저의 아이디

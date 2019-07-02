@@ -1,12 +1,12 @@
 package chatbot.api.skillhub.services;
 
-import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.common.domain.ResponseDTO;
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.mappers.RoleMapper;
 import chatbot.api.mappers.UserMapper;
-import chatbot.api.skillhub.domain.HubInfoDto;
-import chatbot.api.role.domain.RoleDto;
-import chatbot.api.skillhub.domain.HubVo;
+import chatbot.api.skillhub.domain.HubInfoDTO;
+import chatbot.api.role.domain.RoleDTO;
+import chatbot.api.skillhub.domain.HubVO;
 import chatbot.api.user.domain.UserInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +43,9 @@ public class HubRegisterService {
 
 
     @Transactional
-    public ResponseDto register(Long userId, HubVo hubVo) {
+    public ResponseDTO register(Long userId, HubVO hubVo) {
 
-        HubInfoDto hub = null;
+        HubInfoDTO hub = null;
 
         // reactApp으로 부터 받은 beforeIp가 존재한다면, Ip가 바꼈다는 의미니까 hubEdit 실시
         if(hubVo.getBeforeIp() != null) {
@@ -58,7 +58,7 @@ public class HubRegisterService {
             } catch (Exception e) {
                 log.info("해당 맥주소를 가진 허브가 없습니다.");
                 e.printStackTrace();
-                return ResponseDto.builder()
+                return ResponseDTO.builder()
                         .status(HttpStatus.EXPECTATION_FAILED)
                         .build();
             }
@@ -73,7 +73,7 @@ public class HubRegisterService {
                     hubVo.getBeforeIp());
         }
 
-        hub = HubInfoDto.builder()
+        hub = HubInfoDTO.builder()
                 .adminId(userId)
                 .hubName(hubVo.getName())
                 .hubDescript(hubVo.getDesc())
@@ -89,7 +89,7 @@ public class HubRegisterService {
                 .build();
 
         // not yet set hubSeq
-        RoleDto role = RoleDto.builder()
+        RoleDTO role = RoleDTO.builder()
                 .userId(userId)
                 .role(ROLE_ADMIN)
                 .build();
@@ -99,7 +99,7 @@ public class HubRegisterService {
         log.info(hub.toString());
 
 
-        ResponseDto responseDto = new ResponseDto().builder().build();
+        ResponseDTO responseDto = new ResponseDTO().builder().build();
 
         try {
             // 관리자로 등록하려는 사용자의 id는 users 테이블에 있는 데이터인가?

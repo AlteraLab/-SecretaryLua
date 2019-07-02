@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BoxDto implements Serializable {
+public class BoxDTO implements Serializable {
 
     private Long boxId;  // PK
 

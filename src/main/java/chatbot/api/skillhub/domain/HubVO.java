@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HubVo {
+public class HubVO {
 
     // layer 간 데이터 교환
 

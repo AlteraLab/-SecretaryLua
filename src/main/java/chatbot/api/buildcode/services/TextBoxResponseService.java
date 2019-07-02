@@ -3,11 +3,11 @@ package chatbot.api.buildcode.services;
 import chatbot.api.buildcode.domain.*;
 import chatbot.api.buildcode.domain.response.ResponseHrdwrInfo;
 import chatbot.api.buildcode.repository.BuildRepository;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseDtoVerTwo;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
 import chatbot.api.common.services.KakaoBasicCardService;
 import chatbot.api.common.services.KakaoSimpleTextService;
 import chatbot.api.mappers.*;
-import chatbot.api.skillhub.domain.HubInfoDto;
+import chatbot.api.skillhub.domain.HubInfoDTO;
 import chatbot.api.user.domain.UserInfoDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ public class TextBoxResponseService {
 
 
     // 가상 데이터
-  //  private HrdwrDto[] hrdwrs;
+    private HrdwrDTO[] hrdwrs;
 
     public TextBoxResponseService(HubMapper hubmapper, UserMapper userMapper, KakaoBasicCardService kakaoBasicCardService, KakaoSimpleTextService kakaoSimpleTextService, BuildRepository buildRepository, BuildSaveService buildSaveService, RestTemplate restTemplate, BoxMapper boxMapper, BtnMapper btnMapper, DerivationMapper derivationMapper, HrdwrMapper hrdwrMapper) {
         this.hubmapper = hubmapper;
@@ -58,25 +58,23 @@ public class TextBoxResponseService {
         this.buildRepository = buildRepository;
         this.buildSaveService = buildSaveService;
         this.restTemplate = restTemplate;
-/*
-        this.hrdwrs = new HrdwrDto[2];
 
-        this.hrdwrs[0] = HrdwrDto.builder()
+        this.hrdwrs = new HrdwrDTO[2];
+
+        this.hrdwrs[0] = HrdwrDTO.builder()
                 .userDefinedName("LG AC01")
                 .hrdwrMac("12:12:12:12:12:12")
-                .authKey("AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH")
+                .authKey("AAAABBBBCCCCDDDD")
                 .build();
-        this.hrdwrs[1] = HrdwrDto.builder()
+        this.hrdwrs[1] = HrdwrDTO.builder()
                 .userDefinedName("SAMSUNG AC01")
                 .hrdwrMac("72:72:72:72:72:72")
-                .authKey("AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH")
+                .authKey("AAAABBBBCCCCDDDD")
                 .build();
-
-     */
     }
 
 
-    public ResponseDtoVerTwo responserHubsBox(String providerId) {
+    public ResponseVerTwoDTO responserHubsBox(String providerId) {
 
         log.info("================== ResponserHubs ==================");
 
@@ -89,7 +87,7 @@ public class TextBoxResponseService {
 
         UserInfoDto user = userMapper.getUserByProviderId(providerId).get();
 
-        ArrayList<HubInfoDto> hubs = hubmapper.getUserHubsByUserId(user.getUserId());
+        ArrayList<HubInfoDTO> hubs = hubmapper.getUserHubsByUserId(user.getUserId());
         if(hubs == null) return kakaoSimpleTextService.responserShortMsg("사용 가능한 허브가 없습니다.");
 
         buildSaveService.saverHubs(providerId, hubs);
@@ -100,7 +98,7 @@ public class TextBoxResponseService {
 
 
     // 사용자가 발화한 허브 번호를 파싱해서 매개변수로 받는다.
-    public ResponseDtoVerTwo responserHrdwrsBox(String providerId, int hubSeq) {
+    public ResponseVerTwoDTO responserHrdwrsBox(String providerId, int hubSeq) {
 
         log.info("================== Responser Hrdwrs ==================");
 
@@ -115,13 +113,13 @@ public class TextBoxResponseService {
 
         String url = "http://" + reBuild.getPath().getExternalIp() + ":" + reBuild.getPath().getExternalPort() + "/dev";
         log.info("INFO >> 전달할 URL 주소 : " + url);
-        ResponseHrdwrInfo hrdwrInfo = restTemplate.getForObject(url, ResponseHrdwrInfo.class);
+        //ResponseHrdwrInfo hrdwrInfo = restTemplate.getForObject(url, ResponseHrdwrInfo.class);
 
         // 데이터 받은걸로 치자구!!!
-/*        ResponseHrdwrInfo hrdwrInfo = ResponseHrdwrInfo.builder()
+        ResponseHrdwrInfo hrdwrInfo = ResponseHrdwrInfo.builder()
                 .hrdwrsInfo(hrdwrs)
                 .status(true)
-                .build();*/
+                .build();
         log.info("INFO >> RestTemplate 종료");
         log.info("INFO >> DEV INFO 확인 : " + hrdwrInfo.toString());
         if(hrdwrInfo.getDevInfo() == null) {
@@ -130,20 +128,20 @@ public class TextBoxResponseService {
         }
         buildSaveService.saverHrdwrs(providerId, hrdwrInfo.getDevInfo());
 
-        ArrayList<HrdwrDto> hrdwrs = buildRepository.find(providerId).getHrdwrs();
+        ArrayList<HrdwrDTO> hrdwrs = buildRepository.find(providerId).getHrdwrs();
 
         return kakaoSimpleTextService.makerHrdwrsCard(hrdwrs);
     }
 
 
 
-    public ResponseDtoVerTwo responserEntryBox(String providerId, int hrdwrSeq) {
+    public ResponseVerTwoDTO responserEntryBox(String providerId, int hrdwrSeq) {
 
         log.info("================== Responser EntryBox 시작 ==================");
 
         Build reBuild = buildRepository.find(providerId);
         log.info("INFO >> reBuild.getHrdwr -> " + reBuild.getHrdwrs());
-        HrdwrDto selectedHrdwr = reBuild.getHrdwrs().get(hrdwrSeq - 1);
+        HrdwrDTO selectedHrdwr = reBuild.getHrdwrs().get(hrdwrSeq - 1);
         reBuild.getPath().setHrdwrMacAddr(selectedHrdwr.getHrdwrMac());
         reBuild.setAuthKey(selectedHrdwr.getAuthKey());
         log.info("INFO >> TEST AUTH KEY -> " + reBuild.getAuthKey());
@@ -155,16 +153,16 @@ public class TextBoxResponseService {
         // Entry Box 조회 및 Redis 에 데이터 저장
         log.info("INFO >> boxMapper.getEntryBoxByAuthKey(" + selectedHrdwr.getAuthKey() + ")");
         log.info("INFO >> AUTH KEY ->" + selectedHrdwr.getAuthKey());
-        BoxDto entryBox = boxMapper.getEntryBoxByAuthKey(selectedHrdwr.getAuthKey(), 1L);
+        BoxDTO entryBox = boxMapper.getEntryBoxByAuthKey(selectedHrdwr.getAuthKey(), 1L);
         log.info("INFO >> Entry Box -> " + entryBox.toString());
         buildSaveService.saverBox(providerId, entryBox);
 
         // 버튼 조회 및 Redis 에 데이터 저장
-        ArrayList<BtnDto> btns = btnMapper.getBtnsByBoxIdAndAuthKey(entryBox.getBoxId(), entryBox.getAuthKey());   // 수정 해야함
+        ArrayList<BtnDTO> btns = btnMapper.getBtnsByBoxIdAndAuthKey(entryBox.getBoxId(), entryBox.getAuthKey());   // 수정 해야함
         buildSaveService.saverBtns(providerId, btns);
 
         // 파생 조회 및 Redis 에 데이터 저장
-        ArrayList<DerivationDto> derivations = derivationMapper.getDerivationByUpperBoxId(entryBox.getBoxId());
+        ArrayList<DerivationDTO> derivations = derivationMapper.getDerivationByUpperBoxId(entryBox.getBoxId());
         buildSaveService.saverDerivation(providerId, derivations);
 
         // 카드 만들기
@@ -173,7 +171,7 @@ public class TextBoxResponseService {
 
 
 
-    public ResponseDtoVerTwo responserBtnBox(String providerId, int btnSeq) {
+    public ResponseVerTwoDTO responserBtnBox(String providerId, int btnSeq) {
 
         log.info("================== Responser Btn Box 시작 ==================");
 
@@ -195,8 +193,8 @@ public class TextBoxResponseService {
         // curBox + eventCode  ->  lowerBox 를 구한다.
         Long curBoxId = reBuild.getBox().getBoxId();
         Long lowerBoxId = null;
-        ArrayList<DerivationDto> derivations = reBuild.getDerivations();
-        DerivationDto derivation = null;
+        ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
+        DerivationDTO derivation = null;
         for(int i = 0; i < derivations.size(); i++) {
             derivation = derivations.get(i);
             if(eventCode == derivation.getEventCode() && curBoxId == derivation.getUpperBoxId()) {
@@ -211,11 +209,11 @@ public class TextBoxResponseService {
         }
 
         // lowerBoxId 를 이용하여 Box 조회 및 Redis 에 저장
-        BoxDto box = boxMapper.getBoxByBoxIdAndAuthKey(lowerBoxId, reBuild.getAuthKey());
+        BoxDTO box = boxMapper.getBoxByBoxIdAndAuthKey(lowerBoxId, reBuild.getAuthKey());
         buildSaveService.saverBox(providerId, box);
 
         // 버튼 조회 및 Redis 에 데이터 저장
-        ArrayList<BtnDto> btns = btnMapper.getBtnsByBoxIdAndAuthKey(box.getBoxId(), box.getAuthKey());
+        ArrayList<BtnDTO> btns = btnMapper.getBtnsByBoxIdAndAuthKey(box.getBoxId(), box.getAuthKey());
         // 버튼을 조회했는데도 null 이란건, 조회할 버튼이 없다는 뜻임. 그러므로 더이상 빌드할 명령이 없다는 의미
         if(btns == null) {
             return kakaoSimpleTextService.makerTransferSelectCard();
@@ -232,7 +230,7 @@ public class TextBoxResponseService {
 
 
 
-    public ResponseDtoVerTwo responserBtnBoxFromTime(String providerId, int btnSeq, int minute) {
+    public ResponseVerTwoDTO responserBtnBoxFromTime(String providerId, int btnSeq, int minute) {
 
         log.info("================== Responser Btn Box From Time 시작 ==================");
 
@@ -255,8 +253,8 @@ public class TextBoxResponseService {
         // curBox + eventCode  ->  lowerBox 를 구한다.
         Long curBoxId = reBuild.getBox().getBoxId();
         Long lowerBoxId = null;
-        ArrayList<DerivationDto> derivations = reBuild.getDerivations();
-        DerivationDto derivation = null;
+        ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
+        DerivationDTO derivation = null;
         for(int i = 0; i < derivations.size(); i++) {
             derivation = derivations.get(i);
             if(eventCode == derivation.getEventCode() && curBoxId == derivation.getUpperBoxId()) {
@@ -274,11 +272,11 @@ public class TextBoxResponseService {
         }
 
         // lowerBoxId 를 이용하여 Box 조회 및 Redis 에 저장
-        BoxDto box = boxMapper.getBoxByBoxIdAndAuthKey(lowerBoxId, reBuild.getAuthKey());
+        BoxDTO box = boxMapper.getBoxByBoxIdAndAuthKey(lowerBoxId, reBuild.getAuthKey());
         buildSaveService.saverBox(providerId, box);
 
         // 버튼 조회 및 Redis 에 데이터 저장
-        ArrayList<BtnDto> btns = btnMapper.getBtnsByBoxIdAndAuthKey(box.getBoxId(), box.getAuthKey());
+        ArrayList<BtnDTO> btns = btnMapper.getBtnsByBoxIdAndAuthKey(box.getBoxId(), box.getAuthKey());
         // 버튼을 조회했는데도 null 이란건, 조회할 버튼이 없다는 뜻임. 그러므로 더이상 빌드할 명령이 없다는 의미
         if(btns == null) {
             return kakaoSimpleTextService.makerTransferSelectCard();
@@ -294,7 +292,7 @@ public class TextBoxResponseService {
 
 
 
-    public ResponseDtoVerTwo responserInputBox(String providerId, int btnSeq) {
+    public ResponseVerTwoDTO responserInputBox(String providerId, int btnSeq) {
 
         log.info("================== Responser Input Box 시작 ==================");
 
@@ -317,8 +315,8 @@ public class TextBoxResponseService {
         // curBox + eventCode -> LowerBox 를 구한다.
         Long curBoxId = reBuild.getBox().getBoxId();
         Long lowerBoxId = null;
-        ArrayList<DerivationDto> derivations = reBuild.getDerivations();
-        DerivationDto derivation = null;
+        ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
+        DerivationDTO derivation = null;
         for(int i = 0; i < derivations.size(); i++) {
             derivation = derivations.get(i);
             if(eventCode == derivation.getEventCode() && curBoxId == derivation.getUpperBoxId()) {
@@ -328,7 +326,7 @@ public class TextBoxResponseService {
         }
 
         // lowerBoxId 를 이용하여 Box 조회 및 Redis 에 저장
-        BoxDto box = boxMapper.getBoxByBoxIdAndAuthKey(lowerBoxId, reBuild.getAuthKey());
+        BoxDTO box = boxMapper.getBoxByBoxIdAndAuthKey(lowerBoxId, reBuild.getAuthKey());
         buildSaveService.saverBox(providerId, box);
 
         // 파생 조회 및 Redis 에 데이터 저장
@@ -341,7 +339,7 @@ public class TextBoxResponseService {
 
 
 
-    public ResponseDtoVerTwo responserBtnBoxFromInputContext(String providerId, int inputValue) {
+    public ResponseVerTwoDTO responserBtnBoxFromInputContext(String providerId, int inputValue) {
 
         log.info("==================== Responser BtnBox From Input Context 시작 ====================");
 
@@ -354,18 +352,18 @@ public class TextBoxResponseService {
 
         // 하위 박스 아이디를 구한다.
         // Input 텍스트 박스에서는 파생 레코드가 1개 밖에 없기 때문에 아래와 같이 코드를 작성
-        DerivationDto derivation = reBuild.getDerivations().get(0);
+        DerivationDTO derivation = reBuild.getDerivations().get(0);
         Long lowerBoxId = derivation.getLowerBoxId();
         if(lowerBoxId == null) {
             kakaoSimpleTextService.makerTransferSelectCard();
         }
 
         // lowerBoxId 를 이용하여 Box 조회 및 Redis 에 저장
-        BoxDto box = boxMapper.getBoxByBoxIdAndAuthKey(lowerBoxId, reBuild.getAuthKey());
+        BoxDTO box = boxMapper.getBoxByBoxIdAndAuthKey(lowerBoxId, reBuild.getAuthKey());
         buildSaveService.saverBox(providerId, box);
 
         // 버튼 조회 및 Redis 에 데이터 저장
-        ArrayList<BtnDto> btns = btnMapper.getBtnsByBoxIdAndAuthKey(box.getBoxId(), box.getAuthKey());
+        ArrayList<BtnDTO> btns = btnMapper.getBtnsByBoxIdAndAuthKey(box.getBoxId(), box.getAuthKey());
         // 버튼을 조회했는데도 null 이란건, 조회할 버튼이 없다는 뜻임. 그러므로 더이상 빌드할 명령이 없다는 의미
         if(btns == null) {
             return kakaoSimpleTextService.makerTransferSelectCard();
@@ -373,7 +371,7 @@ public class TextBoxResponseService {
         buildSaveService.saverBtns(providerId, btns);
 
         // 파생 조회 및 Redis 에 데이터 저장
-        ArrayList<DerivationDto> derivations = derivationMapper.getDerivationByUpperBoxId(box.getBoxId());
+        ArrayList<DerivationDTO> derivations = derivationMapper.getDerivationByUpperBoxId(box.getBoxId());
         buildSaveService.saverDerivation(providerId, derivations);
 
         return kakaoSimpleTextService.makerBtnsCard(providerId);

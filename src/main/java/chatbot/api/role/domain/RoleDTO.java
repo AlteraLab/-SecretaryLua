@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoleDto {
+public class RoleDTO {
 
     private Long hubId;
 

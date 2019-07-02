@@ -27,7 +27,7 @@
     </select>
 
     <!-- delete hubuser record -->
-    <delete id="deleteAllRoleByAdmin" parameterType="chatbot.api.role.domain.RoleDto">
+    <delete id="deleteAllRoleByAdmin" parameterType="chatbot.api.role.domain.RoleDTO">
         DELETE FROM hub_user WHERE hub_id = #{hubId}
     </delete>
 
@@ -35,7 +35,7 @@
     // 역할1 : 일반 유저 스스로 허브 권한 삭제
     // 역할2 : admin 유저가 일반 유저를 삭제
     -->
-    <delete id="deleteRoleUser" parameterType="chatbot.api.role.domain.RoleDto">
+    <delete id="deleteRoleUser" parameterType="chatbot.api.role.domain.RoleDTO">
         DELETE FROM hub_user
         WHERE hub_id = #{hubId}
           AND user_id = #{userId}
@@ -52,14 +52,14 @@
 
 
 
-    <resultMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDto">
+    <resultMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDTO">
         <result property="hubId" column="hub_id"/>
         <result property="userId" column="user_id"/>
         <!-- role_type-->
         <result property="role" column="role"/>
     </resultMap>
 
-    <parameterMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDto">
+    <parameterMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDTO">
         <parameter property="hubId"/>
         <parameter property="userId"/>
         <!-- role_type-->

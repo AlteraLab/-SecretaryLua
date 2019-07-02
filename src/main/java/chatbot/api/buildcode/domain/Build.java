@@ -18,16 +18,16 @@ public class Build implements Serializable {
 
     private ArrayList<Hub> hubs;
 
-    private ArrayList<HrdwrDto> hrdwrs;
+    private ArrayList<HrdwrDTO> hrdwrs;
     //private HrdwrDto[] hrdwrs;
 
-    private BoxDto box;
+    private BoxDTO box;
 
     private String authKey;
 
-    private ArrayList<BtnDto> btns;
+    private ArrayList<BtnDTO> btns;
 
-    private ArrayList<DerivationDto> derivations;
+    private ArrayList<DerivationDTO> derivations;
 
     private ArrayList<SelectedBtn> selectedBtns; // 전달할 데이터
 

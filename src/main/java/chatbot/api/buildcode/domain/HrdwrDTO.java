@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HrdwrDto implements Serializable {
+public class HrdwrDTO implements Serializable {
 
     private int hrdwrSeq;             // 사용자에게 보여줄 데이터
 

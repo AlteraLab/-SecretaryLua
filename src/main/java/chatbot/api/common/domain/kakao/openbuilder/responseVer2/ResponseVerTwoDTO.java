@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseDtoVerTwo {
+public class ResponseVerTwoDTO {
 
     private String version;
 

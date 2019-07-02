@@ -1,6 +1,6 @@
 package chatbot.api.buildcode.domain.response;
 
-import chatbot.api.buildcode.domain.HrdwrDto;
+import chatbot.api.buildcode.domain.HrdwrDTO;
 import lombok.*;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -15,13 +15,13 @@ public class ResponseHrdwrInfo {
     private boolean status;
 
     @JsonProperty("devInfo")
-    private HrdwrDto[] hrdwrsInfo;
+    private HrdwrDTO[] hrdwrsInfo;
 
-    public HrdwrDto[] getDevInfo() {
+    public HrdwrDTO[] getDevInfo() {
         return hrdwrsInfo;
     }
 
-    public void setDevInfo(HrdwrDto[] hrdwrsInfo) {
+    public void setDevInfo(HrdwrDTO[] hrdwrsInfo) {
         this.hrdwrsInfo = hrdwrsInfo;
     }
 }
