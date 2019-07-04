@@ -51,13 +51,6 @@ public class BuildController {
         return textBoxResponseService.responserHubsBox(providerId);
     }
 
-    @PostMapping("/TEST")
-    public ResponseDTO TestMethod(@RequestBody RequestDTO requestDto) {
-
-        log.info("==================== Test Method 시작 ====================");
-        log.info(requestDto.toString());
-        return ResponseDTO.builder().data(null).status(HttpStatus.OK).build();
-    }
 
     // 사용자가 hub를 선택했을 때 호출되는 메소드
     @PostMapping("/build/hub")
@@ -227,5 +220,14 @@ public class BuildController {
         log.info(requestDto.toString());
 
         return kakaoSimpleTextService.makerTransferSelectCard();
+    }
+
+
+    @PostMapping("/TEST")
+    public ResponseDTO TestMethod(@RequestBody RequestDTO requestDto) {
+
+        log.info("==================== Test Method 시작 ====================");
+        log.info(requestDto.toString());
+        return ResponseDTO.builder().data(null).status(HttpStatus.OK).build();
     }
 }

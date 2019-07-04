@@ -1,5 +1,6 @@
 package chatbot.api.developer.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,10 +20,12 @@ public class DvlpButtonDTO {
 
     private Integer boxId;
 
+    @JsonAlias("eventCode")
     private Integer evCode;
 
     private Boolean isSpread;
 
+    @JsonAlias("type")
     private Character btnType;
     /*
     버튼타입     값

@@ -10,6 +10,7 @@ import chatbot.api.mappers.*;
 import chatbot.api.skillhub.domain.HubInfoDTO;
 import chatbot.api.user.domain.UserInfoDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.client.discovery.ProviderConfiguration;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -79,20 +80,43 @@ public class TextBoxResponseService {
         log.info("================== ResponserHubs ==================");
 
         if(providerId == null) return kakaoBasicCardService.responserRequestPreSignUp();
-
-        if(buildRepository.find(providerId) != null) {
-            buildRepository.delete(providerId);
-            log.info("INFO >> 사용자(" + providerId + ") 의 데이터를 Redis In-Memory 에서 제거");
-        }
+        else                   buildSaveService.saverProviderId(providerId);
 
         UserInfoDto user = userMapper.getUserByProviderId(providerId).get();
 
         ArrayList<HubInfoDTO> hubs = hubmapper.getUserHubsByUserId(user.getUserId());
-        if(hubs == null) return kakaoSimpleTextService.responserShortMsg("사용 가능한 허브가 없습니다.");
+        if(hubs == null) {
+            return kakaoSimpleTextService.responserShortMsg("사용 가능한 허브가 없습니다.\n허브를 등록해주세요.");
+        } else if(hubs.size() == 1) {
+            Build reBuild = buildRepository.find(providerId);
+            reBuild.setPath(Path.builder()
+                    .externalIp(hubs.get(0).getExternalIp())
+                    .externalPort(hubs.get(0).getExternalPort())
+                    .build());
+            reBuild.setHubs(null);
 
-        buildSaveService.saverHubs(providerId, hubs);
+            String url = "http://" + reBuild.getPath().getExternalIp() + ":" + reBuild.getPath().getExternalPort() + "/dev";
+            log.info("INFO >> 전달할 URL 주소 : " + url);
+            //ResponseHrdwrInfo hrdwrInfo = restTemplate.getForObject(url, ResponseHrdwrInfo.class);
+            //log.info("INFO >> RestTemplate 종료");
+            // 데이터 받은걸로 가정
+            ResponseHrdwrInfo hrdwrInfo = ResponseHrdwrInfo.builder()
+                    .hrdwrsInfo(hrdwrs)
+                    .status(true)
+                    .build();
+            log.info("INFO >> DEV INFO 확인 : " + hrdwrInfo.toString());
+            if(hrdwrInfo.getDevInfo() == null) {
+                buildRepository.delete(providerId);
+                return kakaoSimpleTextService.responserShortMsg("허브와 연결된 장비가 없습니다.");
+            }
+            buildSaveService.saverHrdwrs(providerId, hrdwrInfo.getDevInfo());
 
-        return kakaoSimpleTextService.makerHubsCard(hubs);
+            ArrayList<HrdwrDTO> hrdwrs = buildRepository.find(providerId).getHrdwrs();
+            return kakaoSimpleTextService.makerHrdwrsCard(hrdwrs);
+        } else {
+            buildSaveService.saverHubs(providerId, hubs);
+            return kakaoSimpleTextService.makerHubsCard(hubs);
+        }
     }
 
 
@@ -115,7 +139,7 @@ public class TextBoxResponseService {
         log.info("INFO >> 전달할 URL 주소 : " + url);
         //ResponseHrdwrInfo hrdwrInfo = restTemplate.getForObject(url, ResponseHrdwrInfo.class);
 
-        // 데이터 받은걸로 치자구!!!
+        // 데이터 받은걸로 가정
         ResponseHrdwrInfo hrdwrInfo = ResponseHrdwrInfo.builder()
                 .hrdwrsInfo(hrdwrs)
                 .status(true)
@@ -129,7 +153,6 @@ public class TextBoxResponseService {
         buildSaveService.saverHrdwrs(providerId, hrdwrInfo.getDevInfo());
 
         ArrayList<HrdwrDTO> hrdwrs = buildRepository.find(providerId).getHrdwrs();
-
         return kakaoSimpleTextService.makerHrdwrsCard(hrdwrs);
     }
 

@@ -16,32 +16,39 @@ public class BuildSaveService {
 
     private BuildRepository buildRepository;
 
+    public void saverProviderId(String providerId) {
 
+        log.info("=============== Saver ProviderId 시작 ===============");
+
+        Build build = Build.builder()
+                .hProviderId(providerId)
+                .build();
+
+        buildRepository.save(build);
+    }
 
     public void saverHubs(String providerId, ArrayList<HubInfoDTO> hubs) {
 
         log.info("=============== Saver Hubs 시작 ===============");
 
-        Build build = Build.builder()
-                .hProviderId(providerId)
-                .build();
+        Build reBuild = buildRepository.find(providerId);
 
         ArrayList<Hub> arrHubs = new ArrayList<Hub>();
         Hub hub = null;
         for(int i = 0; i < hubs.size(); i++) {
             hub = Hub.builder()
                     .hubSeq(i + 1)
-                    .hubId(hubs.get(i).getHubId())
+                  //  .hubId(hubs.get(i).getHubId())
                     .explicitIp(hubs.get(i).getExternalIp())
                     .explicitPort(hubs.get(i).getExternalPort())
                     .build();
             arrHubs.add(hub);
         }
 
-        build.setHubs(arrHubs);
-        log.info("INFO >> 허브 빌드 내용 : " + build.getHubs());
+        reBuild.setHubs(arrHubs);
+        log.info("INFO >> 허브 빌드 내용 : " + reBuild.getHubs());
 
-        buildRepository.save(build);
+        buildRepository.update(reBuild);
 
         log.info("=============== Saver Hubs 끝    ===============");
     }
@@ -57,16 +64,14 @@ public class BuildSaveService {
         log.info("INFO >> 받아온 DEV 목록");
         for(int i = 0; i < hrdwrs.length; i++) {
             hrdwrs[i].setHrdwrSeq(i + 1);
-            log.info(i + 1 + "번 : " + hrdwrs[i].toString());
+            log.info(hrdwrs[i].getHrdwrSeq() + "번 : " + hrdwrs[i].toString());
         }
 
         reBuild.setHrdwrs(new ArrayList<HrdwrDTO>());
         for(HrdwrDTO tempHrdwr : hrdwrs) {
             reBuild.getHrdwrs().add(tempHrdwr);
         }
-
         buildRepository.update(reBuild);
-
         log.info("=============== Saver Hrdwrs 끝   ===============");
     }
 
