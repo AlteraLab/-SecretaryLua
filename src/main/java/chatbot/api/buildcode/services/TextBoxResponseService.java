@@ -6,17 +6,17 @@ import chatbot.api.buildcode.repository.BuildRepository;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
 import chatbot.api.common.services.KakaoBasicCardService;
 import chatbot.api.common.services.KakaoSimpleTextService;
+import chatbot.api.common.services.RestTemplateService;
 import chatbot.api.mappers.*;
 import chatbot.api.skillhub.domain.HubInfoDTO;
 import chatbot.api.user.domain.UserInfoDto;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.oauth2.client.discovery.ProviderConfiguration;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 
-//@AllArgsConstructor
+@AllArgsConstructor
 @Service
 @Slf4j
 public class TextBoxResponseService {
@@ -26,8 +26,6 @@ public class TextBoxResponseService {
     private UserMapper userMapper;
 
     private DerivationMapper derivationMapper;
-
-    private HrdwrMapper hrdwrMapper;
 
     private BoxMapper boxMapper;
 
@@ -41,38 +39,8 @@ public class TextBoxResponseService {
 
     private BuildSaveService buildSaveService;
 
-    private RestTemplate restTemplate;
+    private BuildActionService buildActionService;
 
-
-    // 가상 데이터
-    private HrdwrDTO[] hrdwrs;
-
-    public TextBoxResponseService(HubMapper hubmapper, UserMapper userMapper, KakaoBasicCardService kakaoBasicCardService, KakaoSimpleTextService kakaoSimpleTextService, BuildRepository buildRepository, BuildSaveService buildSaveService, RestTemplate restTemplate, BoxMapper boxMapper, BtnMapper btnMapper, DerivationMapper derivationMapper, HrdwrMapper hrdwrMapper) {
-        this.hubmapper = hubmapper;
-        this.userMapper = userMapper;
-        this.boxMapper = boxMapper;
-        this.btnMapper = btnMapper;
-        this.derivationMapper = derivationMapper;
-        this.hrdwrMapper = hrdwrMapper;
-        this.kakaoBasicCardService = kakaoBasicCardService;
-        this.kakaoSimpleTextService = kakaoSimpleTextService;
-        this.buildRepository = buildRepository;
-        this.buildSaveService = buildSaveService;
-        this.restTemplate = restTemplate;
-
-        this.hrdwrs = new HrdwrDTO[2];
-
-        this.hrdwrs[0] = HrdwrDTO.builder()
-                .userDefinedName("LG AC01")
-                .hrdwrMac("12:12:12:12:12:12")
-                .authKey("AAAABBBBCCCCDDDD")
-                .build();
-        this.hrdwrs[1] = HrdwrDTO.builder()
-                .userDefinedName("SAMSUNG AC01")
-                .hrdwrMac("72:72:72:72:72:72")
-                .authKey("AAAABBBBCCCCDDDD")
-                .build();
-    }
 
 
     public ResponseVerTwoDTO responserHubsBox(String providerId) {
@@ -85,36 +53,23 @@ public class TextBoxResponseService {
         UserInfoDto user = userMapper.getUserByProviderId(providerId).get();
 
         ArrayList<HubInfoDTO> hubs = hubmapper.getUserHubsByUserId(user.getUserId());
+        buildSaveService.saverHubs(providerId, hubs);
+
         if(hubs == null) {
             return kakaoSimpleTextService.responserShortMsg("사용 가능한 허브가 없습니다.\n허브를 등록해주세요.");
         } else if(hubs.size() == 1) {
-            Build reBuild = buildRepository.find(providerId);
-            reBuild.setPath(Path.builder()
-                    .externalIp(hubs.get(0).getExternalIp())
-                    .externalPort(hubs.get(0).getExternalPort())
-                    .build());
-            reBuild.setHubs(null);
+            buildSaveService.saverPathAboutAddr(
+                    providerId,
+                    Path.builder()
+                            .externalIp(hubs.get(0).getExternalIp())
+                            .externalPort(hubs.get(0).getExternalPort())
+                            .build());
 
-            String url = "http://" + reBuild.getPath().getExternalIp() + ":" + reBuild.getPath().getExternalPort() + "/dev";
-            log.info("INFO >> 전달할 URL 주소 : " + url);
-            //ResponseHrdwrInfo hrdwrInfo = restTemplate.getForObject(url, ResponseHrdwrInfo.class);
-            //log.info("INFO >> RestTemplate 종료");
-            // 데이터 받은걸로 가정
-            ResponseHrdwrInfo hrdwrInfo = ResponseHrdwrInfo.builder()
-                    .hrdwrsInfo(hrdwrs)
-                    .status(true)
-                    .build();
-            log.info("INFO >> DEV INFO 확인 : " + hrdwrInfo.toString());
-            if(hrdwrInfo.getDevInfo() == null) {
-                buildRepository.delete(providerId);
+            if(buildActionService.actionRequestAndSaverHrdwr(providerId)) {
                 return kakaoSimpleTextService.responserShortMsg("허브와 연결된 장비가 없습니다.");
             }
-            buildSaveService.saverHrdwrs(providerId, hrdwrInfo.getDevInfo());
-
-            ArrayList<HrdwrDTO> hrdwrs = buildRepository.find(providerId).getHrdwrs();
-            return kakaoSimpleTextService.makerHrdwrsCard(hrdwrs);
+            return kakaoSimpleTextService.makerHrdwrsCard(providerId);
         } else {
-            buildSaveService.saverHubs(providerId, hubs);
             return kakaoSimpleTextService.makerHubsCard(hubs);
         }
     }
@@ -125,35 +80,18 @@ public class TextBoxResponseService {
     public ResponseVerTwoDTO responserHrdwrsBox(String providerId, int hubSeq) {
 
         log.info("================== Responser Hrdwrs ==================");
-
         Build reBuild = buildRepository.find(providerId);
+        buildSaveService.saverPathAboutAddr(
+                providerId,
+                Path.builder()
+                        .externalIp(reBuild.getHubs().get(hubSeq - 1).getExplicitIp())
+                        .externalPort(reBuild.getHubs().get(hubSeq - 1).getExplicitPort())
+                        .build());
 
-        reBuild.setPath(Path.builder()
-                .externalIp(reBuild.getHubs().get(hubSeq - 1).getExplicitIp())
-                .externalPort(reBuild.getHubs().get(hubSeq - 1).getExplicitPort())
-                .build());
-        reBuild.setHubs(null);
-        buildRepository.update(reBuild);
-
-        String url = "http://" + reBuild.getPath().getExternalIp() + ":" + reBuild.getPath().getExternalPort() + "/dev";
-        log.info("INFO >> 전달할 URL 주소 : " + url);
-        //ResponseHrdwrInfo hrdwrInfo = restTemplate.getForObject(url, ResponseHrdwrInfo.class);
-
-        // 데이터 받은걸로 가정
-        ResponseHrdwrInfo hrdwrInfo = ResponseHrdwrInfo.builder()
-                .hrdwrsInfo(hrdwrs)
-                .status(true)
-                .build();
-        log.info("INFO >> RestTemplate 종료");
-        log.info("INFO >> DEV INFO 확인 : " + hrdwrInfo.toString());
-        if(hrdwrInfo.getDevInfo() == null) {
-            buildRepository.delete(providerId);
+        if(buildActionService.actionRequestAndSaverHrdwr(providerId)) {
             return kakaoSimpleTextService.responserShortMsg("허브와 연결된 장비가 없습니다.");
         }
-        buildSaveService.saverHrdwrs(providerId, hrdwrInfo.getDevInfo());
-
-        ArrayList<HrdwrDTO> hrdwrs = buildRepository.find(providerId).getHrdwrs();
-        return kakaoSimpleTextService.makerHrdwrsCard(hrdwrs);
+        return kakaoSimpleTextService.makerHrdwrsCard(providerId);
     }
 
 

@@ -277,9 +277,10 @@ public class KakaoSimpleTextService {
 
 
 
-    public ResponseVerTwoDTO makerHrdwrsCard(ArrayList<HrdwrDTO> hrdwrs) {
+    public ResponseVerTwoDTO makerHrdwrsCard(String providerId) {
 
         log.info("================== makerHrdwrsCard 시작 ==================");
+        ArrayList<HrdwrDTO> hrdwrs = buildRepository.find(providerId).getHrdwrs();
 
         SimpleText text = new SimpleText();
         StringBuffer responseMsg = new StringBuffer("사용할 수 있는 하드웨어 목록 입니다.\n\n");

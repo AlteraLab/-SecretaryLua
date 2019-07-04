@@ -24,4 +24,9 @@ public class ResponseHrdwrInfo {
     public void setDevInfo(HrdwrDTO[] hrdwrsInfo) {
         this.hrdwrsInfo = hrdwrsInfo;
     }
+
+    public Boolean hasNull() {
+        if(this.getDevInfo() == null) return true;
+        else                          return false;
+    }
 }

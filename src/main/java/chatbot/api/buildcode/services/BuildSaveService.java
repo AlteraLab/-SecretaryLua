@@ -49,7 +49,6 @@ public class BuildSaveService {
         log.info("INFO >> 허브 빌드 내용 : " + reBuild.getHubs());
 
         buildRepository.update(reBuild);
-
         log.info("=============== Saver Hubs 끝    ===============");
     }
 
@@ -75,6 +74,18 @@ public class BuildSaveService {
         log.info("=============== Saver Hrdwrs 끝   ===============");
     }
 
+    public void saverPathAboutAddr(String providerId, Path path) {
+
+        log.info("=============== Saver Path 시작 ===============");
+        Build reBuild = buildRepository.find(providerId);
+        reBuild.setPath(Path.builder()
+                .externalIp(path.getExternalIp())
+                .externalPort(path.getExternalPort())
+                .build());
+        reBuild.setHubs(null);
+        buildRepository.update(reBuild);
+        log.info("=============== Saver Path 끝 ===============");
+    }
 
 
     public void saverBtns(String providerId, ArrayList<BtnDTO> btns) {
