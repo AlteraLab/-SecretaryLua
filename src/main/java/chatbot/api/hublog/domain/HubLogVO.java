@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
-import java.util.Collections;
 
 @Data
 @Builder
@@ -15,6 +14,10 @@ import java.util.Collections;
 public class HubLogVO {
 
     private Timestamp recordedAt;
+
+    private Integer hrdwrId;
+
+    private String hrdwrName;
 
     private String requesterName;
 

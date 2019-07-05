@@ -17,6 +17,10 @@ public class HubLogDTO {
 
     private Long hubId;
 
+    private Integer hrdwrId;        // 0705 추가
+
+    private String hrdwrName;      // 0705 추가
+
     private String requesterId;  // == providerId
 
     private String content;

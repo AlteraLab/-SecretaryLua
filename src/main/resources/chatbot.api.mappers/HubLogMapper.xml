@@ -10,6 +10,8 @@
         INSERT INTO hub_log
         (
         hub_id,
+        hrdwr_id,
+        hrdwr_name,
         requester_id,
         content,
         log_type
@@ -17,26 +19,35 @@
         VALUES
         (
         #{hubId},
+        #{hrdwrId},
+        #{hrdwrName},
         #{requesterId},
         #{content},
         #{logType}
         )
     </insert>
 
+
     <!-- 특정 허브의 로그 조회 -->
     <select id="getHubLog" resultMap="HubLogVo" parameterType="Long">
         SELECT
         u.name,
         l.recorded_at,
+        l.hrdwr_id,
+        l.hrdwr_name,
         l.content,
         l.log_type
         FROM (SELECT * FROM hub_log WHERE hub_id = #{hubId}) AS l INNER JOIN users AS u
         ON l.requester_id = u.provider_id
     </select>
 
+
+
     <resultMap id="HubLogDto" type="chatbot.api.hublog.domain.HubLogDTO">
         <result property="hubId" column="hub_id"/>
         <result property="recordedAt" column="recorded_at"/>
+        <result property="hrdwrId" column="hrdwr_id"/>
+        <result property="hrdwrName" column="hrdwr_name"/>
         <result property="requesterId" column="requester_id"/>
         <result property="content" column="content"/>
         <result property="logType" column="log_type"/>
@@ -44,14 +55,17 @@
 
     <resultMap id="HubLogVo" type="chatbot.api.hublog.domain.HubLogVO">
         <result property="recordedAt" column="recorded_at"/>
+        <result property="hrdwrId" column="hrdwr_id"/>
+        <result property="hrdwrName" column="hrdwr_name"/>
         <result property="requesterName" column="name"/>
         <result property="content" column="content"/>
         <result property="logType" column="log_type"/>
     </resultMap>
 
-
     <parameterMap id="HubLogDto" type="chatbot.api.hublog.domain.HubLogDTO">
         <parameter property="hubId"/>
+        <parameter property="hrdwrId"/>
+        <parameter property="hrdwrName"/>
         <parameter property="recordedAt"/>
         <parameter property="requesterId"/>
         <parameter property="content"/>
