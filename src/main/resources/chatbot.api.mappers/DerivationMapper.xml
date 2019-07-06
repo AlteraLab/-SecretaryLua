@@ -5,42 +5,26 @@
 
 <mapper namespace="chatbot.api.mappers.DerivationMapper">
 
-    <!-- Box Id를 이용하여 파생 테이블에서 event code와 lower box id 값을 알아낸다. -->
-    <select id="getDerivationByUpperBoxId" resultMap="DerivationDto" parameterType="Long">
+    <!-- hrdwr을 이용해서 모든 파생 조회 -->
+    <select id="getDerivationsByHrdwrId" resultMap="DerivationDto" parameterType="Long">
         SELECT
         d.upper_box_id,
-        d.event_code,
+        d.btn_code,
         d.lower_box_id
         FROM derivation AS d
-        WHERE d.upper_box_id = #{upperBoxId}
+        WHERE d.hrdwr_id = #{hrdwrId}
     </select>
 
 
-    <select id="getLowerBoxIdFromUpperTimeBoxId" resultType="Long" parameterType="Long">
-        SELECT d.lower_box_id
-        FROM   derivation AS d
-        WHERE  d.upper_box_id = #{upperTimeBoxId}
-    </select>
-
-    <resultMap id="DerivationDto" type="chatbot.api.buildcode.domain.DerivationDTO">
-        <result property="derivationCode" column="derivation_code"/>
+    <resultMap id="DerivationDto" type="chatbot.api.textbox.domain.textboxdata.DerivationDTO">
         <result property="upperBoxId" column="upper_box_id"/>
-        <result property="btnUppedBoxId" column="btn_upper_box_id"/>
-        <result property="timeUpperBoxId" column="time_upper_box_id"/>
-        <result property="inputUpperBoxId" column="input_upper_box_id"/>
-        <result property="eventCode" column="event_code"/>
+        <result property="btnCode" column="btn_code"/>
         <result property="lowerBoxId" column="lower_box_id"/>
-        <result property="authKey" column="auth_key"/>
     </resultMap>
 
-    <parameterMap id="DerivationDto" type="chatbot.api.buildcode.domain.DerivationDTO">
-        <parameter property="derivationCode"/>
+    <parameterMap id="DerivationDto" type="chatbot.api.textbox.domain.textboxdata.DerivationDTO">
         <parameter property="upperBoxId"/>
-        <parameter property="btnUppedBoxId"/>
-        <parameter property="timeUpperBoxId"/>
-        <parameter property="inputUpperBoxId"/>
-        <parameter property="eventCode"/>
+        <parameter property="btnCode"/>
         <parameter property="lowerBoxId"/>
-        <parameter property="authKey"/>
     </parameterMap>
 </mapper>

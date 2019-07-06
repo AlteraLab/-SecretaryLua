@@ -14,16 +14,16 @@ import java.util.List;
 @Repository
 public interface DeveloperMapper {
 
-    DvlpDevDTO getDevice(@Param("devId") Long devId);
+    DvlpDevDTO getDevice(@Param("hrdwrId") Long devId);
 
     // 데이터 삭제, derivation -> btn -> box -> device
-    void deleteDerivations(@Param("devId") Long devId);
+    void deleteDerivations(@Param("hrdwrId") Long devId);
 
-    void deleteButtons(@Param("devId") Long devId);
+    void deleteButtons(@Param("hrdwrId") Long devId);
 
-    void deleteTextBoxes(@Param("devId") Long devId);
+    void deleteTextBoxes(@Param("hrdwrId") Long devId);
 
-    void deleteDevice(@Param("devId") Long devId);
+    void deleteDevice(@Param("hrdwrId") Long devId);
 
 
     // 다건 데이터 삽입, device -> box -> btn -> derivation
@@ -35,21 +35,21 @@ public interface DeveloperMapper {
     void insertTextBoxes(
             @Param("dvlpBoxDTOList")
             List<DvlpBoxDTO> dvlpBoxDTOList,
-            @Param("devId")
+            @Param("hrdwrId")
             Long devId
     );
 
     void insertButtons(
             @Param("dvlpButtonDTOList")
             List<DvlpButtonDTO> dvlpButtonDTOList,
-            @Param("devId")
+            @Param("hrdwrId")
             Long devId
     );
 
     void insertDerivations(
             @Param("dvlpDerivationDTOList")
             List<DvlpDerivationDTO> dvlpDerivationDTOList,
-            @Param("devId")
+            @Param("hrdwrId")
             Long devId
     );
 }

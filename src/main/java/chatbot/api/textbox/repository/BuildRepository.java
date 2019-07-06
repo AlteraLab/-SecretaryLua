@@ -1,6 +1,6 @@
-package chatbot.api.buildcode.repository;
+package chatbot.api.textbox.repository;
 
-import chatbot.api.buildcode.domain.Build;
+import chatbot.api.textbox.domain.Build;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;

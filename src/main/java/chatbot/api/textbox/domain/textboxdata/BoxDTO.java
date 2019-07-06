@@ -1,4 +1,4 @@
-package chatbot.api.buildcode.domain;
+package chatbot.api.textbox.domain.textboxdata;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,13 +13,17 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class BoxDTO implements Serializable {
 
-    private Long boxId;  // PK
+    private Integer boxId;
 
-    private String authKey;  // VARCHAR 32
+    private String preText;
 
-    private String preText;  // VARCHAR 50
+    private String postText;
 
-    private String postText; // VARCHAR 50
-
-    private int boxType;
+    private Integer boxType;
+    /*
+    entry 5
+    버튼   1
+    동적   2
+    시간   3
+     */
 }

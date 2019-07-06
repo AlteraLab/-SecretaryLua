@@ -1,11 +1,17 @@
-package chatbot.api.buildcode;
+package chatbot.api.textbox;
 
-import chatbot.api.buildcode.domain.Build;
-import chatbot.api.buildcode.domain.Path;
-import chatbot.api.buildcode.domain.SelectedBtn;
-import chatbot.api.buildcode.domain.response.HrdwrControlResult;
-import chatbot.api.buildcode.repository.BuildRepository;
-import chatbot.api.buildcode.services.TextBoxResponseService;
+import chatbot.api.mappers.BtnMapper;
+import chatbot.api.mappers.DerivationMapper;
+import chatbot.api.mappers.BoxMapper;
+import chatbot.api.textbox.domain.*;
+import chatbot.api.textbox.domain.path.Path;
+import chatbot.api.textbox.domain.response.HrdwrControlResult;
+import chatbot.api.textbox.domain.textboxdata.BoxDTO;
+import chatbot.api.textbox.domain.textboxdata.BtnDTO;
+import chatbot.api.textbox.domain.textboxdata.DerivationDTO;
+import chatbot.api.textbox.domain.transfer.cmdList;
+import chatbot.api.textbox.repository.BuildRepository;
+import chatbot.api.textbox.services.TextBoxResponseService;
 import chatbot.api.common.domain.ResponseDTO;
 import chatbot.api.common.domain.kakao.openbuilder.RequestDTO;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
@@ -13,7 +19,6 @@ import chatbot.api.common.services.KakaoSimpleTextService;
 import chatbot.api.common.services.TimeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +29,7 @@ import java.util.ArrayList;
 
 @RestController
 @Slf4j
-public class BuildController {
+public class TextBoxController {
 
     @Autowired
     private TextBoxResponseService textBoxResponseService;
@@ -37,6 +42,41 @@ public class BuildController {
 
     @Autowired
     private BuildRepository buildRepository;
+
+
+    @Autowired
+    private DerivationMapper derivationMapper;
+    @Autowired
+    private BoxMapper boxMapper;
+    @Autowired
+    private BtnMapper btnMapper;
+
+    @PostMapping("/TEST")
+    public ResponseDTO TestMethod() {
+
+        log.info("==================== Test Method 시작 ====================");
+
+        Long hrdwrId = new Long(1);
+        ArrayList<DerivationDTO> derivations = derivationMapper.getDerivationsByHrdwrId(hrdwrId);
+        for(int i = 0; i < derivations.size(); i++) {
+            log.info("(" + (i + 1) + ") Derivation -> " + derivations.get(i));
+        }
+
+        System.out.println("\n");
+
+        ArrayList<BoxDTO> boxs = boxMapper.getBoxsByHrdwrId(hrdwrId);
+        for(int i = 0; i < boxs.size(); i++) {
+            log.info("(" + (i + 1) + ") Box -> " + boxs.get(i));
+        }
+
+        System.out.println("\n");
+
+        ArrayList<BtnDTO> btns = btnMapper.getBtnsByHrdwrId(hrdwrId);
+        for(int i = 0; i < btns.size(); i++) {
+            log.info("(" + (i + 1) + ") Btn -> " + btns.get(i));
+        }
+        return ResponseDTO.builder().build();
+    }
 
 
     // 사용자가 "시바"를 입력했을 때 호출되는 메소드
@@ -173,10 +213,10 @@ public class BuildController {
             int externalPort = path.getExternalPort();
             String hrdwrMacAddr = path.getHrdwrMacAddr();
 
-            ArrayList<SelectedBtn> btns = reBuild.getSelectedBtns();
-            SelectedBtn[] arrBtns = btns.toArray(new SelectedBtn[btns.size()]);
+            ArrayList<cmdList> btns = reBuild.getCmdLists();
+            cmdList[] arrBtns = btns.toArray(new cmdList[btns.size()]);
             log.info("INFO >> Builed Code 목록 -------");
-            for(SelectedBtn temp : arrBtns) {
+            for(cmdList temp : arrBtns) {
                 log.info("- " + temp.toString());
             }
 
@@ -187,7 +227,7 @@ public class BuildController {
             // 밑에 임시 주석
             HrdwrControlResult result = restTemplate.postForObject(url, new Object(){
                     public String requester_id = reBuild.getHProviderId();
-                    public SelectedBtn[] cmd = arrBtns;
+                    public cmdList[] cmd = arrBtns;
                 }, HrdwrControlResult.class);
             //HrdwrControlResult result = new HrdwrControlResult();
             result.setStatus(true);
@@ -220,14 +260,5 @@ public class BuildController {
         log.info(requestDto.toString());
 
         return kakaoSimpleTextService.makerTransferSelectCard();
-    }
-
-
-    @PostMapping("/TEST")
-    public ResponseDTO TestMethod(@RequestBody RequestDTO requestDto) {
-
-        log.info("==================== Test Method 시작 ====================");
-        log.info(requestDto.toString());
-        return ResponseDTO.builder().data(null).status(HttpStatus.OK).build();
     }
 }

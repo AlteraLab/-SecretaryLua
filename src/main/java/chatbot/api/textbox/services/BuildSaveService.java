@@ -1,7 +1,12 @@
-package chatbot.api.buildcode.services;
+package chatbot.api.textbox.services;
 
-import chatbot.api.buildcode.domain.*;
-import chatbot.api.buildcode.repository.BuildRepository;
+import chatbot.api.textbox.domain.*;
+import chatbot.api.textbox.domain.path.HrdwrDTO;
+import chatbot.api.textbox.domain.path.Hub;
+import chatbot.api.textbox.domain.path.Path;
+import chatbot.api.textbox.domain.textboxdata.BoxDTO;
+import chatbot.api.textbox.domain.textboxdata.DerivationDTO;
+import chatbot.api.textbox.repository.BuildRepository;
 import chatbot.api.skillhub.domain.HubInfoDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -88,7 +93,7 @@ public class BuildSaveService {
     }
 
 
-    public void saverBtns(String providerId, ArrayList<BtnDTO> btns) {
+/*    public void saverBtns(String providerId, ArrayList<BtnDTO> btns) {
 
         log.info("=============== Saver Btns 시작 ===============");
 
@@ -103,7 +108,7 @@ public class BuildSaveService {
         buildRepository.update(reBuild);
 
         log.info("=============== Saver Btns 끝   ===============");
-    }
+    }*/
 
 
 
@@ -131,7 +136,6 @@ public class BuildSaveService {
         log.info("INFO >> BOX 데이터 확인 -> " + box.toString());
 
         Build reBuild = buildRepository.find(providerId);
-        reBuild.setBox(box);
         buildRepository.update(reBuild);
         log.info("=============== Saver Box 끝   ===============");
     }

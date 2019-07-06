@@ -5,42 +5,23 @@
 
 <mapper namespace="chatbot.api.mappers.BoxMapper">
 
-    <!-- Entry Box 중에서 box_id가 1인 레코드를 조회  -->
-    <select id="getEntryBoxByAuthKey" resultMap="BoxDto" parameterType="hashmap">
-        SELECT *
-        FROM   box
-        WHERE  auth_key = #{authKey} AND box_id = #{boxId}
-    </select>
-
-
-    <!-- Box Id 를 이용해서 box 데이터를 조회 -->
-    <select id="getBoxByBoxIdAndAuthKey" resultMap="BoxDto" parameterType="hashmap">
+    <!-- hrdwrId를 이용해서 모든 박스를 조회 -->
+    <select id="getBoxsByHrdwrId" resultMap="BoxDto" parameterType="Long">
         SELECT
-        b.box_id,
-        b.auth_key,
-        b.pre_text,
-        b.post_text,
-        b.box_type
-        FROM box AS b
-        WHERE box_id = #{boxId}
-        AND   auth_key = #{authKey}
+        box_id,
+        pre_text,
+        post_text,
+        box_type
+        FROM box
+        WHERE hrdwr_id = #{hrdwrId}
     </select>
 
 
 
-    <resultMap id="BoxDto" type="chatbot.api.buildcode.domain.BoxDTO">
+    <resultMap id="BoxDto" type="chatbot.api.textbox.domain.textboxdata.BoxDTO">
         <result property="boxId" column="box_id"/>
-        <result property="authKey" column="auth_key"/>
         <result property="preText" column="pre_text"/>
         <result property="postText" column="post_text"/>
         <result property="boxType" column="box_type"/>
     </resultMap>
-
-    <parameterMap id="BoxDto" type="chatbot.api.buildcode.domain.BoxDTO">
-        <parameter property="boxId"/>
-        <parameter property="authKey"/>
-        <parameter property="preText"/>
-        <parameter property="postText"/>
-        <parameter property="boxType"/>
-    </parameterMap>
 </mapper>

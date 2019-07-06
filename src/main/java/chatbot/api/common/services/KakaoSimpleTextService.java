@@ -1,7 +1,9 @@
 package chatbot.api.common.services;
 
-import chatbot.api.buildcode.domain.*;
-import chatbot.api.buildcode.repository.BuildRepository;
+import chatbot.api.textbox.domain.*;
+import chatbot.api.textbox.domain.path.HrdwrDTO;
+import chatbot.api.textbox.domain.textboxdata.BoxDTO;
+import chatbot.api.textbox.repository.BuildRepository;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.QuickReply;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.simpleText.ComponentSimpleText;
@@ -14,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
-import static chatbot.api.buildcode.utils.BuildConstants.*;
+import static chatbot.api.textbox.utils.BuildConstants.*;
 
 @Service
 @AllArgsConstructor
@@ -323,11 +325,11 @@ public class KakaoSimpleTextService {
 
     public ResponseVerTwoDTO makerBtnsCard(String providerId) {
 
-        log.info("================== makerBtnsCard 시작 ==================");
+       /* log.info("================== makerBtnsCard 시작 ==================");
 
         Build reBuild = buildRepository.find(providerId);
 
-        BoxDTO curBox = reBuild.getBox();
+        TextBoxDTO curBox = reBuild.getBox();
         ArrayList<BtnDTO> btns = reBuild.getBtns();
 
         // 카드 만들기
@@ -374,7 +376,8 @@ public class KakaoSimpleTextService {
         return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(template)
-                .build();
+                .build();*/
+       return null;
     }
 
 
@@ -385,28 +388,11 @@ public class KakaoSimpleTextService {
 
 
         Build reBuild = buildRepository.find(providerId);
-        BoxDTO inputBox = reBuild.getBox();
-        log.info("INFO >> Box_Type == 3 -> Input Box 의 타입 : " + inputBox.getBoxType());
-
-        String msg = inputBox.getPreText() + "\n\n" + inputBox.getPostText();
-
-        SimpleText simpleTextVo = new SimpleText();
-        simpleTextVo.setText(msg);
-
-        ComponentSimpleText simpleText = new ComponentSimpleText();
-        simpleText.setSimpleText(simpleTextVo);
-
-        ArrayList<Object> outputs = new ArrayList<>();
-        outputs.add(simpleText);
-
-        SkillTemplate template = new SkillTemplate();
-        template.setOutputs(outputs);
 
         log.info("================== makerInputCard 끝    ==================");
 
         return new ResponseVerTwoDTO().builder()
                 .version("2.0")
-                .template(template)
                 .build();
     }
 }

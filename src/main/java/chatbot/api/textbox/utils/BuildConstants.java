@@ -1,4 +1,4 @@
-package chatbot.api.buildcode.utils;
+package chatbot.api.textbox.utils;
 
 import lombok.NoArgsConstructor;
 

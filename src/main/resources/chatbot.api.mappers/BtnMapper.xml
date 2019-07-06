@@ -5,29 +5,27 @@
 
 <mapper namespace="chatbot.api.mappers.BtnMapper">
 
-    <!-- 해당 박스에 꾸며질 버튼들을 조회한다. -->
-    <select id="getBtnsByBoxIdAndAuthKey" resultMap="BtnDto" parameterType="hashmap">
-        SELECT *
-        FROM   btn
-        WHERE  box_id = #{boxId}
-        AND auth_key = #{authKey}
+    <!-- hrdwrId를 이용해서 모든 텍스트 박스(box + btn)를 조회 -->
+    <select id="getBtnsByHrdwrId" resultMap="BtnDto" parameterType="Long">
+        SELECT
+        btn_code,
+        event_code,
+        btn_name,
+        idx,
+        is_spread,
+        btn_type
+        FROM btn
+        WHERE hrdwr_id = #{hrdwrId}
     </select>
 
 
 
-    <resultMap id="BtnDto" type="chatbot.api.buildcode.domain.BtnDTO">
-        <result property="boxId" column="box_id"/>
-        <result property="authKey" column="auth_key"/>
+    <resultMap id="BtnDto" type="chatbot.api.textbox.domain.textboxdata.BtnDTO">
+        <result property="btnCode" column="btn_code"/>
         <result property="eventCode" column="event_code"/>
         <result property="btnName" column="btn_name"/>
-        <result property="blockId" column="block_id"/>
+        <result property="idx" column="idx"/>
+        <result property="isSpread" column="is_spread"/>
+        <result property="btnType" column="btn_type"/>
     </resultMap>
-
-    <parameterMap id="BtnDto" type="chatbot.api.buildcode.domain.BtnDTO">
-        <parameter property="boxId"/>
-        <parameter property="authKey"/>
-        <parameter property="eventCode"/>
-        <parameter property="btnName"/>
-        <parameter property="blockId"/>
-    </parameterMap>
 </mapper>

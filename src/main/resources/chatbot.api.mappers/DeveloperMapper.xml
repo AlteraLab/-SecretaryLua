@@ -6,7 +6,7 @@
 <mapper namespace="chatbot.api.mappers.DeveloperMapper">
 
     <select id="getDevice" resultMap="DvlpDevDTO" parameterType="Long">
-        SELECT * FROM hrdwr WHERE hrdwr_id=#{devId}
+        SELECT * FROM hrdwr WHERE hrdwr_id=#{hrdwrId}
     </select>
 
 
@@ -17,23 +17,23 @@
 
     <!-- 1. derivations 삭제 -->
     <delete id="deleteDerivations" parameterType="Long">
-      DELETE FROM derivation WHERE hrdwr_id=#{devId}
+      DELETE FROM derivation WHERE hrdwr_id=#{hrdwrId}
     </delete>
 
     <!-- btn 삭제 -->
     <delete id="deleteButtons" parameterType="Long">
-      DELETE FROM btn WHERE hrdwr_id=#{devId}
+      DELETE FROM btn WHERE hrdwr_id=#{hrdwrId}
     </delete>
 
 
     <!-- box 삭제 -->
     <delete id="deleteTextBoxes" parameterType="Long">
-      DELETE FROM box WHERE hrdwr_id=#{devId}
+      DELETE FROM box WHERE hrdwr_id=#{hrdwrId}
     </delete>
 
     <!-- device 삭제 -->
     <delete id="deleteDevice" parameterType="Long">
-      DELETE FROM hrdwr WHERE hrdwr_id=#{devId}
+      DELETE FROM hrdwr WHERE hrdwr_id=#{hrdwrId}
     </delete>
 
 
@@ -75,7 +75,7 @@
             #{item.preText},
             #{item.postText},
             #{item.boxType},
-            #{devId}
+            #{hrdwrId}
             )
         </foreach>
     </insert>
@@ -93,7 +93,7 @@
             #{item.boxId},
             #{item.isSpread},
             #{item.btnType},
-            #{devId}
+            #{hrdwrId}
             )
         </foreach>
     </insert>
@@ -105,9 +105,9 @@
         <foreach collection="dvlpDerivationDTOList" item="item" separator=" , ">
             (
             #{item.btnCode},
-            #{item.pboxId},
-            #{item.cboxId},
-            #{devId}
+            #{item.upperBoxId},
+            #{item.lowerBoxId},
+            #{hrdwrId}
             )
         </foreach>
     </insert>

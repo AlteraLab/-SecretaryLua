@@ -1,15 +1,15 @@
 package chatbot.api.mappers;
 
-import chatbot.api.buildcode.domain.BoxDTO;
+import chatbot.api.textbox.domain.textboxdata.BoxDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
 
 @Mapper
 @Repository
 public interface BoxMapper {
 
-    BoxDTO getEntryBoxByAuthKey(@Param("authKey") String authKey, @Param("boxId") Long boxId);
-
-    BoxDTO getBoxByBoxIdAndAuthKey(@Param("boxId") Long boxId, @Param("authKey") String authKey);
+    ArrayList<BoxDTO> getBoxsByHrdwrId(@Param("hrdwrId") Long hrdwrId);
 }

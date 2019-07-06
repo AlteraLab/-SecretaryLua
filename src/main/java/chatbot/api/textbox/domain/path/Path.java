@@ -1,4 +1,4 @@
-package chatbot.api.buildcode.domain;
+package chatbot.api.textbox.domain.path;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

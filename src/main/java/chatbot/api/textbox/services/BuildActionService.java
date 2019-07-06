@@ -1,18 +1,12 @@
-package chatbot.api.buildcode.services;
+package chatbot.api.textbox.services;
 
-import chatbot.api.buildcode.domain.Build;
-import chatbot.api.buildcode.domain.Hub;
-import chatbot.api.buildcode.domain.Path;
-import chatbot.api.buildcode.domain.response.ResponseHrdwrInfo;
-import chatbot.api.buildcode.repository.BuildRepository;
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
+import chatbot.api.textbox.domain.response.ResponseHrdwrInfo;
+import chatbot.api.textbox.repository.BuildRepository;
 import chatbot.api.common.services.KakaoSimpleTextService;
 import chatbot.api.common.services.RestTemplateService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 
 @Service
 @AllArgsConstructor

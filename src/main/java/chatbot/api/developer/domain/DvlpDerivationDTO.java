@@ -1,5 +1,6 @@
 package chatbot.api.developer.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,9 @@ public class DvlpDerivationDTO {
 
     private Integer btnCode;
 
-    private Integer pboxId;  // 부모 - 상위
+    @JsonAlias("pboxId")
+    private Integer upperBoxId;  // 부모 - 상위
 
-    private Integer cboxId;  // 자식 - 하위
+    @JsonAlias("cboxId")
+    private Integer lowerBoxId;  // 자식 - 하위
 }

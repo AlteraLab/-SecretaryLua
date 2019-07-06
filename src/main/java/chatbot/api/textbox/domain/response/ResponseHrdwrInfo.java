@@ -1,6 +1,6 @@
-package chatbot.api.buildcode.domain.response;
+package chatbot.api.textbox.domain.response;
 
-import chatbot.api.buildcode.domain.HrdwrDTO;
+import chatbot.api.textbox.domain.path.HrdwrDTO;
 import lombok.*;
 import org.codehaus.jackson.annotate.JsonProperty;
 

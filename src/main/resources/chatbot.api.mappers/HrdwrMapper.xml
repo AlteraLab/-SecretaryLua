@@ -14,7 +14,7 @@
 
 
 
-    <resultMap id="HrdwrDto" type="chatbot.api.buildcode.domain.HrdwrDTO">
+    <resultMap id="HrdwrDto" type="chatbot.api.textbox.domain.path.HrdwrDTO">
         <result property="authKey" column="auth_key"/>
         <result property="hrdwrName" column="hrdwr_name"/>
         <result property="category" column="catetory"/>
@@ -22,7 +22,7 @@
         <result property="userDefinedName" column="user_defined_name"/>
     </resultMap>
 
-    <parameterMap id="HrdwrDto" type="chatbot.api.buildcode.domain.HrdwrDTO">
+    <parameterMap id="HrdwrDto" type="chatbot.api.textbox.domain.path.HrdwrDTO">
         <parameter property="authKey"/>
         <parameter property="hrdwrName"/>
         <parameter property="category"/>

@@ -1,9 +1,9 @@
 package chatbot.api.common.services;
 
-import chatbot.api.buildcode.domain.Build;
-import chatbot.api.buildcode.domain.HrdwrDTO;
-import chatbot.api.buildcode.domain.response.ResponseHrdwrInfo;
-import chatbot.api.buildcode.repository.BuildRepository;
+import chatbot.api.textbox.domain.Build;
+import chatbot.api.textbox.domain.path.HrdwrDTO;
+import chatbot.api.textbox.domain.response.ResponseHrdwrInfo;
+import chatbot.api.textbox.repository.BuildRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
