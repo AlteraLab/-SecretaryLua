@@ -26,4 +26,6 @@ public class BoxDTO implements Serializable {
     동적   2
     시간   3
      */
+
+
 }

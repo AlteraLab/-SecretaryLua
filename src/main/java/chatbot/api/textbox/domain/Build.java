@@ -6,7 +6,7 @@ import chatbot.api.textbox.domain.path.Path;
 import chatbot.api.textbox.domain.textboxdata.BoxDTO;
 import chatbot.api.textbox.domain.textboxdata.BtnDTO;
 import chatbot.api.textbox.domain.textboxdata.DerivationDTO;
-import chatbot.api.textbox.domain.transfer.cmdList;
+import chatbot.api.textbox.domain.transfer.CmdList;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,6 +36,15 @@ public class Build implements Serializable {
     private ArrayList<BtnDTO> btns;
     private ArrayList<DerivationDTO> derivations;
 
+    // 선택된 하드웨어
+    private HrdwrDTO selectedHrdwr;
+
+    // 선택된 박스
+    private BoxDTO curBox;
+
+    // 선택된 박스에 포함된 버튼 리스트
+    private ArrayList<BtnDTO> curBtns;
+
     // 전달할 데이터
-    private ArrayList<cmdList> cmdLists;
+    private CmdList cmdList;
 }

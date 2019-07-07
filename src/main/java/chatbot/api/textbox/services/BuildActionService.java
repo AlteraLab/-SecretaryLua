@@ -17,22 +17,20 @@ public class BuildActionService {
 
     private BuildSaveService buildSaveService;
 
-    private KakaoSimpleTextService kakaoSimpleTextService;
-
     private RestTemplateService restTemplateService;
 
 
-    public Boolean actionRequestAndSaverHrdwr(String providerId) {
+    public Boolean actionRequestAndSaverAboutHrdwr(String providerId) {
 
         log.info("허브와 연결된 장치가 있는지 체크");
         ResponseHrdwrInfo hrdwrInfo = restTemplateService.requestHrdwrsInfo(providerId);
-        buildSaveService.saverHrdwrs(providerId, hrdwrInfo.getDevInfo());
         if(hrdwrInfo.hasNull()) {
             buildRepository.delete(providerId);
             log.info("허브와 연결된 장치가 없다");
             return true;
         }
         log.info("허브와 연결된 장치가 있다");
+        buildSaveService.saverHrdwrs(providerId, hrdwrInfo.getDevInfo());
         return false;
     }
 }

@@ -2,7 +2,6 @@ package chatbot.api.common.services;
 
 import chatbot.api.textbox.domain.*;
 import chatbot.api.textbox.domain.path.HrdwrDTO;
-import chatbot.api.textbox.domain.textboxdata.BoxDTO;
 import chatbot.api.textbox.repository.BuildRepository;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.QuickReply;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
@@ -10,13 +9,15 @@ import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.simple
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.simpleText.SimpleText;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.SkillTemplate;
 import chatbot.api.skillhub.domain.HubInfoDTO;
+import chatbot.api.textbox.services.BuildAllocaterService;
+import chatbot.api.textbox.services.BuildSaveService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
-import static chatbot.api.textbox.utils.BuildConstants.*;
+import static chatbot.api.textbox.utils.TextBoxConstants.*;
 
 @Service
 @AllArgsConstructor
@@ -24,6 +25,11 @@ import static chatbot.api.textbox.utils.BuildConstants.*;
 public class KakaoSimpleTextService {
 
     private BuildRepository buildRepository;
+
+    private BuildSaveService buildSaveService;
+
+    private BuildAllocaterService buildAllocaterService;
+
 
 
     public ResponseVerTwoDTO responserShortMsg(String msg) {
@@ -378,6 +384,62 @@ public class KakaoSimpleTextService {
                 .template(template)
                 .build();*/
        return null;
+    }
+
+    public ResponseVerTwoDTO makerEntryCard(String providerId) {
+
+        log.info("================== makerBtnsCard 시작 ==================");
+
+        buildSaveService.saverCurBtns(providerId);
+
+        Build reBuild = buildRepository.find(providerId);
+
+        // 카드 만들기
+        SimpleText text = new SimpleText();
+        StringBuffer responseMsg = new StringBuffer(reBuild.getCurBox().getPreText() + "\n\n");
+        for (int i = 0; i < reBuild.getCurBtns().size(); i++) {
+            responseMsg.append(reBuild.getCurBtns().get(i).getIdx()
+                    + ". " + reBuild.getCurBtns().get(i).getBtnName() + "\n");
+        }
+        responseMsg.append("\n" + reBuild.getCurBox().getPostText());
+        text.setText(responseMsg.toString());
+
+        ComponentSimpleText simpleText = new ComponentSimpleText();
+        simpleText.setSimpleText(text);
+
+        ArrayList<Object> outputs = new ArrayList<Object>();
+        outputs.add(simpleText);
+
+        // 버튼 꾸미기
+        ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
+        Integer lowerBoxType = null;
+        String blockId = null;
+        for (int i = 0; i < reBuild.getCurBtns().size(); i++) {
+            lowerBoxType = buildAllocaterService.allocateLowerBoxType(providerId, i);
+            blockId = buildAllocaterService.allocateBlockId(lowerBoxType);
+            QuickReply quick = QuickReply.builder()
+                    .label(Integer.toString(reBuild.getCurBtns().get(i).getIdx()))
+                    .messageText("버튼 " + reBuild.getCurBtns().get(i).getIdx() + "번")
+                    .action("block")
+                    .blockId(blockId)
+                    .build();
+            quickReplies.add(quick);
+        }
+
+        QuickReply transferBtn = QuickReply.builder()
+                .label("전송")
+                .messageText("명령 전송")
+                .action("block")
+                .blockId(BLOCK_ID_BUILDED_CODES)
+                .build();
+        quickReplies.add(transferBtn);
+        SkillTemplate template = new SkillTemplate(outputs, quickReplies);
+        log.info("================== makerBtnsCard 끝    ==================");
+
+        return new ResponseVerTwoDTO().builder()
+                .version("2.0")
+                .template(template)
+                .build();
     }
 
 

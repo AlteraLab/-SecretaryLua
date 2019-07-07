@@ -9,7 +9,6 @@ import chatbot.api.textbox.domain.response.HrdwrControlResult;
 import chatbot.api.textbox.domain.textboxdata.BoxDTO;
 import chatbot.api.textbox.domain.textboxdata.BtnDTO;
 import chatbot.api.textbox.domain.textboxdata.DerivationDTO;
-import chatbot.api.textbox.domain.transfer.cmdList;
 import chatbot.api.textbox.repository.BuildRepository;
 import chatbot.api.textbox.services.TextBoxResponseService;
 import chatbot.api.common.domain.ResponseDTO;
@@ -43,40 +42,14 @@ public class TextBoxController {
     @Autowired
     private BuildRepository buildRepository;
 
-
     @Autowired
     private DerivationMapper derivationMapper;
+
     @Autowired
     private BoxMapper boxMapper;
+    
     @Autowired
     private BtnMapper btnMapper;
-
-    @PostMapping("/TEST")
-    public ResponseDTO TestMethod() {
-
-        log.info("==================== Test Method 시작 ====================");
-
-        Long hrdwrId = new Long(1);
-        ArrayList<DerivationDTO> derivations = derivationMapper.getDerivationsByHrdwrId(hrdwrId);
-        for(int i = 0; i < derivations.size(); i++) {
-            log.info("(" + (i + 1) + ") Derivation -> " + derivations.get(i));
-        }
-
-        System.out.println("\n");
-
-        ArrayList<BoxDTO> boxs = boxMapper.getBoxsByHrdwrId(hrdwrId);
-        for(int i = 0; i < boxs.size(); i++) {
-            log.info("(" + (i + 1) + ") Box -> " + boxs.get(i));
-        }
-
-        System.out.println("\n");
-
-        ArrayList<BtnDTO> btns = btnMapper.getBtnsByHrdwrId(hrdwrId);
-        for(int i = 0; i < btns.size(); i++) {
-            log.info("(" + (i + 1) + ") Btn -> " + btns.get(i));
-        }
-        return ResponseDTO.builder().build();
-    }
 
 
     // 사용자가 "시바"를 입력했을 때 호출되는 메소드
@@ -115,7 +88,7 @@ public class TextBoxController {
         log.info(requestDto.toString());
 
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
-        int hrdwrSeq = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        Integer hrdwrSeq = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
         log.info("INFO >> Hrdwr Seq -> " + hrdwrSeq);
 
         return textBoxResponseService.responserEntryBox(providerId, hrdwrSeq);
@@ -131,10 +104,11 @@ public class TextBoxController {
         log.info(requestDto.toString());
 
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
-        int btnSeq = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
-        log.info("INFO >> Btn Seq -> " + btnSeq);
+        Integer btnIdx = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        log.info("INFO >> Btn Idx -> " + btnIdx);
 
-        return textBoxResponseService.responserBtnBox(providerId, btnSeq);
+        //return textBoxResponseService.responserBtnBox(providerId, btnSeq);
+        return textBoxResponseService.responserAnyBox(providerId, btnIdx);
     }
 
 
@@ -156,7 +130,8 @@ public class TextBoxController {
         TimeService timeService = new TimeService();
         int minute = timeService.convertFromDateTimeToMinute(params);
 
-        return textBoxResponseService.responserBtnBoxFromTime(providerId, btnSeq, minute);
+        //return textBoxResponseService.responserBtnBoxFromTime(providerId, btnSeq, minute);
+        return null;
     }
 
 
@@ -172,7 +147,8 @@ public class TextBoxController {
         int btnSeq = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
         log.info("INFO >> Btn Seq -> " + btnSeq);
 
-        return textBoxResponseService.responserInputBox(providerId, btnSeq);
+        //return textBoxResponseService.responserInputBox(providerId, btnSeq);
+        return null;
     }
 
 
@@ -188,7 +164,8 @@ public class TextBoxController {
         int inputValue = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
         log.info("INFO >> 사용자가 입력한 inputValue -> " + inputValue);
 
-        return textBoxResponseService.responserBtnBoxFromInputContext(providerId, inputValue);
+        //return textBoxResponseService.responserBtnBoxFromInputContext(providerId, inputValue);
+        return null;
     }
 
 
@@ -213,12 +190,12 @@ public class TextBoxController {
             int externalPort = path.getExternalPort();
             String hrdwrMacAddr = path.getHrdwrMacAddr();
 
-            ArrayList<cmdList> btns = reBuild.getCmdLists();
-            cmdList[] arrBtns = btns.toArray(new cmdList[btns.size()]);
+            //ArrayList<CmdList> btns = reBuild.getCmdLists();
+            //CmdList[] arrBtns = btns.toArray(new CmdList[btns.size()]);
             log.info("INFO >> Builed Code 목록 -------");
-            for(cmdList temp : arrBtns) {
-                log.info("- " + temp.toString());
-            }
+            //for(CmdList temp : arrBtns) {
+            //    log.info("- " + temp.toString());
+            //}
 
             String url = new String("http://" + externalIp + ":" + externalPort + "/dev/" + hrdwrMacAddr);
             log.info("INFO >> URL -> " + url);
@@ -227,7 +204,7 @@ public class TextBoxController {
             // 밑에 임시 주석
             HrdwrControlResult result = restTemplate.postForObject(url, new Object(){
                     public String requester_id = reBuild.getHProviderId();
-                    public cmdList[] cmd = arrBtns;
+             //       public CmdList[] cmd = arrBtns;
                 }, HrdwrControlResult.class);
             //HrdwrControlResult result = new HrdwrControlResult();
             result.setStatus(true);
@@ -260,5 +237,32 @@ public class TextBoxController {
         log.info(requestDto.toString());
 
         return kakaoSimpleTextService.makerTransferSelectCard();
+    }
+
+    @PostMapping("/TEST")
+    public ResponseDTO TestMethod() {
+
+        log.info("==================== Test Method 시작 ====================");
+
+        Long hrdwrId = new Long(1);
+        ArrayList<DerivationDTO> derivations = derivationMapper.getDerivationsByHrdwrId(hrdwrId);
+        for(int i = 0; i < derivations.size(); i++) {
+            log.info("(" + (i + 1) + ") Derivation -> " + derivations.get(i));
+        }
+
+        System.out.println("\n");
+
+        ArrayList<BoxDTO> boxs = boxMapper.getBoxsByHrdwrId(hrdwrId);
+        for(int i = 0; i < boxs.size(); i++) {
+            log.info("(" + (i + 1) + ") Box -> " + boxs.get(i));
+        }
+
+        System.out.println("\n");
+
+        ArrayList<BtnDTO> btns = btnMapper.getBtnsByHrdwrId(hrdwrId);
+        for(int i = 0; i < btns.size(); i++) {
+            log.info("(" + (i + 1) + ") Btn -> " + btns.get(i));
+        }
+        return ResponseDTO.builder().build();
     }
 }

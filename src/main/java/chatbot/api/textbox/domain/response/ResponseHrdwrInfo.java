@@ -17,6 +17,8 @@ public class ResponseHrdwrInfo {
     @JsonProperty("devInfo")
     private HrdwrDTO[] hrdwrsInfo;
 
+
+
     public HrdwrDTO[] getDevInfo() {
         return hrdwrsInfo;
     }

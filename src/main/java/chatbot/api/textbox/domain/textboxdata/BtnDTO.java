@@ -13,6 +13,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class BtnDTO implements Serializable {
 
+    private Integer boxId;
+
     private Integer btnCode;
 
     private Integer eventCode;
@@ -29,6 +31,6 @@ public class BtnDTO implements Serializable {
     조회-허브-예약 `2`
     조회-허브-센싱 `3`
     조회-디바이스  `4`
-    예약         `5`
+    예약         `5` <- 없앨 예정
      */
 }

@@ -5,28 +5,25 @@
 
 <mapper namespace="chatbot.api.mappers.HrdwrMapper">
 
-    <!-- UserDefinedName 을 이용해서 사용자가 선택한 하드웨어의 Auth Key 를 알아낸다. -->
-    <select id="getAuthKeyByUserDefinedName" resultType="String" parameterType="String">
-        SELECT h.auth_key
+    <!-- auty 을 이용해서 사용자가 선택한 하드웨어의 Auth Key 를 알아낸다. -->
+    <select id="getHrdwrByAuthKey" resultMap="HrdwrDto" parameterType="String">
+        SELECT
+        h.hrdwr_name,
+        h.user_defined_name,
+        h.hrdwr_type,
+        h.category,
+        h.hrdwr_id
         FROM   hrdwr AS h
-        WHERE  h.user_defined_name = #{userDefinedName}
+        WHERE  h.auth_key = #{authKey}
     </select>
 
 
 
     <resultMap id="HrdwrDto" type="chatbot.api.textbox.domain.path.HrdwrDTO">
-        <result property="authKey" column="auth_key"/>
         <result property="hrdwrName" column="hrdwr_name"/>
-        <result property="category" column="catetory"/>
-        <result property="hrdwrType" column="hrdwr_type"/>
         <result property="userDefinedName" column="user_defined_name"/>
+        <result property="hrdwrType" column="hrdwr_type"/>
+        <result property="category" column="category"/>
+        <result property="hrdwrId" column="hrdwr_id"/>
     </resultMap>
-
-    <parameterMap id="HrdwrDto" type="chatbot.api.textbox.domain.path.HrdwrDTO">
-        <parameter property="authKey"/>
-        <parameter property="hrdwrName"/>
-        <parameter property="category"/>
-        <parameter property="hrdwrType"/>
-        <parameter property="userDefinedName"/>
-    </parameterMap>
 </mapper>

@@ -8,6 +8,7 @@
     <!-- hrdwrId를 이용해서 모든 텍스트 박스(box + btn)를 조회 -->
     <select id="getBtnsByHrdwrId" resultMap="BtnDto" parameterType="Long">
         SELECT
+        box_id,
         btn_code,
         event_code,
         btn_name,
@@ -21,6 +22,7 @@
 
 
     <resultMap id="BtnDto" type="chatbot.api.textbox.domain.textboxdata.BtnDTO">
+        <result property="boxId" column="box_id"/>
         <result property="btnCode" column="btn_code"/>
         <result property="eventCode" column="event_code"/>
         <result property="btnName" column="btn_name"/>

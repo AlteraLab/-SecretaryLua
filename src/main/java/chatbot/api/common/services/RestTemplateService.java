@@ -32,15 +32,14 @@ public class RestTemplateService {
         // 일단 데이터 받은걸로 가정합시다.
         HrdwrDTO[] hrdwrs = new HrdwrDTO[2];
         hrdwrs[0] = HrdwrDTO.builder()
-                .userDefinedName("LG AC01")
                 .hrdwrMac("12:12:12:12:12:12")
-                .authKey("AAAABBBBCCCCDDDD")
+                .authKey("b776d155a4d44816969408f831600e2d")
                 .build();
         hrdwrs[1] = HrdwrDTO.builder()
-                .userDefinedName("SAMSUNG AC01")
                 .hrdwrMac("72:72:72:72:72:72")
-                .authKey("AAAABBBBCCCCDDDD")
+                .authKey("aaaabbbbccccddddeeeeffffgggghhhh")
                 .build();
+
         ResponseHrdwrInfo hrdwrInfo = ResponseHrdwrInfo.builder()
                 .hrdwrsInfo(hrdwrs)
                 .status(true)

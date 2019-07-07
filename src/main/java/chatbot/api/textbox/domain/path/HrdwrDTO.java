@@ -1,5 +1,6 @@
 package chatbot.api.textbox.domain.path;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,13 +21,15 @@ public class HrdwrDTO implements Serializable {
 
     private String category;
 
-    private int hrdwrType;
+    private String hrdwrType;
 
     private String userDefinedName;
+
+    private Long hrdwrId;
 
     @JsonProperty("dev_type")
     private String authKey;           // userDefinedName 로 auth key 조회
 
-    @JsonProperty("dev_mac")
+    @JsonAlias("dev_mac")
     private String hrdwrMac;          // DB 에는 없는 데이터이다.
 }

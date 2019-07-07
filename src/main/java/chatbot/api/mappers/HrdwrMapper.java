@@ -1,5 +1,6 @@
 package chatbot.api.mappers;
 
+import chatbot.api.textbox.domain.path.HrdwrDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -8,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface HrdwrMapper {
 
-    String getAuthKeyByUserDefinedName(@Param("userDefinedName") String userDefinedName);
+    HrdwrDTO getHrdwrByAuthKey(@Param("authKey") String authKey);
 }

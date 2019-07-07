@@ -12,7 +12,7 @@ import java.util.ArrayList;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class cmdList implements Serializable {
+public class CmdList implements Serializable {
 
     private Integer btnType;
     /*
