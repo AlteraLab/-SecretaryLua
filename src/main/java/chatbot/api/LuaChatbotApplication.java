@@ -8,6 +8,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import javax.annotation.PostConstruct;
+import java.util.TimeZone;
+
 @Slf4j
 @SpringBootApplication
 @MapperScan(basePackages="chatbot.api.mappers")
@@ -15,18 +18,17 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class LuaChatbotApplication {
 
+	@PostConstruct
+	void started() {
+		//TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+	}
+
 	public static final String APP_LOCATIONS = "spring.config.location=" +
 			"classpath:application.yml," +
 			"/app/config/lua-skill-server/production-application.yml";
 
 	public static void main(String[] args) {
-
-		/*log.trace("Hello World");
-		log.debug("Hello World");
-		log.info("Hello World");
-		log.warn("Hello World");
-		log.error("Hello World");*/
-
 		new SpringApplicationBuilder(LuaChatbotApplication.class)
 				.properties(APP_LOCATIONS)
 				.run(args);

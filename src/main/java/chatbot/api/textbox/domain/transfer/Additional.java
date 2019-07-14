@@ -14,9 +14,5 @@ import java.sql.Timestamp;
 public class Additional {
 
     private Character type;
-    // '1' : time
-    // '2' : dynamic
-    private Timestamp timeVar;
-
-    private Integer dynamicVar;
+    private Object value;
 }

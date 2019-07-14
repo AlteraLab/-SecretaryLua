@@ -1,5 +1,6 @@
 package chatbot.api.textbox.domain;
 
+import chatbot.api.textbox.domain.blockid.BelowBlockIds;
 import chatbot.api.textbox.domain.path.HrdwrDTO;
 import chatbot.api.textbox.domain.path.Hub;
 import chatbot.api.textbox.domain.path.Path;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @Data
 @Builder
@@ -45,6 +47,14 @@ public class Build implements Serializable {
     // 선택된 박스에 포함된 버튼 리스트
     private ArrayList<BtnDTO> curBtns;
 
-    // 전달할 데이터
-    private CmdList cmdList;
+    // 사용자가 선택한 버튼의 인덱스 값 (사용자가 선택한 버튼의 시나리오가 무엇인지 식별하기 위해 사용한다)
+    private BtnDTO selectedBtn;
+
+    // 제어 시나리오 최종 전달 데이터
+    private ArrayList<CmdList> cmdList;
+
+    // 하나의 텍스트 박스(or Entry)에서 5개의 제어 버튼이 있다면
+    // 각 제어 버튼당 하위 박스들을 조회하여 시나리오를 저장하는 멤버 변수
+    // <index, BelowBlockIds>
+    private HashMap<Integer, BelowBlockIds> hControlBlocks;
 }

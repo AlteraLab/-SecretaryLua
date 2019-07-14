@@ -6,6 +6,7 @@ import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.basicC
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.basicCard.ComponentBasicCard;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.SkillTemplate;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,6 @@ import java.util.ArrayList;
 
 @Service
 @Slf4j
-@AllArgsConstructor
 public class KakaoBasicCardService {
 
     private KakaoSimpleTextService kakaoSimpleTextService;

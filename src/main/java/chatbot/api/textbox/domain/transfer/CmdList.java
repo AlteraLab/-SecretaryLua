@@ -14,7 +14,7 @@ import java.util.ArrayList;
 @AllArgsConstructor
 public class CmdList implements Serializable {
 
-    private Integer btnType;
+    private Character btnType;
     /*
     제어 1
     조회-허브-예약 2

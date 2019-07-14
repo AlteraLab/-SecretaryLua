@@ -2,6 +2,9 @@ package chatbot.api.common.services;
 
 import chatbot.api.textbox.domain.*;
 import chatbot.api.textbox.domain.path.HrdwrDTO;
+import chatbot.api.textbox.domain.textboxdata.BoxDTO;
+import chatbot.api.textbox.domain.textboxdata.BtnDTO;
+import chatbot.api.textbox.domain.textboxdata.DerivationDTO;
 import chatbot.api.textbox.repository.BuildRepository;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.QuickReply;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
@@ -10,9 +13,10 @@ import chatbot.api.common.domain.kakao.openbuilder.responseVer2.component.simple
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.SkillTemplate;
 import chatbot.api.skillhub.domain.HubInfoDTO;
 import chatbot.api.textbox.services.BuildAllocaterService;
-import chatbot.api.textbox.services.BuildSaveService;
+import chatbot.api.textbox.services.BuildCheckerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,15 +24,19 @@ import java.util.ArrayList;
 import static chatbot.api.textbox.utils.TextBoxConstants.*;
 
 @Service
-@AllArgsConstructor
 @Slf4j
 public class KakaoSimpleTextService {
 
+    @Autowired
     private BuildRepository buildRepository;
 
-    private BuildSaveService buildSaveService;
-
+    @Autowired
     private BuildAllocaterService buildAllocaterService;
+
+    @Autowired
+    private BuildCheckerService buildCheckerService;
+
+
 
 
 
@@ -194,7 +202,7 @@ public class KakaoSimpleTextService {
                 .label("2")
                 .messageText("명령 재선택")
                 .action("block")
-                .blockId(BLOCK_ID_BTN_TEXTBOX)
+                .blockId(BLOCK_ID_TO_ANY_BOX)
                 .build();
 
         QuickReply cancleBtn = QuickReply.builder()
@@ -268,7 +276,7 @@ public class KakaoSimpleTextService {
                     .label(Integer.toString(i + 1))
                     .action("block")
                     .messageText("허브 " + (i + 1) + "번")
-                    .blockId(BLOCK_ID_RETURN_HRDWRS)
+                    .blockId(BLOCK_ID_TO_HRDWRS_BOX)
                     .build();
                 quickReplies.add(quick);
         }
@@ -312,7 +320,7 @@ public class KakaoSimpleTextService {
                     .messageText("하드웨어 " + (i + 1) + "번")
                     //.messageText("모듈 " + (i + 1) + "번")
                     .action("block")
-                    .blockId(BLOCK_ID_RETURN_BTNS)
+                    .blockId(BLOCK_ID_TO_ENTRY_BOX)
                     .build();
              quickReplies.add(quick);
         }
@@ -328,10 +336,221 @@ public class KakaoSimpleTextService {
     }
 
 
+    public ResponseVerTwoDTO makerEntryAndControlCard(String providerId) {
 
+        log.info("================== maker Entry Card 시작 ==================");
+
+        Build reBuild = buildRepository.find(providerId);
+
+        // 1. 사용자에게 보여줄 텍스트
+        SimpleText text = new SimpleText();
+        StringBuffer responseMsg = new StringBuffer(reBuild.getCurBox().getPreText() + "\n\n");
+        for (int i = 0; i < reBuild.getCurBtns().size(); i++) {
+            responseMsg.append((reBuild.getCurBtns().get(i).getIdx())
+                    + ". " + reBuild.getCurBtns().get(i).getBtnName() + "\n");
+        }
+        responseMsg.append("\n" + reBuild.getCurBox().getPostText());
+        text.setText(responseMsg.toString());
+
+        ComponentSimpleText simpleText = new ComponentSimpleText();
+        simpleText.setSimpleText(text);
+
+        ArrayList<Object> outputs = new ArrayList<Object>();
+        outputs.add(simpleText);
+
+
+        // 2. 버튼 만들기
+        // 적어도 entry box 에서는 하나의 버튼이 갖는 blockId 값을 할당하기 위해서
+        // 텍스트 박스 타입이 아닌 현재 텍스트 박스내의 각 버튼의 타입으로 할당해줘야 한다.
+        // 그렇지만 만약 버튼 타입이 '1'(제어)인 경우에는 하위 박스들을 조회하여 5가지 하위 시나리오에 맞춰서 blockId를 할당 해줘야 한다.
+        ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
+        String blockId = null;
+        BtnDTO curBtnOfCurBtns = null;
+        for (int idx = 1; idx < reBuild.getCurBtns().size() + 1; idx++) {
+            // Entry Box에 들어갈 버튼들의 블록 아이디를 정해줘야 한다.
+            // 버튼 타입만 알면 제어 / 조회 / 예약 시나리오를 알 수 있다.
+            // 만약 제어 시나리오라면 하위 텍스트 박스들의 타입들을 이용해서 시나리오를 구성해줘야 한다.
+
+            // 먼저 제어 버튼인지 아닌지 조회한다. 현재 내가 가진것중에 인덱스 값으로 curBtns 에서 해당 btn을 찾아내고
+            // 이 버튼의 타입이 제어인지 체크
+            curBtnOfCurBtns = reBuild.getCurBtns().get(idx - 1);
+            log.info("현재 버튼 정보 -> " + curBtnOfCurBtns);
+            if(buildCheckerService.isControlTypeOf(curBtnOfCurBtns)) {  // 제어 버튼 이므로 하위 박스의 타입에 따라 blockId 할당
+                buildAllocaterService.allocateHControlBlocksBycBoxTypeWhenControlType(providerId, curBtnOfCurBtns);
+                reBuild = buildRepository.find(providerId);
+                log.info("IDX (" + idx + ") -> " + reBuild.getHControlBlocks().get(idx));
+                log.info(reBuild.getHControlBlocks().toString());
+                blockId = reBuild.getHControlBlocks().get(idx).getBlockIdOnebelow();
+            } else { // 버튼의 타입에 따라서 어떤 센싱인지 혹은 예약 인지에 따라 blockid 할당
+                blockId = buildAllocaterService.allocateBlockIdByBtnTypeWhenNotControl(curBtnOfCurBtns);
+            }
+            log.info("Block Id -> " + blockId);
+            QuickReply quick = QuickReply.builder()
+                    .label(Integer.toString(reBuild.getCurBtns().get(idx - 1).getIdx()))
+                    .messageText("버튼 " + reBuild.getCurBtns().get(idx - 1).getIdx() + "번")
+                    .action("block")
+                    .blockId(blockId)
+                    .build();
+            quickReplies.add(quick);
+        }
+
+        QuickReply transferBtn = QuickReply.builder()
+                .label("전송")
+                .messageText("명령 전송")
+                .action("block")
+                .blockId(BLOCK_ID_BUILDED_CODES)
+                .build();
+        quickReplies.add(transferBtn);
+        SkillTemplate template = new SkillTemplate(outputs, quickReplies);
+
+        log.info("================== maker Entry Card 종료 ==================");
+        return new ResponseVerTwoDTO().builder()
+                .version("2.0")
+                .template(template)
+                .build();
+    }
+
+
+    // 사용자에게 보여줄 동적 카드 When Dynamic From Time From Entry
+    public ResponseVerTwoDTO makerDynamicCardWhenDynamicFrTimeFrEntry(String providerId) {
+
+        log.info("================== maker Dynamic Card When Dynamic From Time From Entry 시작    ==================");
+        Build reBuild = buildRepository.find(providerId);
+
+        ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
+        BoxDTO curBox = reBuild.getCurBox();
+        BtnDTO selectedBtn = reBuild.getSelectedBtn();
+
+        for(DerivationDTO tempDerivation : derivations) {
+            if(curBox.getBoxId() == tempDerivation.getUpperBoxId() &&
+            selectedBtn.getBtnCode() == tempDerivation.getBtnCode()) {
+                curBox = buildAllocaterService.allocateBoxByBoxId(providerId, tempDerivation.getLowerBoxId());
+                break;
+            }
+        }
+        for(DerivationDTO tempDerivation : derivations) {
+            if(curBox.getBoxId() == tempDerivation.getUpperBoxId()) {
+                curBox = buildAllocaterService.allocateBoxByBoxId(providerId, tempDerivation.getLowerBoxId());
+                break;
+            }
+        }
+        reBuild.setCurBox(curBox);
+        buildRepository.update(reBuild);
+
+
+        // 카드 만들기
+        BoxDTO dynamicBox = curBox;
+        log.info("Dynamic Box -> " + dynamicBox);
+        log.info("================== maker Dynamic Card When Dynamic From Time From Entry 끝    ==================");
+        return new ResponseVerTwoDTO().builder()
+                .version("2.0")
+                .template(this.makerTemplateWhenMakingDynamicCard(dynamicBox))
+                .build();
+    }
+
+
+    // 사용자에게 보여줄 동적 카드 When _Dynamic From Entry
+    public ResponseVerTwoDTO makerDynamicCardWhenUDynamicFrEntry(String providerId) {
+        log.info("================== maker Dynamic Card When _Dynamic From Entry 시작    ==================");
+        Build reBuild = buildRepository.find(providerId);
+
+        ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
+        BoxDTO curBox = reBuild.getCurBox();
+        BtnDTO selectedBtn = reBuild.getSelectedBtn();
+
+        for(DerivationDTO tempDerivation : derivations) {
+            if(curBox.getBoxId() == tempDerivation.getUpperBoxId() &&
+                    selectedBtn.getBtnCode() == tempDerivation.getBtnCode()) {
+                curBox = buildAllocaterService.allocateBoxByBoxId(providerId, tempDerivation.getLowerBoxId());
+                break;
+            }
+        }
+        reBuild.setCurBox(curBox);
+        buildRepository.update(reBuild);
+
+        // 카드 만들기
+        BoxDTO dynamicBox = curBox;
+        log.info("Dynamic Box -> " + dynamicBox);
+
+        String msg = dynamicBox.getPreText() + "\n\n" + dynamicBox.getPostText();
+
+        SimpleText simpleTextVo = new SimpleText();
+        simpleTextVo.setText(msg);
+
+        ComponentSimpleText simpleText = new ComponentSimpleText();
+        simpleText.setSimpleText(simpleTextVo);
+
+        ArrayList<Object> outputs = new ArrayList<>();
+        outputs.add(simpleText);
+
+        SkillTemplate template = new SkillTemplate();
+        template.setOutputs(outputs);
+        log.info("================== maker Dynamic Card When _Dynamic From Entry 종료    ==================");
+        return new ResponseVerTwoDTO().builder()
+                .version("2.0")
+                .template(template)
+                .build();
+    }
+
+
+    // 사용자에게 보여줄 동적 카드 When Dynamic From Entry
+    public ResponseVerTwoDTO makerDynamicCardWhenDynamicFrEntry(String providerId) {
+        log.info("================== maker Dynamic Card When Dynamic From Entry 종료    ==================");
+        Build reBuild = buildRepository.find(providerId);
+
+        ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
+        BoxDTO curBox = reBuild.getCurBox();
+        BtnDTO selectedBtn = reBuild.getSelectedBtn();
+
+        for(DerivationDTO tempDerivation : derivations) {
+            if(curBox.getBoxId() == tempDerivation.getUpperBoxId() &&
+                    selectedBtn.getBtnCode() == tempDerivation.getBtnCode()) {
+                curBox = buildAllocaterService.allocateBoxByBoxId(providerId, tempDerivation.getLowerBoxId());
+                break;
+            }
+        }
+        reBuild.setCurBox(curBox);
+        buildRepository.update(reBuild);
+
+
+        // 카드 만들기
+        BoxDTO dynamicBox = curBox;
+        log.info("Dynamic Box -> " + dynamicBox);
+        log.info("================== maker Dynamic Card When Dynamic From Entry 종료    ==================");
+        return new ResponseVerTwoDTO().builder()
+                .version("2.0")
+                .template(this.makerTemplateWhenMakingDynamicCard(dynamicBox))
+                .build();
+    }
+
+
+    public SkillTemplate makerTemplateWhenMakingDynamicCard(BoxDTO curBox) {
+        log.info("================== maker Template When Making Dynamic Card 시작    ==================");
+
+        String msg = curBox.getPreText() + "\n\n" + curBox.getPostText();
+
+        SimpleText simpleTextVo = new SimpleText();
+        simpleTextVo.setText(msg);
+
+        ComponentSimpleText simpleText = new ComponentSimpleText();
+        simpleText.setSimpleText(simpleTextVo);
+
+        ArrayList<Object> outputs = new ArrayList<>();
+        outputs.add(simpleText);
+
+        SkillTemplate template = new SkillTemplate();
+        template.setOutputs(outputs);
+
+        log.info("================== maker Template When Making Dynamic Card 종료    ==================");
+        return template;
+    }
+}
+
+
+/*
     public ResponseVerTwoDTO makerBtnsCard(String providerId) {
 
-       /* log.info("================== makerBtnsCard 시작 ==================");
+        log.info("================== makerBtnsCard 시작 ==================");
 
         Build reBuild = buildRepository.find(providerId);
 
@@ -382,79 +601,6 @@ public class KakaoSimpleTextService {
         return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(template)
-                .build();*/
+                .build();
        return null;
-    }
-
-    public ResponseVerTwoDTO makerEntryCard(String providerId) {
-
-        log.info("================== makerBtnsCard 시작 ==================");
-
-        buildSaveService.saverCurBtns(providerId);
-
-        Build reBuild = buildRepository.find(providerId);
-
-        // 카드 만들기
-        SimpleText text = new SimpleText();
-        StringBuffer responseMsg = new StringBuffer(reBuild.getCurBox().getPreText() + "\n\n");
-        for (int i = 0; i < reBuild.getCurBtns().size(); i++) {
-            responseMsg.append(reBuild.getCurBtns().get(i).getIdx()
-                    + ". " + reBuild.getCurBtns().get(i).getBtnName() + "\n");
-        }
-        responseMsg.append("\n" + reBuild.getCurBox().getPostText());
-        text.setText(responseMsg.toString());
-
-        ComponentSimpleText simpleText = new ComponentSimpleText();
-        simpleText.setSimpleText(text);
-
-        ArrayList<Object> outputs = new ArrayList<Object>();
-        outputs.add(simpleText);
-
-        // 버튼 꾸미기
-        ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
-        Integer lowerBoxType = null;
-        String blockId = null;
-        for (int i = 0; i < reBuild.getCurBtns().size(); i++) {
-            lowerBoxType = buildAllocaterService.allocateLowerBoxType(providerId, i);
-            blockId = buildAllocaterService.allocateBlockId(lowerBoxType);
-            QuickReply quick = QuickReply.builder()
-                    .label(Integer.toString(reBuild.getCurBtns().get(i).getIdx()))
-                    .messageText("버튼 " + reBuild.getCurBtns().get(i).getIdx() + "번")
-                    .action("block")
-                    .blockId(blockId)
-                    .build();
-            quickReplies.add(quick);
-        }
-
-        QuickReply transferBtn = QuickReply.builder()
-                .label("전송")
-                .messageText("명령 전송")
-                .action("block")
-                .blockId(BLOCK_ID_BUILDED_CODES)
-                .build();
-        quickReplies.add(transferBtn);
-        SkillTemplate template = new SkillTemplate(outputs, quickReplies);
-        log.info("================== makerBtnsCard 끝    ==================");
-
-        return new ResponseVerTwoDTO().builder()
-                .version("2.0")
-                .template(template)
-                .build();
-    }
-
-
-
-    public ResponseVerTwoDTO makerInputCard(String providerId) {
-
-        log.info("================== makerInputCard 시작    ==================");
-
-
-        Build reBuild = buildRepository.find(providerId);
-
-        log.info("================== makerInputCard 끝    ==================");
-
-        return new ResponseVerTwoDTO().builder()
-                .version("2.0")
-                .build();
-    }
-}
+    }*/

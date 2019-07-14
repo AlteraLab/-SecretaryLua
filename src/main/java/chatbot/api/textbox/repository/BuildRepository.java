@@ -37,7 +37,6 @@ public class BuildRepository  {
     }
 
     public Build find(String providerId) {
-        log.info("INFO -> BuildRepository.get(" + providerId + ")");
         Build build = this.valueOperations.get(providerId);
         if(build == null) {
             log.info("INFO -> BuildRepository.get(" + providerId + ")" + " == NULL");
