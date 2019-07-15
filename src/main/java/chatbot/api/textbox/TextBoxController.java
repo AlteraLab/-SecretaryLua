@@ -4,6 +4,7 @@ import chatbot.api.common.services.TimeService;
 import chatbot.api.textbox.domain.*;
 import chatbot.api.textbox.domain.path.Path;
 import chatbot.api.textbox.domain.response.HrdwrControlResult;
+import chatbot.api.textbox.domain.transfer.CmdList;
 import chatbot.api.textbox.repository.BuildRepository;
 import chatbot.api.textbox.services.TextBoxResponseService;
 import chatbot.api.common.domain.kakao.openbuilder.RequestDTO;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 @RestController
 @Slf4j
@@ -260,15 +262,28 @@ public class TextBoxController {
     }
 
 
+    // 블록 아이디 : BLOCK_ID_BUILDED_CODES,
+    // "전송" 버튼을 클릭하면 이 메소드가 호출
+    // 전송하시겠습니까? Yes or No
+    @PostMapping("/textbox/select/btn")
+    public ResponseVerTwoDTO textBoxSelectBox(@RequestBody RequestDTO requestDto) {
+
+        log.info("============ textBox Select Box With Yes Or No Button 시작 ============");
+        log.info("중간에 \"전송\" 버튼을 눌렀을때, 사용자에게 Yes Or No Button 을 보여준다");
+        log.info(requestDto.toString());
+
+        return kakaoSimpleTextService.makerTransferSelectCard();
+    }
 
 
+    // 블록 아이디 : BLOCK_ID_TRANSFER_RESULT_DATA,
+    // "예" Or "아니오" 버튼을 클릭 -> 아래 메소드 호출
+    // "예" -> 허브로 명령 전송
+    // "아니오" -> 명령 취소 시나리오 실행
+    @PostMapping("/textbox/transfer/data")
+    public ResponseVerTwoDTO transferResultData(@RequestBody RequestDTO requestDto) {
 
-    // 블록 아이디 : BLOCK_ID_TRANSFER_RESULT,
-    // "예" 혹은 "아니오" 버튼을 클릭하면 아래 메소드 호출
-    @PostMapping("/complete/builded/codes")
-    public ResponseVerTwoDTO transferCompleteBuildedCodes(@RequestBody RequestDTO requestDto) {
-
-        log.info("==================== Transfer Complete Builded Codes 시작 ====================");
+        log.info("==================== Transfer Data 시작 ====================");
         log.info("사용자가 선택한 버튼이 \"예\" 버튼 이여서, 빌드된 코드를 전송할 때 호출되는 메소드 입니다.");
         log.info(requestDto.toString());
 
@@ -285,23 +300,25 @@ public class TextBoxController {
             int externalPort = path.getExternalPort();
             String hrdwrMacAddr = path.getHrdwrMacAddr();
 
-            //ArrayList<CmdList> btns = reBuild.getCmdLists();
-            //CmdList[] arrBtns = btns.toArray(new CmdList[btns.size()]);
-            log.info("INFO >> Builed Code 목록 -------");
-            //for(CmdList temp : arrBtns) {
-            //    log.info("- " + temp.toString());
-            //}
+//            ArrayList<CmdList> btns = reBuild.getCmdList();
+  //          CmdList[] arrBtns = btns.toArray(new CmdList[btns.size()]);
+            ArrayList<CmdList> cmdLists = reBuild.getCmdList();
+            log.info("INFO >> Cmd List 목록 -------");
+            for(CmdList tempCmd : cmdLists) {
+                log.info("- " + tempCmd);
+            }
 
             String url = new String("http://" + externalIp + ":" + externalPort + "/dev/" + hrdwrMacAddr);
             log.info("INFO >> URL -> " + url);
 
-
             // 밑에 임시 주석
-            HrdwrControlResult result = restTemplate.postForObject(url, new Object(){
-                    public String requester_id = reBuild.getHProviderId();
-             //       public CmdList[] cmd = arrBtns;
-                }, HrdwrControlResult.class);
-            //HrdwrControlResult result = new HrdwrControlResult();
+            /*HrdwrControlResult result = restTemplate.postForObject(url,
+                    new Object() {
+                        public String requester_id = reBuild.getHProviderId();
+                        public ArrayList<CmdList> cmdList = cmdLists;
+                    },
+                    HrdwrControlResult.class);*/
+            HrdwrControlResult result = new HrdwrControlResult();
             result.setStatus(true);
             log.info("INFO >> Result 결과 -> " + result.toString());
 
@@ -314,25 +331,12 @@ public class TextBoxController {
                 msg.append("명령 전송이 실패하였습니다.\n\n");
             }
             msg.append("또 다른 명령을 수행하고 싶으시다면 아래 슬롯을 올려 \"시바\" 버튼을 누르세요.");
-            return kakaoSimpleTextService.makerTransferCompleteCard(msg.toString());
+            return kakaoSimpleTextService.responserShortMsg(msg.toString());
         }
 
         // 사용자가 취소 명령을 눌렀다면
         // 취소 선택 버튼 3가지 경우의 수를 리턴한다.
         return kakaoSimpleTextService.makerCancleSelectCard();
-    }
-
-
-    // 블록 아이디 : BLOCK_ID_BUILDED_CODES,
-    // "전송" 버튼을 클릭하면 이 메소드가 호출
-    @PostMapping("/builed/codes")
-    public ResponseVerTwoDTO transferCodes(@RequestBody RequestDTO requestDto) {
-
-        log.info("============ Transfer Codes 시작 ============");
-        log.info("중간에 \"전송\" 버튼을 눌렀을때, 빌딩된 명령을 전송하는 메소드");
-        log.info(requestDto.toString());
-
-        return kakaoSimpleTextService.makerTransferSelectCard();
     }
 }
 /*

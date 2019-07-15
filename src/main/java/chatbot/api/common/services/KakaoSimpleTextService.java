@@ -14,7 +14,6 @@ import chatbot.api.common.domain.kakao.openbuilder.responseVer2.SkillTemplate;
 import chatbot.api.skillhub.domain.HubInfoDTO;
 import chatbot.api.textbox.services.BuildAllocaterService;
 import chatbot.api.textbox.services.BuildCheckerService;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,7 +82,7 @@ public class KakaoSimpleTextService {
                 .label("전송")
                 .messageText("명령 전송")
                 .action("block")
-                .blockId(BLOCK_ID_BUILDED_CODES)
+                .blockId(BLOCK_ID_SELECT_BOX_YES_OR_NO)
                 .build();
 
         quickReplies.add(transferBtn);
@@ -118,14 +117,14 @@ public class KakaoSimpleTextService {
                 .label("예")
                 .messageText("명령 전송")
                 .action("block")
-                .blockId(BLOCK_ID_TRANSFER_RESULT)
+                .blockId(BLOCK_ID_TRANSFER_RESULT_DATA)
                 .build();
 
         QuickReply cancleBtn = QuickReply.builder()
                 .label("아니오")
                 .messageText("명령 취소")
                 .action("block")
-                .blockId(BLOCK_ID_TRANSFER_RESULT)
+                .blockId(BLOCK_ID_TRANSFER_RESULT_DATA)
                 .build();
 
         quickReplies.add(transferBtn);
@@ -138,29 +137,6 @@ public class KakaoSimpleTextService {
                 .template(template)
                 .build();
     }
-
-
-
-    public ResponseVerTwoDTO makerTransferCompleteCard(String msg) {
-
-        SimpleText simpleTextVo = new SimpleText();
-        simpleTextVo.setText(msg);
-
-        ComponentSimpleText simpleText = new ComponentSimpleText();
-        simpleText.setSimpleText(simpleTextVo);
-
-        ArrayList<Object> outputs = new ArrayList<>();
-        outputs.add(simpleText);
-
-        SkillTemplate template = new SkillTemplate();
-        template.setOutputs(outputs);
-
-        return new ResponseVerTwoDTO().builder()
-                .version("2.0")
-                .template(template)
-                .build();
-    }
-
 
 
     public ResponseVerTwoDTO makerCancleSelectCard() {
@@ -205,16 +181,16 @@ public class KakaoSimpleTextService {
                 .blockId(BLOCK_ID_TO_ANY_BOX)
                 .build();
 
-        QuickReply cancleBtn = QuickReply.builder()
+   /*     QuickReply cancleBtn = QuickReply.builder()
                 .label("3")
                 .messageText("취소")
                 .action("block")
                 .blockId(BLOCK_ID_CANCLE_COMPLETE)
-                .build();
+                .build();*/
 
         quickReplies.add(cancleBtnToControlHubs);
         quickReplies.add(cancleBtnToCodeList);
-        quickReplies.add(cancleBtn);
+        //quickReplies.add(cancleBtn);
 
         template.setQuickReplies(quickReplies);
 
@@ -398,7 +374,7 @@ public class KakaoSimpleTextService {
                 .label("전송")
                 .messageText("명령 전송")
                 .action("block")
-                .blockId(BLOCK_ID_BUILDED_CODES)
+                .blockId(BLOCK_ID_SELECT_BOX_YES_OR_NO)
                 .build();
         quickReplies.add(transferBtn);
         SkillTemplate template = new SkillTemplate(outputs, quickReplies);

@@ -49,8 +49,6 @@ public class TextBoxConstants {
     public static final String BLOCK_ID__DYNAMIC_ENTRY = "5d2428a8b617ea0001154397";
     public static final String BLOCK_ID_END_TIME__DYNAMIC_ENTRY = "5d2428d3b617ea0001154399";
 
-    public static final String BLOCK_ID_TRANSFER_RESULT = "5ccc1f5c384c5508fceef866";
-
-    public static final String BLOCK_ID_BUILDED_CODES = "5cc93fd8e82127558b7e7b8f";
-    public static final String BLOCK_ID_CANCLE_COMPLETE = "5ccfec8ae821271a946123d9";
+    public static final String BLOCK_ID_SELECT_BOX_YES_OR_NO = "5cc93fd8e82127558b7e7b8f";
+    public static final String BLOCK_ID_TRANSFER_RESULT_DATA = "5ccc1f5c384c5508fceef866";
 }

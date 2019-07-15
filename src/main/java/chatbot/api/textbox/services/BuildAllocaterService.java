@@ -102,24 +102,6 @@ public class BuildAllocaterService {
     }
 
 
-    // 제어 / 허브 예약 조회 / 센싱 데이터 조회 / 장치 상태 조회 / 예약
-    public String allocateBlockIdByEntryLowerBoxId(Integer lowerBoxType) {
-        log.info("=========== allocate BlockId By Lower Box Type 시작 ===========");
-        String blockId = null;
-        if (lowerBoxType == BOX_TYPE_TIME) {
-            log.info("BLOCK_ID_ADDITIONAL_RESERVATION_TEXTBOX");
-        } else if (lowerBoxType == BOX_TYPE_DYNAMIC) {
-            log.info("BLOCK_ID_ADDITIONAL_INPUT_TEXTBOX");
-        } else if (lowerBoxType == BOX_TYPE_END){
-            log.info("BLOCK_ID_BUILDED_CODES");
-        } else {
-            log.info("BLOCK_ID_TO_ANY_BOX");
-        }
-        log.info("Block Id -> " + blockId);
-        log.info("=========== allocate BlockId By Lower Box Type 종료 ===========");
-        return blockId;
-    }
-
 
     // boxId 로 box 를 구하는 메소드
     public BoxDTO allocateBoxByBoxId(String providerId, Integer boxId) {
@@ -302,3 +284,22 @@ public class BuildAllocaterService {
         return responseVerTwoDTO;
     }
 */
+
+/*
+    // 제어 / 허브 예약 조회 / 센싱 데이터 조회 / 장치 상태 조회 / 예약
+    public String allocateBlockIdByEntryLowerBoxId(Integer lowerBoxType) {
+        log.info("=========== allocate BlockId By Lower Box Type 시작 ===========");
+        String blockId = null;
+        if (lowerBoxType == BOX_TYPE_TIME) {
+            log.info("BLOCK_ID_ADDITIONAL_RESERVATION_TEXTBOX");
+        } else if (lowerBoxType == BOX_TYPE_DYNAMIC) {
+            log.info("BLOCK_ID_ADDITIONAL_INPUT_TEXTBOX");
+        } else if (lowerBoxType == BOX_TYPE_END){
+            log.info("");
+        } else {
+            log.info("BLOCK_ID_TO_ANY_BOX");
+        }
+        log.info("Block Id -> " + blockId);
+        log.info("=========== allocate BlockId By Lower Box Type 종료 ===========");
+        return blockId;
+    }*/
