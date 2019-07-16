@@ -6,6 +6,7 @@ import chatbot.api.common.domain.ResponseDTO;
 import chatbot.api.common.security.UserPrincipal;
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.skillhub.domain.*;
+import chatbot.api.skillhub.repository.KeepAliveRepository;
 import chatbot.api.skillhub.services.HubEditService;
 import chatbot.api.skillhub.services.HubDeleteService;
 import chatbot.api.skillhub.services.HubSelectService;
@@ -53,6 +54,8 @@ public class HubController {
     @Autowired
     private RoleMapper roleMapper;
 
+    @Autowired
+    private KeepAliveRepository keepAliveRepository;
 
 
     // UPnP 수행 이후, 할당 받은 Ip가 이전 Ip와 다르다면 스킬 서버로 데이터를 전송
@@ -77,6 +80,22 @@ public class HubController {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
+    // text keep alive redis
+    @GetMapping("/textbox/keep")
+    public ResponseDTO keepAlive(){
+
+        this.keepAliveRepository.save("1111", true);
+        Boolean testBool = this.keepAliveRepository.find("1111");
+        if(testBool) {
+            log.info("Keep Redis -> TRUE");
+        } else {
+            log.info("Keep Redis -> FALSE");
+        }
+
+        return null;
+    }
+
+
     ////////////////////////////////////////////////////////////////////////////
 
 
