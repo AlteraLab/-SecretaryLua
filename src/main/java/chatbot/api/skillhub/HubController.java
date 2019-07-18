@@ -1,5 +1,9 @@
 package chatbot.api.skillhub;
 
+import chatbot.api.common.config.rabbit.domain.sub.EstablishMessage;
+import chatbot.api.common.config.rabbit.domain.sub.KeepAliveMessage;
+import chatbot.api.common.config.rabbit.services.consumer.establish.EstablishMessageReceiver;
+import chatbot.api.common.config.rabbit.services.consumer.keepalive.KeepAliveMessageReceiver;
 import chatbot.api.mappers.RoleMapper;
 import chatbot.api.role.domain.RoleDTO;
 import chatbot.api.common.domain.ResponseDTO;
@@ -57,6 +61,11 @@ public class HubController {
     @Autowired
     private KeepAliveRepository keepAliveRepository;
 
+    @Autowired
+    private EstablishMessageReceiver establishMessageReceiver;
+
+    @Autowired
+    private KeepAliveMessageReceiver keepAliveMessageReceiver;
 
     // UPnP 수행 이후, 할당 받은 Ip가 이전 Ip와 다르다면 스킬 서버로 데이터를 전송
     // Ip 수정 실시
@@ -77,25 +86,28 @@ public class HubController {
         return hubEditService.editerHubUpnpIp(hubInfoVo);
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    // text keep alive redis
-    @GetMapping("/textbox/keep")
-    public ResponseDTO keepAlive(){
-
-        this.keepAliveRepository.save("1111", true);
-        Boolean testBool = this.keepAliveRepository.find("1111");
-        if(testBool) {
-            log.info("Keep Redis -> TRUE");
-        } else {
-            log.info("Keep Redis -> FALSE");
-        }
-
-        return null;
+    // 허브 최초 연결 후, 허브에서 스킬 서버로 establishment 메시지를 보낸다
+    @PutMapping("/hub/establishment")
+    public ResponseDTO receiveEstablishMessage(@RequestBody EstablishMessage establishMessage) {
+        log.info("\n\n"); log.info("=========== Receive Establish Message ===========");
+        establishMessageReceiver.sendEstablishMessageToExchange(establishMessage);
+        return ResponseDTO.builder()
+                .status(HttpStatus.OK)
+                .build();
     }
 
 
+    // Hub Establishment 과정이 정상적으로 진행된 후, Keep-Alive 신호를 받음
+    @PutMapping("/hub/keepalive")
+    public ResponseDTO receiveKeepAliveMessage(@RequestBody KeepAliveMessage keepAliveMessage) {
+        log.info("\n\n"); log.info("=========== Receive Keep-Alive Message ===========");
+        keepAliveMessageReceiver.sendKeepAliveMessageToExchange(keepAliveMessage);
+        return ResponseDTO.builder()
+                .status(HttpStatus.OK)
+                .build();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
 
 

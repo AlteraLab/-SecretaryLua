@@ -1,7 +1,9 @@
 package chatbot.api.common.config;
 
+import chatbot.api.mappers.HubMapper;
 import chatbot.api.textbox.domain.Build;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
@@ -27,6 +29,10 @@ public class RedisConfig extends CachingConfigurerSupport {
 
     @Value("${spring.redis.port}")
     private int redisPort;
+
+    @Autowired
+    private HubMapper hubMapper;
+
 
 
     // RedisConnectionFactory를 통해 내장 혹은 외부의 Redis를 연결
@@ -61,17 +67,16 @@ public class RedisConfig extends CachingConfigurerSupport {
     // 데이터 만료시 발생
     @Bean
     RedisMessageListenerContainer keyExpirationListenerContainer(LettuceConnectionFactory lettuceConnectionFactory) {
-        
+
         RedisMessageListenerContainer listenerContainer = new RedisMessageListenerContainer();
 
         listenerContainer.setConnectionFactory(lettuceConnectionFactory);
         listenerContainer.addMessageListener((message, pattern) -> {
             log.info("Message -> " + message);
-            log.info("Pattern -> " + pattern);
-            // message 에  ":"
-            if(message.toString().contains(":")) {
+            if(message.toString().contains(":")) {  // message 에  ":" 이 포함되어 있다면,
                 // message (허브 맥 주소) 를 이용해서 데이터베이스에서 해당 허브의 status 값을 false 로 바꾼다.
-                // 허브로 status false 신호를 보내준다.
+                log.info("Message 에 \":\" 데이터가 포함되어 있습니다.");
+                hubMapper.editStateToFalseWhenKeyExpired(message.toString());
             }
         }, new PatternTopic("__keyevent@*__:expired"));
 

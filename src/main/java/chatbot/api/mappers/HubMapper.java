@@ -60,12 +60,19 @@ public interface HubMapper {
                  @Param("searchId") String searchId,
                  @Param("desc") String hubDescription,
                  @Param("externalIp") String externalIp,
-                 @Param("externalPort") int externalPort,
+                 @Param("externalPort") Integer externalPort,
                  @Param("beforeIp") String beforeIp);
 
 
     // edit upnpIp
     void editHubIp(@Param("macAddr") String macAddr,
                    @Param("externalIp") String externalIp,
-                   @Param("externalPort") int externalPort);
+                   @Param("externalPort") Integer externalPort);
+
+    // establish -> state를 true로 만듬
+    void editStateToTrueWhenEstablish(@Param("macAddr") String macAddr,
+                                      @Param("externalIp") String externalIp,
+                                      @Param("externalPort") Integer externalPort);
+
+    void editStateToFalseWhenKeyExpired(@Param("macAddr") String macAddr);
 }
