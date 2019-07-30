@@ -84,7 +84,7 @@ public class HubRegisterService {
                 .lastUsedTime(Timestamp.valueOf(LocalDateTime.now()))
                 .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .createdAt(Timestamp.valueOf(LocalDateTime.now()))
-                .state(false)
+                .state(true)
                 .beforeIp(null)
                 .build();
 

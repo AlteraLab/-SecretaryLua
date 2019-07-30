@@ -25,20 +25,6 @@ public class RabbitMQConfig {
     }
 
 
-    // extablish
-    // 큐 생성
-    @Bean
-    Queue queueForEstablish() {
-        return new Queue(RabbitMQConstants.SKILL_ESTABLISH_QUEUE, false);
-    }
-
-    // exchange (라우터) 와 Establish Queue 를 바인딩 시키고, exchange 에게 Establish Queue 로 접근하기 위한 라우팅 키를 알려줌
-    @Bean
-    Binding bindingForEstablish(@Qualifier("queueForEstablish") Queue queueEstablish, TopicExchange exchange) {
-        return BindingBuilder.bind(queueEstablish).to(exchange).with(RabbitMQConstants.SKILL_ESTABLISH_ROUTE_KEY);
-    }
-
-
     // keep-alive
     // 큐 생성
     @Bean
