@@ -17,7 +17,8 @@ public class TextBoxConstants {
     public static final Character BUTTON_TYPE_LOOKUP_RESERVATION = '2';
     public static final Character BUTTON_TYPE_LOOKUP_SENSING = '3';
     public static final Character BUTTON_TYPE_LOOKUP_DEVICE = '4';
-    public static final Character BUTTON_TYPE_ONLY_RESERVATION = '5';
+    public static final Character BUTTON_TYPE_RESERVATION = '5';
+    public static final Character BUTTON_TYPE_RESERVATION_DELETION = '6';
 
     // Destination
     public static final String BLOCK_ID_TO_HRDWRS_BOX = "5c7670efe821274ba78984c4"; // to hrdwrs box
@@ -51,4 +52,26 @@ public class TextBoxConstants {
 
     public static final String BLOCK_ID_SELECT_BOX_YES_OR_NO = "5cc93fd8e82127558b7e7b8f";
     public static final String BLOCK_ID_TRANSFER_RESULT_DATA = "5ccc1f5c384c5508fceef866";
+
+
+    // 예약 시나리오 블록s
+    public static final String BLOCK_ID_END_RESERVATION_ENTRY = "5d22a205ffa7480001c5b91d";
+
+    public static final String BLOCK_ID_DY_RESERVATION_ENTRY = "5d3d9028ffa7480001de2c00";
+    public static final String BLOCK_ID_END_DY_RESERVATION_ENTRY = "5d3d904092690d000124ce0b";
+
+    public static final String BLOCK_ID_DY_ENTRY = "5d3d905d92690d000124ce0d";
+    public static final String BLOCK_ID_END_RESERVATION_DY_ENTRY = "5d3d908fb617ea00018377d4";
+
+    public static final String BLOCK_ID_RESERVATION_DELETION_RESULT = "5d3e35ddffa7480001de2d1c";
+
+    public static final String ONLY_ONE_EXECUTE = "1회 실행";
+    public static final String EVERY_DAY_EXECUTE = "매일 실행";
+    public static final String EVERY_WEEK_EXECUTE = "매주 실행";
+
+    public static final Character ONLY_ONE_TYPE = '1';
+    public static final Character EVERY_DAY_TYPE = '2';
+    public static final Character EVERY_WEEK_TYPE = '3';
+
+    public static final Character INTERVAL_TYPE = '4';
 }

@@ -54,7 +54,7 @@ public class HubRegisterService {
 
             // 허브 조회 결과 만약 허브가 없다면
             try {
-                if(hub == null)  throw new Exception();
+                if(hub == null)  throw new NullPointerException();
             } catch (Exception e) {
                 log.info("해당 맥주소를 가진 허브가 없습니다.");
                 e.printStackTrace();
@@ -81,11 +81,11 @@ public class HubRegisterService {
                 .macAddr(hubVo.getMacAddr())
                 .externalIp(hubVo.getExternalIp())
                 .externalPort(hubVo.getExternalPort())
-                .beforeIp(hubVo.getBeforeIp())
                 .lastUsedTime(Timestamp.valueOf(LocalDateTime.now()))
                 .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .createdAt(Timestamp.valueOf(LocalDateTime.now()))
-                .state(true)
+                .state(false)
+                .beforeIp(null)
                 .build();
 
         // not yet set hubSeq
@@ -95,18 +95,17 @@ public class HubRegisterService {
                 .build();
 
         // log
-        log.info(role.toString());
-        log.info(hub.toString());
+        log.info("Role -> " + role.toString());
+        log.info("Hub -> " + hub.toString());
 
 
-        ResponseDTO responseDto = new ResponseDTO().builder().build();
-
+        ResponseDTO responseDto = new ResponseDTO();
         try {
             // 관리자로 등록하려는 사용자의 id는 users 테이블에 있는 데이터인가?
             UserInfoDto user = userMapper.getUserByUserId(role.getUserId());
             if(user == null) {
                 responseDto.setMsg(FAIL_MSG_NO_EXIST_USER_FROM_USERS_TABLE);
-                responseDto.setStatus(HttpStatus.EXPECTATION_FAILED);
+                responseDto.setStatus(HttpStatus.NO_CONTENT);
                 return responseDto;
             }
 
@@ -120,14 +119,15 @@ public class HubRegisterService {
             roleMapper.save(role);
 
             String url = "http://"+ hubVo.getExternalIp()+":" + hubVo.getExternalPort() + "/hub";
-            log.info(url);
+            log.info("URL -> " + url);
 
             String resultByHub = restTemplate.postForObject(url, null, String.class);
+
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(resultByHub);
             resultByHub = String.valueOf(jsonObject.get("status"));
 
-            log.info("Result By Hub :: " + resultByHub);
+            log.info("Result By Hub -> " + resultByHub);
             if(resultByHub != "true") {
                 responseDto.setMsg(EXCEPTION_MSG_DURING_REGISTER);
                 throw new Exception();
@@ -141,8 +141,7 @@ public class HubRegisterService {
             responseDto.setStatus(HttpStatus.EXPECTATION_FAILED);
             log.info(EXCEPTION_MSG_DURING_REGISTER);
             e.printStackTrace();
-        } finally {
-            return responseDto;
         }
+        return responseDto;
     }
 }

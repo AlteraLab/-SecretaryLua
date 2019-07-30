@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static chatbot.api.textbox.utils.TextBoxConstants.BUTTON_TYPE_CONTROL;
+import static chatbot.api.textbox.utils.TextBoxConstants.BUTTON_TYPE_RESERVATION;
 
 @Slf4j
 @Service
@@ -17,6 +18,19 @@ public class BuildCheckerService {
     @Autowired
     private BuildRepository buildRepository;
 
+
+    public Boolean isReservationTypeOf(BtnDTO curBtn) {
+        log.info("================== isReservationType 시작    ==================");
+        Boolean returnBoolean = null;
+        if(curBtn.getBtnType() == BUTTON_TYPE_RESERVATION) {
+            returnBoolean = true;
+        } else {
+            returnBoolean = false;
+        }
+        log.info("Return Boolean -> " + returnBoolean.toString());
+        log.info("================== isReservationType 끝    ==================");
+        return returnBoolean;
+    }
 
 
     public Boolean isControlTypeOf(BtnDTO curBtn) {

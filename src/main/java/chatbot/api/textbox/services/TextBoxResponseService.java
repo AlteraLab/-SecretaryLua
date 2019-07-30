@@ -1,17 +1,21 @@
 package chatbot.api.textbox.services;
 
+import chatbot.api.common.services.RestTemplateService;
 import chatbot.api.textbox.domain.*;
 import chatbot.api.textbox.domain.path.Path;
+import chatbot.api.textbox.domain.reservation.ReservationListDTO;
 import chatbot.api.textbox.repository.BuildRepository;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
 import chatbot.api.common.services.KakaoBasicCardService;
 import chatbot.api.common.services.KakaoSimpleTextService;
 import chatbot.api.mappers.*;
 import chatbot.api.skillhub.domain.HubInfoDTO;
+import chatbot.api.textbox.repository.ReservationListRepository;
 import chatbot.api.user.domain.UserInfoDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -25,6 +29,9 @@ public class TextBoxResponseService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RestTemplateService restTemplateService;
 
     @Autowired
     private KakaoBasicCardService kakaoBasicCardService;
@@ -44,6 +51,8 @@ public class TextBoxResponseService {
     @Autowired
     private BuildAllocaterService buildAllocaterService;
 
+    @Autowired
+    private ReservationListRepository reservationListRepository;
 
 
     public ResponseVerTwoDTO responserHubsBox(String providerId) {
@@ -55,6 +64,7 @@ public class TextBoxResponseService {
         UserInfoDto user = userMapper.getUserByProviderId(providerId).get();
 
         ArrayList<HubInfoDTO> hubs = hubmapper.getUserHubsByUserId(user.getUserId());
+        log.info("Hub List -> " + hubs);
         buildSaveService.saverHubs(providerId, hubs);
 
         if (hubs == null) {
@@ -243,12 +253,26 @@ public class TextBoxResponseService {
 
         return buildAllocaterService.allocaterResponseVerTwoDtoByExistLowerBox(providerId);
     }
+
+
+    public ResponseVerTwoDTO responserIntervalBox() {
+        log.info("================== Responser Interval Box 시작 ==================");
+        return kakaoSimpleTextService.makerIntervalCard();
+    }
+
+
+    public ResponseVerTwoDTO responserReservationListBox(String providerId) {
+        log.info("================== Responser Reservation List Box 시작 ==================");
+        Build reBuild = buildRepository.find(providerId);
+        ReservationListDTO reservationList = restTemplateService.requestReservationList(providerId);
+
+        // redis 에 데이터 저장
+        reservationListRepository.save(providerId, reservationList);
+
+        // 장치에 대한 예약 목록 박스 만들어서 반환
+        return kakaoSimpleTextService.makerReservationListCard(reservationList);
+    }
 }
-
-
-
-
-
 
 /*
     // when before box type is entry, excute

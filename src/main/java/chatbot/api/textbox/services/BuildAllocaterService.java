@@ -135,6 +135,8 @@ public class BuildAllocaterService {
         Integer depth = 0;
         Integer lowerBoxId = null;
         Integer boxId = null;
+        BoxDTO lowerBox = null;
+
         while (depth < MAX_DEPTH) {
             for(DerivationDTO tempDerivation : derivations) {
                 if(depth == 0) { // depth 가 0 일 때만, curBtn 의 버튼 코드와 derivation 을 이용해서, lowerBoxId 를 구한다
@@ -157,7 +159,7 @@ public class BuildAllocaterService {
                 boxId = lowerBoxId;
             }
             // boxId 를 이용해서 박스를 얻은 후 -> 박스 타입을 체크한다. control이면 end 랑 같으니까, break 검
-            BoxDTO lowerBox = this.allocateBoxByBoxId(providerId, boxId);
+            lowerBox = this.allocateBoxByBoxId(providerId, boxId);
             if(lowerBox.getBoxType() == BOX_TYPE_CONTROL) {   // 만약 하위 박스의 박스 타입이 Control 이였다면,
                 hBoxTypeOfDepth.put(depth, BOX_TYPE_CONTROL);
                 break;
@@ -205,6 +207,80 @@ public class BuildAllocaterService {
 
 
 
+    public void allocateHControlBlocksBycBoxTypeWhenReservationType(String providerId, BtnDTO curBtn) {
+        log.info("=========== allocate HControl BlockIDs By lower box type When btnType is Reservation Type 시작 ===========");
+        Build reBuild = buildRepository.find(providerId);
+        HashMap<Integer, BelowBlockIds> hControlBlockIds = reBuild.getHControlBlocks();
+
+        // 1. 첫 번째 박스 타입이 무엇이냐??
+        // 2. 딥스가 2 ? 3 ?
+        ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
+        BoxDTO curBox = reBuild.getCurBox();
+        Integer depth = 0;
+
+        BoxDTO lowerBox = null;
+        Integer lowerBoxId = null;
+        Integer boxId = null;
+        Integer firstBoxType = null;
+
+        while(depth < MAX_DEPTH) {
+            for(DerivationDTO tempDerivation : derivations) {
+                if (depth == 0){
+                    if(curBox.getBoxId() == tempDerivation.getUpperBoxId() &&
+                            curBtn.getBtnCode() == tempDerivation.getBtnCode()) {
+                        lowerBoxId = tempDerivation.getLowerBoxId();
+                        break;
+                    }
+                } else if(depth != 0) {
+                    if(tempDerivation.getUpperBoxId() == boxId) {
+                        lowerBoxId = tempDerivation.getLowerBoxId();
+                        break;
+                    }
+                }
+            }
+
+            depth++;
+
+            log.info(depth + " :: LowerBox Id -> " + lowerBoxId);
+
+            if(lowerBoxId == null) {
+                log.info("Break :: " + depth + " Lower Box Id == NULL");
+                break;
+            } else {
+                boxId = lowerBoxId;
+            }
+
+            lowerBox = this.allocateBoxByBoxId(providerId, boxId);
+
+            if(depth == 1) {
+                log.info("First Box -> " + lowerBox);
+                firstBoxType = lowerBox.getBoxType();
+            }
+
+            lowerBoxId = null;
+        }
+
+        // 블록 아이디 할당
+        BelowBlockIds belowBlockIds = new BelowBlockIds();
+        log.info("Depth -> " + depth);
+        if(depth == 2) {
+            belowBlockIds.setBlockIdOnebelow(BLOCK_ID_END_RESERVATION_ENTRY);
+        } else if (depth == 3){
+            if(firstBoxType == BOX_TYPE_TIME) {
+                belowBlockIds.setBlockIdOnebelow(BLOCK_ID_DY_RESERVATION_ENTRY);
+            } else if(firstBoxType == BOX_TYPE_DYNAMIC) {
+                belowBlockIds.setBlockIdOnebelow(BLOCK_ID_DY_ENTRY);
+            }
+        }
+
+        hControlBlockIds.put(curBtn.getIdx(), belowBlockIds);
+        log.info("hControlBlocks.Idx -> " + curBtn.getIdx());
+        log.info("hControlBlocks.belowBlockIds -> " + hControlBlockIds.get(curBtn.getIdx()));
+        buildRepository.update(reBuild);
+        log.info("=========== allocate HControl BlockIDs By lower box type When btnType is Reservation Type 종료 ===========");
+    }
+
+
     // 버튼 타입이 제어가 아닐때, 해당 버튼의 타입에 따라서 blockId 할당
     public String allocateBlockIdByBtnTypeWhenNotControl(BtnDTO curBtn) {
         log.info("=========== allocate BlockId By Current Button Type When btnType is Not Control Type 시작 ===========");
@@ -218,7 +294,7 @@ public class BuildAllocaterService {
         } else if(curBtn.getBtnType() == BUTTON_TYPE_LOOKUP_DEVICE) {
             returnBlockId = BLOCK_ID_TO_LOOKUP_DEVICE;
             log.info("Block Id -> BLOCK_ID_TO_LOOKUP_DEVICE");
-        } else if(curBtn.getBtnType() == BUTTON_TYPE_ONLY_RESERVATION) {
+        } else if(curBtn.getBtnType() == BUTTON_TYPE_RESERVATION) {
             returnBlockId = BLOCK_ID_TO_ONLY_RESERVATION;
             log.info("Block Id -> BLOCK_ID_TO_ONLY_RESERVATION");
         }
@@ -275,7 +351,7 @@ public class BuildAllocaterService {
             //
             log.info("=== (조회-디바이스) 시나리오 ===");
             responseVerTwoDTO = kakaoSimpleTextService.responserShortMsg("조회-디바이스");
-        } else if(btnType == BUTTON_TYPE_ONLY_RESERVATION) {
+        } else if(btnType == BUTTON_TYPE_RESERVATION) {
             log.info("=== (예약) 시나리오 ===");
             responseVerTwoDTO = kakaoSimpleTextService.responserShortMsg("예약");
         }

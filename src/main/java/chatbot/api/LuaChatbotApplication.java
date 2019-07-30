@@ -18,12 +18,6 @@ import java.util.TimeZone;
 @EnableScheduling
 public class LuaChatbotApplication {
 
-	@PostConstruct
-	void started() {
-		//TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
-		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-	}
-
 	public static final String APP_LOCATIONS = "spring.config.location=" +
 			"classpath:application.yml," +
 			"/app/config/lua-skill-server/production-application.yml";

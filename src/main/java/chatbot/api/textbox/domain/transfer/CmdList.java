@@ -16,11 +16,11 @@ public class CmdList implements Serializable {
 
     private Character btnType;
     /*
-    제어 1
-    조회-허브-예약 2
-    조회-허브-센싱 3
-    조회-디바이스 4
-    예약 5
+    제어 -> 1
+    조회-허브-예약 -> 2
+    조회-허브-센싱 -> 3
+    조회-디바이스 -> 4
+    예약 -> 5
      */
     private Integer eventCode;
 

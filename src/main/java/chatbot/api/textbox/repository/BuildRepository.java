@@ -17,8 +17,6 @@ public class BuildRepository  {
     private ValueOperations<String, Build> valueOperations;
 
 
-
-    // 다시 살릴거임
     public BuildRepository(RedisTemplate<String, Build> redisTemplate) {
         log.info("INFO -> Construct : BuildRepository Start");
         this.redisTemplate = redisTemplate;

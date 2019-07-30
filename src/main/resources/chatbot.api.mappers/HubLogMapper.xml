@@ -6,7 +6,7 @@
 <mapper namespace="chatbot.api.mappers.HubLogMapper">
 
     <!-- 명령 수행 결과 로그 저장 -->
-    <insert id="saveHubLog" parameterMap="HubLogDto">
+    <insert id="saveHubLog" parameterMap="HubLogMessage">
         INSERT INTO hub_log
         (
         hub_id,
@@ -14,7 +14,8 @@
         hrdwr_name,
         requester_id,
         content,
-        log_type
+        log_type,
+        recorded_at
         )
         VALUES
         (
@@ -23,7 +24,8 @@
         #{hrdwrName},
         #{requesterId},
         #{content},
-        #{logType}
+        #{logType},
+        #{recordedAt}
         )
     </insert>
 
@@ -62,7 +64,8 @@
         <result property="logType" column="log_type"/>
     </resultMap>
 
-    <parameterMap id="HubLogDto" type="chatbot.api.hublog.domain.HubLogDTO">
+    <!--<parameterMap id="HubLogDto" type="chatbot.api.hublog.domain.HubLogDTO">-->
+    <parameterMap id="HubLogMessage" type="chatbot.api.common.config.rabbit.domain.sub.HubLogMessage">
         <parameter property="hubId"/>
         <parameter property="hrdwrId"/>
         <parameter property="hrdwrName"/>

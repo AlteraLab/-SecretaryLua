@@ -1,5 +1,6 @@
 package chatbot.api.common.config.rabbit;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableRabbit
+@Slf4j
 public class RabbitMQConfig {
 
     // exchange, 라우터 설정
@@ -51,6 +53,20 @@ public class RabbitMQConfig {
     }
 
 
+    // hub_log
+    // 큐 생성
+    @Bean
+    Queue queueForHubLog() {
+        return new Queue(RabbitMQConstants.SKILL_HUB_LOG_QUEUE, false);
+    }
+
+    // exchange (라우터) 와 HubLog Queue 를 바인딩 시키고, exchange 에게 HubLog Queue 로 접근하기 위한 라우팅 키를 알려줌
+    @Bean
+    Binding bindingForHubLog(@Qualifier("queueForHubLog") Queue queueHubLog, TopicExchange exchange) {
+        return BindingBuilder.bind(queueHubLog).to(exchange).with(RabbitMQConstants.SKILL_HUB_LOG_ROUTE_KEY);
+    }
+
+
     // 메시지 컨버터
     @Bean
     public Jackson2JsonMessageConverter producerJackson2MessageConverter() {
@@ -62,6 +78,7 @@ public class RabbitMQConfig {
     @Bean
     public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
         final var rabbitTemplate = new RabbitTemplate(connectionFactory);
+        log.info("Rabbit MQ Connection Factory -> " + connectionFactory.toString());
         rabbitTemplate.setMessageConverter(producerJackson2MessageConverter());
         return rabbitTemplate;
     }

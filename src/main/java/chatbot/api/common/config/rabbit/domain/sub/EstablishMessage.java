@@ -14,6 +14,16 @@ public class EstablishMessage implements Serializable {
 
     private String mac;
 
+    public EstablishMessage() {
+    }
+
+    public EstablishMessage(@JsonAlias("ip") String ip,
+                            @JsonAlias("port") Integer port,
+                            @JsonAlias("mac")String mac) {
+        this.ip = ip;
+        this.port = port;
+        this.mac = mac;
+    }
 
     public String getIp() {
         return ip;

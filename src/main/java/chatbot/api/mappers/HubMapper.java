@@ -69,10 +69,11 @@ public interface HubMapper {
                    @Param("externalIp") String externalIp,
                    @Param("externalPort") Integer externalPort);
 
-    // establish -> state를 true로 만듬
+    // establish -> state 를 true 로 만듬
     void editStateToTrueWhenEstablish(@Param("macAddr") String macAddr,
                                       @Param("externalIp") String externalIp,
                                       @Param("externalPort") Integer externalPort);
 
+    // key-expire -> state 를 false 로 만듬
     void editStateToFalseWhenKeyExpired(@Param("macAddr") String macAddr);
 }

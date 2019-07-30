@@ -40,13 +40,12 @@ public class UserController {
     @GetMapping(value = "/user")
     public ResponseDTO kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         log.info("" + userPrincipal);
-        log.info("userPrincipal >> " + userPrincipal.getId() + " ::: " + userMapper.getUser(userPrincipal.getId()).get());
         UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
         //UserInfoDto userInfoDto = userMapper.getUser(new Long(1)).get();
 
         List<HubVO> hubsInfoList;
         hubsInfoList = hubMapper.getHubsInfoByUserId(userInfoDto.getUserId());
-        // 바로 위, 일단 주석... 야밤에 코드 작성하니까 잘못 작성한듯...
+        log.info("HubsInfo -> " + hubsInfoList);
         //hubsInfoList = hubMapper.getHubsInfoByUserId(new Long(1));
         log.info(hubsInfoList.toString());
         return ResponseDTO.builder()

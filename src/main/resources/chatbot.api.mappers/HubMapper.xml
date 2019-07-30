@@ -14,7 +14,7 @@
 		WHERE mac_addr = #{macAddr}
 	</update>
 
-    <!--  -->
+    <!-- establish -> state 를 true 로 만듬 -->
     <update id="editStateToTrueWhenEstablish" parameterType="hashmap">
 		UPDATE hub
 		SET    state = true
@@ -23,16 +23,12 @@
 		AND    external_port = #{externalPort}
 	</update>
 
-    <!-- -->
+    <!-- key-expire -> state 를 false 로 만듬 -->
     <update id="editStateToFalseWhenKeyExpired" parameterType="String">
 		UPDATE hub
 		SET    state = false
 		WHERE  mac_addr = #{macAddr}
 	</update>
-    <!-- ==================================================== -->
-    <!-- ==================================================== -->
-    <!-- ==================================================== -->
-    <!-- ==================================================== -->
     <!-- ==================================================== -->
     <!-- ==================================================== -->
 

@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ResponseDTO {
 	private String msg;
-	private String title;
 	private HttpStatus status;
 	private Object data;
 }

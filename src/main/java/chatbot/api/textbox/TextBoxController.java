@@ -1,11 +1,13 @@
 package chatbot.api.textbox;
 
+import chatbot.api.common.services.RestTemplateService;
 import chatbot.api.common.services.TimeService;
 import chatbot.api.textbox.domain.*;
 import chatbot.api.textbox.domain.path.Path;
 import chatbot.api.textbox.domain.response.HrdwrControlResult;
 import chatbot.api.textbox.domain.transfer.CmdList;
 import chatbot.api.textbox.repository.BuildRepository;
+import chatbot.api.textbox.services.BuildSaveService;
 import chatbot.api.textbox.services.TextBoxResponseService;
 import chatbot.api.common.domain.kakao.openbuilder.RequestDTO;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
@@ -15,10 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+
+import static chatbot.api.textbox.utils.TextBoxConstants.EVERY_DAY_EXECUTE;
+import static chatbot.api.textbox.utils.TextBoxConstants.EVERY_WEEK_EXECUTE;
+import static chatbot.api.textbox.utils.TextBoxConstants.ONLY_ONE_EXECUTE;
 
 @RestController
 @Slf4j
@@ -31,14 +36,16 @@ public class TextBoxController {
     private KakaoSimpleTextService kakaoSimpleTextService;
 
     @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
     private BuildRepository buildRepository;
 
     @Autowired
     private TimeService timeService;
 
+    @Autowired
+    private BuildSaveService buildSaveService;
+
+    @Autowired
+    private RestTemplateService restTemplateService;
 
 
     // from "시바" to hubs box
@@ -78,6 +85,38 @@ public class TextBoxController {
         log.info("INFO >> Hrdwr Seq -> " + hrdwrSeq);
 
         return textBoxResponseService.responserEntryBox(providerId, hrdwrSeq);
+    }
+
+
+    // 예약 목록 조회
+    @PostMapping("/textbox/lookup/reservation")
+    public ResponseVerTwoDTO textBoxLookUpReservationFromAny(@RequestBody RequestDTO requestDTO) {
+        log.info("\n\n"); log.info("==================== from entry box to LookUp Reservation box 시작 ====================");
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+        String blockId = requestDTO.getUserRequest().getBlock().getId();
+        log.info("Block Id -> " + blockId);
+        log.info(requestDTO.toString());
+        return textBoxResponseService.responserReservationListBox(providerId);
+    }
+
+
+    // 예약 리스트 중 취소 항목이 있을때 호출되는 메소드
+    @PostMapping("/textbox/reservation/deletion/result")
+    public ResponseVerTwoDTO textBoxReservationDeletionResult(@RequestBody RequestDTO requestDTO) {
+        // 5d3e35ddffa7480001de2d1c
+        log.info("\n\n"); log.info("==================== from LookUp Reservation box to Reservation Delete Result 시작 ====================");
+        log.info(requestDTO.toString());
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+
+        // 사용자가 취소하기러 한 명령이 무엇인지 뽑아낸다
+        Integer resIdForDeletion =
+                Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+
+        // 선택한 명령을 취소하기 위해서 명령 아이디를 허브로 보냄
+        String resultMsgAboutReservaionDeletion =
+                restTemplateService.requestForReservationDeletion(providerId, resIdForDeletion);
+
+        return kakaoSimpleTextService.responserShortMsg(resultMsgAboutReservaionDeletion);
     }
 
 
@@ -162,7 +201,6 @@ public class TextBoxController {
         String blockId = requestDTO.getUserRequest().getBlock().getId();
         Integer btnIdx = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
 
-        log.info("Block Id -> " + blockId);
         return textBoxResponseService.responserUDynamicBoxFrEntry(providerId, btnIdx); // U == underbar
     }
     @PostMapping("/textbox/end/time/_dynamic/entry")
@@ -262,6 +300,138 @@ public class TextBoxController {
     }
 
 
+    // 예약 버튼 시나리오s
+
+    // Entry -> Reservation
+    @PostMapping("/textbox/end/reservation/entry")
+    public ResponseVerTwoDTO textBoxEndFrReservationFrEntry(@RequestBody RequestDTO requestDTO) {
+        // 1. 사용자가 선택한 버튼을 저장해야 한다
+        //      1-1. 사용자가 선택한 버튼의 버튼 타입을 저장해야 한다
+        //      1-2. 사용자가 선택한 버튼의 이벤트 코드를 저장해야 한다
+        // 2. timestamp 를 저장해야 한다
+
+        // 5d22a205ffa7480001c5b91d
+
+        log.info("\n\n"); log.info("==================== textBox (End From Reservation From Entry) ====================");
+        log.info(requestDTO.toString());
+
+        String blockId = requestDTO.getUserRequest().getBlock().getId();
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+        Integer btnIdx = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        Object dateTimeParams = requestDTO.getAction().getParams().get("datetime");
+        Timestamp timeStamp = timeService.convertTimeStampFromObject(dateTimeParams);
+
+        log.info("Block Id -> " + blockId);
+        log.info("Button Index -> " + btnIdx);
+        log.info("DataTime -> " + dateTimeParams);
+        log.info("TimeStamp -> " + timeStamp);
+
+        buildSaveService.initHControlBlocksToNull(providerId);
+        buildSaveService.saverSelectedBtn(providerId, btnIdx);
+        buildSaveService.initAdditional(providerId);
+        buildSaveService.saverTimeStamp(providerId, timeStamp);
+
+        return textBoxResponseService.responserIntervalBox();
+    }
+
+
+    // Entry -> Reservation -> Dynamic
+    @PostMapping("/textbox/dy/reservation/entry")
+    public ResponseVerTwoDTO textBoxDyFrReservationFrEtnry(@RequestBody RequestDTO requestDTO) {
+        // 1. 사용자가 선택한 버튼을 저장해야 한다
+        //      1-1. 사용자가 선택한 버튼의 버튼 타입을 저장해야 한다
+        //      1-2. 사용자가 선택한 버튼의 이벤트 코드를 저장해야 한다
+        // 2. timestamp 를 저장해야 한다
+
+        // 5d3d9028ffa7480001de2c00
+        log.info("\n\n"); log.info("==================== textBox (Dy From Reservation From Entry) ====================");
+        log.info(requestDTO.toString());
+
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+        String blockId = requestDTO.getUserRequest().getBlock().getId();
+        Integer btnIdx = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+
+        Object dateTimeParams = requestDTO.getAction().getParams().get("datetime");
+        Timestamp timeStamp = timeService.convertTimeStampFromObject(dateTimeParams);
+
+        log.info("Block Id -> " + blockId);
+        log.info("Button Index -> " + btnIdx);
+        log.info("DataTime -> " + dateTimeParams);
+        log.info("TimeStamp -> " + timeStamp);
+
+        // 사용자에게 보여줄 Dynamic Box 를 사용자에게 보여줘야 한다.
+        return textBoxResponseService.responserDynamicBoxFrTimeFrEntry(providerId, btnIdx, timeStamp);
+    }
+    // Entry -> Reservation -> Dynamic -> End
+    @PostMapping("/textbox/end/dy/reservation/entry")
+    public ResponseVerTwoDTO textBoxEndFrDyFrReservationFrEtnry(@RequestBody RequestDTO requestDTO) {
+        // 1. 동적 입력 데이터를 Additonal 에 추가해야 한다
+
+        // 5d3d904092690d000124ce0b
+        log.info("\n\n"); log.info("==================== textBox (End From Dy From Reservation From Entry) ====================");
+        log.info(requestDTO.toString());
+
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+        String blockId = requestDTO.getUserRequest().getBlock().getId();
+        Integer dynamicValue = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+
+        log.info("Block Id -> " + blockId);
+        log.info("INFO >> 사용자가 입력한 dynamicValue -> " + dynamicValue);
+        buildSaveService.saverDynamicValue(providerId, dynamicValue);
+        return textBoxResponseService.responserIntervalBox();
+    }
+
+
+    // Entry -> Dynamic
+    @PostMapping("/textbox/dy/entry")
+    public ResponseVerTwoDTO textBoxDyFrEntry(@RequestBody RequestDTO requestDTO) {
+        // 1. 사용자가 선택한 버튼을 저장해야 한다
+        //      1-1. 사용자가 선택한 버튼의 버튼 타입을 저장해야 한다
+        //      1-2. 사용자가 선택한 버튼의 이벤트 코드를 저장해야 한다
+        // 2. Cur Box 를 조정해야 한다
+
+        // 5d3d905d92690d000124ce0d
+        log.info("\n\n"); log.info("==================== textBox (Dy From Entry) ====================");
+        log.info(requestDTO.toString());
+
+        String blockId = requestDTO.getUserRequest().getBlock().getId();
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+        Integer btnIdx = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+
+        log.info("Block Id -> " + blockId);
+        log.info("Button Index -> " + btnIdx);
+
+        return textBoxResponseService.responserUDynamicBoxFrEntry(providerId, btnIdx);
+    }
+    // Entry -> Dynamic -> Reservation -> End
+    @PostMapping("/textbox/end/reservation/dy/entry")
+    public ResponseVerTwoDTO textBoxEndFrReservationFrDyFrEntry(@RequestBody RequestDTO requestDTO) {
+        // 1. timestamp 를 저장해야 한다
+        // 2. 동적 입력 데이터를 저장해야 한다
+
+        // 5d3d908fb617ea00018377d4
+        log.info("\n\n"); log.info("==================== textBox (End From Reservation From Dy From Entry) ====================");
+        log.info(requestDTO.toString());
+
+        String blockId = requestDTO.getUserRequest().getBlock().getId();
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+        Integer dynamicValue = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        Object dateTimeParams = requestDTO.getAction().getParams().get("datetime");
+        Timestamp timeStamp = timeService.convertTimeStampFromObject(dateTimeParams);
+
+        log.info("Block Id -> " + blockId);
+        log.info("INFO >> 사용자가 입력한 dynamicValue -> " + dynamicValue);
+        log.info("DataTime -> " + dateTimeParams);
+        log.info("TimeStamp -> " + timeStamp);
+
+        buildSaveService.initAdditional(providerId);
+        buildSaveService.saverTimeStamp(providerId, timeStamp);
+        buildSaveService.saverDynamicValue(providerId, dynamicValue);
+
+        return textBoxResponseService.responserIntervalBox();
+    }
+
+
     // 블록 아이디 : BLOCK_ID_BUILDED_CODES,
     // "전송" 버튼을 클릭하면 이 메소드가 호출
     // 전송하시겠습니까? Yes or No
@@ -289,9 +459,14 @@ public class TextBoxController {
 
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
         String utterance = requestDto.getUserRequest().getUtterance();
-        Build reBuild = buildRepository.find(providerId);
 
-        if(utterance.equals("명령 전송")) {
+        if(utterance.equals("명령 전송") ||
+                utterance.equals(ONLY_ONE_EXECUTE) || utterance.equals(EVERY_DAY_EXECUTE) || utterance.equals(EVERY_WEEK_EXECUTE)) {
+
+            if(utterance.equals(ONLY_ONE_EXECUTE) || utterance.equals(EVERY_DAY_EXECUTE) || utterance.equals(EVERY_WEEK_EXECUTE)) {
+                buildSaveService.saverIntervalSetting(providerId, utterance);
+            }
+            Build reBuild = buildRepository.find(providerId);
             Path path = reBuild.getPath();
 
             log.info("INFO >> PATH -> " + path.toString());
@@ -307,6 +482,7 @@ public class TextBoxController {
             for(CmdList tempCmd : cmdLists) {
                 log.info("- " + tempCmd);
             }
+            log.info("Requester Id -> " + reBuild.getHProviderId());
 
             String url = new String("http://" + externalIp + ":" + externalPort + "/dev/" + hrdwrMacAddr);
             log.info("INFO >> URL -> " + url);
@@ -341,16 +517,6 @@ public class TextBoxController {
 }
 /*
     // 이쪽으로 오는거 필요 없을수도 있음
-    @PostMapping("/textbox/lookup/reservation")
-    public ResponseVerTwoDTO textBoxLookUpReservationFromAny(@RequestBody RequestDTO requestDTO) {
-        log.info("\n\n==================== from LookUp Reservation box to control box 시작 ====================");
-        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-        String blockId = requestDTO.getUserRequest().getBlock().getId();
-        log.info("Block Id -> " + blockId);
-        log.info(requestDTO.toString());
-        return null;
-    }
-    // 이쪽으로 오는거 필요 없을수도 있음
     @PostMapping("/textbox/lookup/sensing")
     public ResponseVerTwoDTO textBoxLookUpSensingFromAny(@RequestBody RequestDTO requestDTO) {
         log.info("\n\n==================== from LookUp Sensing box to control box 시작 ====================");
@@ -364,16 +530,6 @@ public class TextBoxController {
     @PostMapping("/textbox/lookup/device")
     public ResponseVerTwoDTO textBoxLookUpDeviceFromAny(@RequestBody RequestDTO requestDTO) {
         log.info("\n\n==================== from LookUp Device box to control box 시작 ====================");
-        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-        String blockId = requestDTO.getUserRequest().getBlock().getId();
-        log.info("Block Id -> " + blockId);
-        log.info(requestDTO.toString());
-        return null;
-    }
-    // 이쪽으로 오는거 필요 없을수도 있음
-    @PostMapping("/textbox/reservation")
-    public ResponseVerTwoDTO textBoxOnlyReservationFromAny(@RequestBody RequestDTO requestDTO) {
-        log.info("\n\n==================== from only reservation box to control box 시작 ====================");
         String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
         String blockId = requestDTO.getUserRequest().getBlock().getId();
         log.info("Block Id -> " + blockId);
@@ -396,7 +552,7 @@ public class TextBoxController {
         log.info("시나리오 2 : BUTTON_TYPE_LOOKUP_RESERVATION");
         log.info("시나리오 3 : BUTTON_TYPE_LOOKUP_SENSING");
         log.info("시나리오 4 : BUTTON_TYPE_LOOKUP_DEVICE");
-        log.info("시나리오 5 : BUTTON_TYPE_ONLY_RESERVATION");
+        log.info("시나리오 5 : BUTTON_TYPE_RESERVATION");
         log.info(requestDto.toString());
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
         Integer btnIdx = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));

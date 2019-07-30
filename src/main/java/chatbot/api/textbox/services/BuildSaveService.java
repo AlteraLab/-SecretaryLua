@@ -29,8 +29,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import static chatbot.api.textbox.utils.TextBoxConstants.BOX_TYPE_ENTRY;
-import static chatbot.api.textbox.utils.TextBoxConstants.BUTTON_TYPE_CONTROL;
+import static chatbot.api.textbox.utils.TextBoxConstants.*;
 
 @Service
 @Slf4j
@@ -54,6 +53,27 @@ public class BuildSaveService {
     @Autowired
     private BuildAllocaterService buildAllocaterService;
 
+
+    public void saverIntervalSetting(String providerId, String utterance) {
+        log.info("=============== Saver Interval Setting 시작 ===============");
+        Build reBuild = buildRepository.find(providerId);
+        Additional additional = Additional.builder()
+                .type(INTERVAL_TYPE) // Interval Type
+                .build();
+        if(utterance.equals(ONLY_ONE_EXECUTE)) {
+            additional.setValue(ONLY_ONE_TYPE);
+        }
+        if(utterance.equals(EVERY_DAY_EXECUTE)) {
+            additional.setValue(EVERY_DAY_TYPE);
+        }
+        if(utterance.equals(EVERY_WEEK_EXECUTE)) {
+            additional.setValue(EVERY_WEEK_TYPE);
+        }
+        CmdList cmd = reBuild.getCmdList().get(reBuild.getCmdList().size() - 1);
+        cmd.getAdditional().add(additional);
+        buildRepository.update(reBuild);
+        log.info("=============== Saver Interval Setting 종료 ===============");
+    }
 
 
     public void saverProviderId(String providerId) {
@@ -303,13 +323,13 @@ public class BuildSaveService {
     }
 
     public void initAdditional(String providerId) {
-        log.info("=============== Save Additional 시작 ===============");
+        log.info("=============== Init Additional 시작 ===============");
         Build reBuild = buildRepository.find(providerId);
         ArrayList<CmdList> cmdList = reBuild.getCmdList();
         CmdList cmd = cmdList.get(cmdList.size() - 1);
         cmd.setAdditional(new ArrayList<Additional>());
         buildRepository.update(reBuild);
-        log.info("=============== Save Additional 종료 ===============");
+        log.info("=============== Init Additional 종료 ===============");
     }
 
 
@@ -370,11 +390,13 @@ public class BuildSaveService {
         for(DerivationDTO tempDerivation : derivations) {
             if(curBox.getBoxId() == tempDerivation.getUpperBoxId()) {
                 curBox = buildAllocaterService.allocateBoxByBoxId(providerId, tempDerivation.getLowerBoxId());
+                break;
             }
         }
         for(DerivationDTO tempDerivation : derivations) {
             if(curBox.getBoxId() == tempDerivation.getUpperBoxId()) {
                 lowerBox = buildAllocaterService.allocateBoxByBoxId(providerId, tempDerivation.getLowerBoxId());
+                break;
             }
         }
         reBuild.setCurBox(lowerBox);

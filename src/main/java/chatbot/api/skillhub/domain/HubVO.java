@@ -15,13 +15,9 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class HubVO {
 
-    // layer 간 데이터 교환
-
     private Long hubId;
 
     private Long adminId;
-
-    // min 설정
 
     @Size(max = 16, message = "허브 이름은 16자를 넘을 수 없습니다.")
     @JsonProperty("hub_name")

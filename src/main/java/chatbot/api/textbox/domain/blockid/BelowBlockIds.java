@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class BelowBlockIds {
 
     private String blockIdOnebelow;
+
     private String blockIdTwobelow;
 }

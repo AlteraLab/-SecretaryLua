@@ -2,6 +2,7 @@ package chatbot.api.common.config;
 
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.textbox.domain.Build;
+import chatbot.api.textbox.domain.reservation.ReservationListDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,6 +65,15 @@ public class RedisConfig extends CachingConfigurerSupport {
         return redisTemplate;
     }
 
+    @Bean
+    public RedisTemplate<String, ReservationListDTO> redisTemplateAboutReservationList(LettuceConnectionFactory lettuceConnectionFactory) {
+        RedisTemplate redisTemplate = new RedisTemplate();
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(ReservationListDTO.class));
+        redisTemplate.setConnectionFactory(lettuceConnectionFactory);
+        return redisTemplate;
+    }
+
     // 데이터 만료시 발생
     @Bean
     RedisMessageListenerContainer keyExpirationListenerContainer(LettuceConnectionFactory lettuceConnectionFactory) {
@@ -72,7 +82,7 @@ public class RedisConfig extends CachingConfigurerSupport {
 
         listenerContainer.setConnectionFactory(lettuceConnectionFactory);
         listenerContainer.addMessageListener((message, pattern) -> {
-            log.info("Message -> " + message);
+            log.info("Expire Message -> " + message);
             if(message.toString().contains(":")) {  // message 에  ":" 이 포함되어 있다면,
                 // message (허브 맥 주소) 를 이용해서 데이터베이스에서 해당 허브의 status 값을 false 로 바꾼다.
                 log.info("Message 에 \":\" 데이터가 포함되어 있습니다.");

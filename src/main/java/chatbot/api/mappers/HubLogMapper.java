@@ -1,5 +1,6 @@
 package chatbot.api.mappers;
 
+import chatbot.api.common.config.rabbit.domain.sub.HubLogMessage;
 import chatbot.api.hublog.domain.HubLogDTO;
 import chatbot.api.hublog.domain.HubLogVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -12,7 +13,7 @@ import java.util.List;
 @Repository
 public interface HubLogMapper {
 
-    void saveHubLog(HubLogDTO hubLogDto);
+    void saveHubLog(HubLogMessage hubLogMessage);
 
     List<HubLogVO> getHubLog(@Param("hubId") Long hubId);
 }

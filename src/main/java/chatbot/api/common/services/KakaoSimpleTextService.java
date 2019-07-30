@@ -2,6 +2,8 @@ package chatbot.api.common.services;
 
 import chatbot.api.textbox.domain.*;
 import chatbot.api.textbox.domain.path.HrdwrDTO;
+import chatbot.api.textbox.domain.reservation.ReservationDTO;
+import chatbot.api.textbox.domain.reservation.ReservationListDTO;
 import chatbot.api.textbox.domain.textboxdata.BoxDTO;
 import chatbot.api.textbox.domain.textboxdata.BtnDTO;
 import chatbot.api.textbox.domain.textboxdata.DerivationDTO;
@@ -259,7 +261,7 @@ public class KakaoSimpleTextService {
 
         SkillTemplate template = new SkillTemplate(outputs, quickReplies);
 
-        log.info("================== makerHubsCard 끝 ==================");
+        log.info("================== makerHubsCard 종료 ==================");
 
         return new ResponseVerTwoDTO().builder()
                 .version("2.0")
@@ -303,7 +305,7 @@ public class KakaoSimpleTextService {
 
         SkillTemplate template = new SkillTemplate(outputs, quickReplies);
 
-        log.info("================== makerHrdwrsCard 끝    ==================");
+        log.info("================== makerHrdwrsCard 종료    ==================");
 
         return new ResponseVerTwoDTO().builder()
                 .version("2.0")
@@ -357,6 +359,12 @@ public class KakaoSimpleTextService {
                 log.info("IDX (" + idx + ") -> " + reBuild.getHControlBlocks().get(idx));
                 log.info(reBuild.getHControlBlocks().toString());
                 blockId = reBuild.getHControlBlocks().get(idx).getBlockIdOnebelow();
+            } else if(buildCheckerService.isReservationTypeOf(curBtnOfCurBtns)) {
+                buildAllocaterService.allocateHControlBlocksBycBoxTypeWhenReservationType(providerId, curBtnOfCurBtns);
+                reBuild = buildRepository.find(providerId);
+                log.info("IDX (" + idx + ") -> " + reBuild.getHControlBlocks().get(idx));
+                log.info(reBuild.getHControlBlocks().toString());
+                blockId = reBuild.getHControlBlocks().get(idx).getBlockIdOnebelow();
             } else { // 버튼의 타입에 따라서 어떤 센싱인지 혹은 예약 인지에 따라 blockid 할당
                 blockId = buildAllocaterService.allocateBlockIdByBtnTypeWhenNotControl(curBtnOfCurBtns);
             }
@@ -387,6 +395,47 @@ public class KakaoSimpleTextService {
     }
 
 
+    public ResponseVerTwoDTO makerReservationListCard(ReservationListDTO reservationList) {
+        log.info("================== maker Reservation List Card 시작    ==================");
+        StringBuffer msg = new StringBuffer("예약된 명령들 입니다.(" + reservationList.getReservationDTOList().size() + "개)\n\n");
+        for(int i = 0; i < reservationList.getReservationDTOList().size(); i++) {
+            msg.append((i + 1) + ". " +
+                    "시간설정(" + reservationList.getReservationDTOList().get(i).getActionAt() + ")\n"); // 추후 수정
+        }
+        msg.append("\n예약 취소를 원하신다면 선택하세요.");
+
+
+        SimpleText simpleTextVo = new SimpleText();
+        simpleTextVo.setText(msg.toString());
+
+        ComponentSimpleText simpleText = new ComponentSimpleText();
+        simpleText.setSimpleText(simpleTextVo);
+
+        ArrayList<Object> outputs = new ArrayList<>();
+        outputs.add(simpleText);
+
+        ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
+        for(int i = 0; i < reservationList.getReservationDTOList().size(); i++) {
+            QuickReply quick = QuickReply.builder()
+                    .label(Integer.toString(i + 1))
+                    .messageText("취소할 예약 아이디 : " +
+                            reservationList.getReservationDTOList().get(i).getReservationId())
+                    .action("block")
+                    .blockId(BLOCK_ID_RESERVATION_DELETION_RESULT)
+                    .build();
+            quickReplies.add(quick);
+        }
+
+        SkillTemplate template = new SkillTemplate(outputs, quickReplies);
+
+        log.info("================== maker Reservation List Card 종료    ==================");
+        return new ResponseVerTwoDTO().builder()
+                .version("2.0")
+                .template(template)
+                .build();
+    }
+        
+    
     // 사용자에게 보여줄 동적 카드 When Dynamic From Time From Entry
     public ResponseVerTwoDTO makerDynamicCardWhenDynamicFrTimeFrEntry(String providerId) {
 
@@ -417,7 +466,7 @@ public class KakaoSimpleTextService {
         // 카드 만들기
         BoxDTO dynamicBox = curBox;
         log.info("Dynamic Box -> " + dynamicBox);
-        log.info("================== maker Dynamic Card When Dynamic From Time From Entry 끝    ==================");
+        log.info("================== maker Dynamic Card When Dynamic From Time From Entry 종료    ==================");
         return new ResponseVerTwoDTO().builder()
                 .version("2.0")
                 .template(this.makerTemplateWhenMakingDynamicCard(dynamicBox))
@@ -520,6 +569,63 @@ public class KakaoSimpleTextService {
         log.info("================== maker Template When Making Dynamic Card 종료    ==================");
         return template;
     }
+
+
+    public ResponseVerTwoDTO makerIntervalCard() {
+        log.info("================== maker Interval Card 시작    ==================");
+        String msg = "명령 실행 주기를 설정해주세요.\n\n" +
+                "1. 1회\n" +
+                "2. 매일\n" +
+                "3. 매주\n\n" +
+                "버튼을 선택해주세요.";
+
+        SimpleText simpleTextVo = new SimpleText();
+        simpleTextVo.setText(msg);
+
+        ComponentSimpleText simpleText = new ComponentSimpleText();
+        simpleText.setSimpleText(simpleTextVo);
+
+        ArrayList<Object> outputs = new ArrayList<>();
+        outputs.add(simpleText);
+
+        SkillTemplate template = new SkillTemplate();
+        template.setOutputs(outputs);
+
+        ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
+
+        QuickReply onlyOne = QuickReply.builder()
+                .label("1")
+                .messageText(ONLY_ONE_EXECUTE)
+                .action("block")
+                .blockId(BLOCK_ID_TRANSFER_RESULT_DATA)
+                .build();
+
+        QuickReply everyDay = QuickReply.builder()
+                .label("2")
+                .messageText(EVERY_DAY_EXECUTE)
+                .action("block")
+                .blockId(BLOCK_ID_TRANSFER_RESULT_DATA)
+                .build();
+
+        QuickReply everyWeek = QuickReply.builder()
+                .label("3")
+                .messageText(EVERY_WEEK_EXECUTE)
+                .action("block")
+                .blockId(BLOCK_ID_TRANSFER_RESULT_DATA)
+                .build();
+
+        quickReplies.add(onlyOne);
+        quickReplies.add(everyDay);
+        quickReplies.add(everyWeek);
+
+        template.setQuickReplies(quickReplies);
+
+        log.info("================== maker Interval Card 종료    ==================");
+        return new ResponseVerTwoDTO().builder()
+                .version("2.0")
+                .template(template)
+                .build();
+    }
 }
 
 
@@ -572,7 +678,7 @@ public class KakaoSimpleTextService {
 
         SkillTemplate template = new SkillTemplate(outputs, quickReplies);
 
-        log.info("================== makerBtnsCard 끝    ==================");
+        log.info("================== makerBtnsCard 종료    ==================");
 
         return new ResponseVerTwoDTO().builder()
                 .version("2.0")

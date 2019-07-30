@@ -22,12 +22,14 @@ public class KeepAliveRepository {
 
     // Redis 에 허브 맥 주소 추가
     public void save(String hubMacAddr, Boolean status) {
-        valueOperations.set(hubMacAddr, status, 5L, TimeUnit.SECONDS);
+        log.info("Redis 내에 데이터가 없습니다. 데이터를 추가합니다");
+        valueOperations.set(hubMacAddr, status, 20L, TimeUnit.SECONDS);
     }
 
     // Redis 에 허브 맥 주소 갱신
     public void update(String hubMacAddr, Boolean status) {
-        valueOperations.set(hubMacAddr, status, 5L, TimeUnit.SECONDS);
+        log.info("데이터 갱신");
+        valueOperations.set(hubMacAddr, status, 20L, TimeUnit.SECONDS);
     }
 
     // 허브 맥 주소 조회

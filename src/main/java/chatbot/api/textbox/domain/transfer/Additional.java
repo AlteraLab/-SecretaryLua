@@ -14,5 +14,13 @@ import java.sql.Timestamp;
 public class Additional {
 
     private Character type;
+    /*
+    type : 4 (interval)
+    */
     private Object value;
+    /*
+    '1' -> 1 회
+    '2' -> 매일
+    '3' -> 매주
+     */
 }
