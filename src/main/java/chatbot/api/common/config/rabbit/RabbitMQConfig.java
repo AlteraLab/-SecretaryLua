@@ -18,40 +18,62 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class RabbitMQConfig {
 
-    // exchange, 라우터 설정
-    @Bean
-    TopicExchange topicExchange() {
-        return new TopicExchange(RabbitMQConstants.SKILL_EXCHANGE);
-    }
-
-
     // keep-alive
+    // exchange
+    @Bean
+    TopicExchange keepAliveExchange() {
+        return new TopicExchange(RabbitMQConstants.SKILL_KEEP_ALIVE_EXCHANGE);
+    }
     // 큐 생성
     @Bean
     Queue queueForKeepAlive() {
         return new Queue(RabbitMQConstants.SKILL_KEEP_ALIVE_QUEUE, false);
     }
-
     // exchange (라우터) 와 Keep-Alive Queue 를 바인딩 시키고, exchange 에게 Keep-Alive Queue 로 접근하기 위한 라우팅 키를 알려줌
     @Bean
-    Binding bindingForKeepAlive(@Qualifier("queueForKeepAlive") Queue queueKeepAlive, TopicExchange exchange) {
+    Binding bindingForKeepAlive(@Qualifier("queueForKeepAlive") Queue queueKeepAlive, @Qualifier("keepAliveExchange") TopicExchange exchange) {
         return BindingBuilder.bind(queueKeepAlive).to(exchange).with(RabbitMQConstants.SKILL_KEEP_ALIVE_ROUTE_KEY);
     }
 
+//------------------------------------------------------------------------------------------------------------------
+
+    // extablish
+    // exchange
+    @Bean
+    TopicExchange establishExchange() {
+        return new TopicExchange(RabbitMQConstants.SKILL_ESTABLISH_EXCHANGE);
+    }
+    // 큐 생성
+    @Bean
+    Queue queueForEstablish() {
+        return new Queue(RabbitMQConstants.SKILL_ESTABLISH_QUEUE, false);
+    }
+    // exchange (라우터) 와 Establish Queue 를 바인딩 시키고, exchange 에게 Establish Queue 로 접근하기 위한 라우팅 키를 알려줌
+    @Bean
+    Binding bindingForEstablish(@Qualifier("queueForEstablish") Queue queueEstablish, @Qualifier("establishExchange") TopicExchange exchange) {
+        return BindingBuilder.bind(queueEstablish).to(exchange).with(RabbitMQConstants.SKILL_ESTABLISH_ROUTE_KEY);
+    }
+
+//------------------------------------------------------------------------------------------------------------------
 
     // hub_log
+    // exchange
+    @Bean
+    TopicExchange hubLogExchange() {
+        return new TopicExchange(RabbitMQConstants.SKILL_HUB_LOG_EXCHANGE);
+    }
     // 큐 생성
     @Bean
     Queue queueForHubLog() {
         return new Queue(RabbitMQConstants.SKILL_HUB_LOG_QUEUE, false);
     }
-
     // exchange (라우터) 와 HubLog Queue 를 바인딩 시키고, exchange 에게 HubLog Queue 로 접근하기 위한 라우팅 키를 알려줌
     @Bean
-    Binding bindingForHubLog(@Qualifier("queueForHubLog") Queue queueHubLog, TopicExchange exchange) {
+    Binding bindingForHubLog(@Qualifier("queueForHubLog") Queue queueHubLog, @Qualifier("hubLogExchange") TopicExchange exchange) {
         return BindingBuilder.bind(queueHubLog).to(exchange).with(RabbitMQConstants.SKILL_HUB_LOG_ROUTE_KEY);
     }
 
+//------------------------------------------------------------------------------------------------------------------
 
     // 메시지 컨버터
     @Bean
@@ -59,6 +81,7 @@ public class RabbitMQConfig {
         return new Jackson2JsonMessageConverter();
     }
 
+//------------------------------------------------------------------------------------------------------------------
 
     // template
     @Bean

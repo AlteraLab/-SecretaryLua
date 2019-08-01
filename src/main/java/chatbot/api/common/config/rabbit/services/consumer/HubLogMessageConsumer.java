@@ -29,7 +29,7 @@ public class HubLogMessageConsumer {
         hubLogMessage.setRecordedAt(Timestamp.valueOf(LocalDateTime.now()));
         log.info("HubLogMessage : " + hubLogMessage.toString());
         try {
-            hubLogMapper.saveHubLog(hubLogMessage);
+//            hubLogMapper.saveHubLog(hubLogMessage);
         } catch (Exception e) {
             log.info(EXCEPTION_MSG_FAILED_RECORD_HUB_LOG);
             e.printStackTrace();

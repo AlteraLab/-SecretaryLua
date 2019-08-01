@@ -14,12 +14,12 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class ReservationDTO {
 
-    @JsonAlias("res_id")
+    //@JsonAlias("res_id")
     private Integer reservationId;
 
-    @JsonAlias("ev_code")
+    //@JsonAlias("ev_code")
     private Integer eventCode;
 
-    @JsonAlias("act_at")
+    //@JsonAlias("act_at")
     private Timestamp actionAt;
 }

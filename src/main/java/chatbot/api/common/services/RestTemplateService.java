@@ -1,6 +1,7 @@
 package chatbot.api.common.services;
 
 import chatbot.api.common.domain.ResponseDTO;
+import chatbot.api.skillhub.domain.ResultAboutReservationDelete;
 import chatbot.api.textbox.domain.Build;
 import chatbot.api.textbox.domain.path.HrdwrDTO;
 import chatbot.api.textbox.domain.reservation.ReservationDTO;
@@ -35,12 +36,13 @@ public class RestTemplateService {
         log.info("=========== RestTemplate -> requestHrdwrsInfo 시작 ===========");
         Build reBuild = buildRepository.find(providerId);
         String url = "http://" + reBuild.getPath().getExternalIp() + ":" + reBuild.getPath().getExternalPort() + "/dev";
-        log.info("INFO >> 전달할 URL 주소 : " + url);
+        log.info("하드웨어 목록 조회 URL -> " + url);
         log.info("=========== RestTemplate -> requestHrdwrsInfo 종료 ===========");
 
-        //return restTemplate.getForObject(url, ResponseHrdwrInfo.class);
+        return restTemplate.getForObject(url, ResponseHrdwrInfo.class);
 
         // 일단 데이터 받은걸로 가정합시다.
+        /*
         HrdwrDTO[] hrdwrs = new HrdwrDTO[2];
         hrdwrs[0] = HrdwrDTO.builder()
                 .hrdwrMac("12:12:12:12:12:12")
@@ -57,6 +59,7 @@ public class RestTemplateService {
                 .build();
         log.info("INFO >> DEV INFO 확인 : " + hrdwrInfo.toString());
         return hrdwrInfo;
+        */
     }
 
 
@@ -64,14 +67,15 @@ public class RestTemplateService {
         log.info("=========== RestTemplate -> requestReservationList 시작 ===========");
         Build reBuild = buildRepository.find(providerId);
         String url = "http://" + reBuild.getPath().getExternalIp() + ":" + reBuild.getPath().getExternalPort() + "/hub/" + reBuild.getPath().getHrdwrMacAddr() + "/reservation";
-        log.info("INFO >> 전달할 URL 주소 : " + url);
+        log.info("예약 목록 조회 URL -> " + url);
         log.info("=========== RestTemplate -> requestReservationList 종료 ===========");
-
         // 나중에 주석 풀기
-        //return restTemplate.getForObject(url, ReservationListDTO.class);
-
+        ReservationListDTO reservationList = restTemplate.getForObject(url, ReservationListDTO.class);
+        log.info("ReservationList 확인 -> " + reservationList.getReserveList());
+        return reservationList;
+/*
         ReservationListDTO reservationListDTO = new ReservationListDTO();
-        reservationListDTO.setReservationDTOList(new ArrayList<ReservationDTO>());
+        reservationListDTO.setReserveList(new ArrayList<ReservationDTO>());
         ReservationDTO reservationDTO_1 = ReservationDTO.builder()
                 .reservationId(1)
                 .eventCode(2)
@@ -82,9 +86,10 @@ public class RestTemplateService {
                 .eventCode(3)
                 .actionAt(new Timestamp(157240005555L))
                 .build();
-        reservationListDTO.getReservationDTOList().add(reservationDTO_1);
-        reservationListDTO.getReservationDTOList().add(reservationDTO_2);
+        reservationListDTO.getReserveList().add(reservationDTO_1);
+        reservationListDTO.getReserveList().add(reservationDTO_2);
         return reservationListDTO;
+        */
     }
 
 
@@ -100,7 +105,7 @@ public class RestTemplateService {
                 .additional(resIdForDeletion)
                 .eventCode(null)
                 .build();
-        for(ReservationDTO tempReservation : reservationList.getReservationDTOList()) {
+        for(ReservationDTO tempReservation : reservationList.getReserveList()) {
             if(resIdForDeletion == tempReservation.getReservationId()) {
                 cmdReservationDeletion.setEventCode(tempReservation.getEventCode());
                 break;
@@ -110,10 +115,12 @@ public class RestTemplateService {
         //  url 완성
         String url = reservationList.getUrl() + resIdForDeletion;
 
-        // 데이터를 받아옴
-        ResponseDTO responseDTO = restTemplate.postForObject(url, null, ResponseDTO.class);
+        log.info("예약 취소 URL -> " + url);
+        ResultAboutReservationDelete resultAboutReservationDelete = restTemplate.postForObject(url, null, ResultAboutReservationDelete.class);
+
+//        ResponseDTO responseDTO = ResponseDTO.builder().msg("명령이 성공적으로 삭제되었습니다.").build();
 
         log.info("=========== RestTemplate -> requestReservationIdForDeletion 종료 ===========");
-        return responseDTO.getMsg();
+        return resultAboutReservationDelete.getMsg();
     }
 }

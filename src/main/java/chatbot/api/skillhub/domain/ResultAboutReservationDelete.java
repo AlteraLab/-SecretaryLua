@@ -1,7 +1,6 @@
-package chatbot.api.textbox.domain.response;
+package chatbot.api.skillhub.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class HrdwrControlResult {
+public class ResultAboutReservationDelete {
 
     private HttpStatus status;
 

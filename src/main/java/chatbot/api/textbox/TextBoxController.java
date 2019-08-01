@@ -14,9 +14,11 @@ import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDT
 import chatbot.api.common.services.KakaoSimpleTextService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -46,6 +48,9 @@ public class TextBoxController {
 
     @Autowired
     private RestTemplateService restTemplateService;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
 
     // from "시바" to hubs box
@@ -481,29 +486,33 @@ public class TextBoxController {
             log.info("INFO >> Cmd List 목록 -------");
             for(CmdList tempCmd : cmdLists) {
                 log.info("- " + tempCmd);
+                if(tempCmd.getAdditional() == null) {
+                    tempCmd.setAdditional(new ArrayList<>());
+                }
             }
+
             log.info("Requester Id -> " + reBuild.getHProviderId());
 
             String url = new String("http://" + externalIp + ":" + externalPort + "/dev/" + hrdwrMacAddr);
-            log.info("INFO >> URL -> " + url);
+            log.info("명령 전송 URL -> " + url);
 
             // 밑에 임시 주석
-            /*HrdwrControlResult result = restTemplate.postForObject(url,
+            HrdwrControlResult result = restTemplate.postForObject(url,
                     new Object() {
                         public String requester_id = reBuild.getHProviderId();
                         public ArrayList<CmdList> cmdList = cmdLists;
                     },
-                    HrdwrControlResult.class);*/
-            HrdwrControlResult result = new HrdwrControlResult();
-            result.setStatus(true);
+                    HrdwrControlResult.class);
+            //HrdwrControlResult result = new HrdwrControlResult(); result.setStatus(true);
+
             log.info("INFO >> Result 결과 -> " + result.toString());
 
             buildRepository.delete(providerId);
 
             StringBuffer msg = new StringBuffer("");
-            if(result.isStatus() == true) {
+            if(result.getStatus() == HttpStatus.OK) {
                 msg.append("명령 전송이 성공적으로 수행 되었습니다.\n\n");
-            } else if (result.isStatus() == false) {
+            } else {
                 msg.append("명령 전송이 실패하였습니다.\n\n");
             }
             msg.append("또 다른 명령을 수행하고 싶으시다면 아래 슬롯을 올려 \"시바\" 버튼을 누르세요.");

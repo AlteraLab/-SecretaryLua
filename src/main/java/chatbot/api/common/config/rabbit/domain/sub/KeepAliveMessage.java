@@ -13,6 +13,7 @@ public class KeepAliveMessage implements Serializable {
     public KeepAliveMessage() {
     }
 
+    // 'id' is 'mac'
     public KeepAliveMessage(@JsonAlias("mac") String mac) {
         this.mac = mac;
     }

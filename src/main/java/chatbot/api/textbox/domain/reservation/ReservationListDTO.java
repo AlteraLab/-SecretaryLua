@@ -13,7 +13,9 @@ import java.util.ArrayList;
 @AllArgsConstructor
 public class ReservationListDTO {
 
-    private ArrayList<ReservationDTO> reservationDTOList;
+    private Boolean status;
+
+    private ArrayList<ReservationDTO> reserveList;
 
     private String url;
 }

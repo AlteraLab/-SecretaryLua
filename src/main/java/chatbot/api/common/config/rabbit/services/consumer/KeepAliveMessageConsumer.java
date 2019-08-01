@@ -17,13 +17,13 @@ public class KeepAliveMessageConsumer {
 
     @RabbitListener(queues = {RabbitMQConstants.SKILL_KEEP_ALIVE_QUEUE})
     public void consumeKeepAliveMessage(final KeepAliveMessage keepAliveMessage) {
-        log.info("=========== Consume Keep-Alive Message 시작 ===========");
-        log.info("Mac -> " + keepAliveMessage.getMac());
+       // log.info("=========== Consume Keep-Alive Message 시작 ===========");
+      //  log.info("Mac -> " + keepAliveMessage.getMac());
         if(keepAliveRepository.find(keepAliveMessage.getMac()) != null) {
             keepAliveRepository.update(keepAliveMessage.getMac(), true);
         } else {
             keepAliveRepository.save(keepAliveMessage.getMac(), true);
         }
-        log.info("=========== Consume Keep-Alive Message 종료 ===========");
+     //   log.info("=========== Consume Keep-Alive Message 종료 ===========");
     }
 }

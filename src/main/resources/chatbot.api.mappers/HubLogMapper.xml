@@ -9,23 +9,29 @@
     <insert id="saveHubLog" parameterMap="HubLogMessage">
         INSERT INTO hub_log
         (
-        hub_id,
-        hrdwr_id,
-        hrdwr_name,
+        <!-- hub_id,  삭제 -->
+        <!-- hrdwr_id, 삭제 -->
+        <!-- hrdwr_name, 삭제 -->
         requester_id,
         content,
         log_type,
-        recorded_at
+        recorded_at,
+        hub_mac,
+        hrdwr_mac,
+        auth_key
         )
         VALUES
         (
-        #{hubId},
-        #{hrdwrId},
-        #{hrdwrName},
+        <!-- #{hubId}, 삭제 -->
+        <!-- #{hrdwrId}, 삭제 -->
+        <!-- #{hrdwrName}, 삭제 -->
         #{requesterId},
         #{content},
         #{logType},
-        #{recordedAt}
+        #{recordedAt},
+        #{hubMac},
+        #{devMac},
+        #{devType}
         )
     </insert>
 
@@ -66,12 +72,12 @@
 
     <!--<parameterMap id="HubLogDto" type="chatbot.api.hublog.domain.HubLogDTO">-->
     <parameterMap id="HubLogMessage" type="chatbot.api.common.config.rabbit.domain.sub.HubLogMessage">
-        <parameter property="hubId"/>
-        <parameter property="hrdwrId"/>
-        <parameter property="hrdwrName"/>
         <parameter property="recordedAt"/>
+        <parameter property="hubMac"/>
+        <parameter property="devType"/>
         <parameter property="requesterId"/>
         <parameter property="content"/>
+        <parameter property="devMac"/>
         <parameter property="logType"/>
     </parameterMap>
 </mapper>

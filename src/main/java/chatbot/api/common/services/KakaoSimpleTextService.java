@@ -397,13 +397,17 @@ public class KakaoSimpleTextService {
 
     public ResponseVerTwoDTO makerReservationListCard(ReservationListDTO reservationList) {
         log.info("================== maker Reservation List Card 시작    ==================");
-        StringBuffer msg = new StringBuffer("예약된 명령들 입니다.(" + reservationList.getReservationDTOList().size() + "개)\n\n");
-        for(int i = 0; i < reservationList.getReservationDTOList().size(); i++) {
-            msg.append((i + 1) + ". " +
-                    "시간설정(" + reservationList.getReservationDTOList().get(i).getActionAt() + ")\n"); // 추후 수정
+       // StringBuffer msg = new StringBuffer("예약된 명령들 입니다.(" + reservationList.getReserveList().size() + "개)\n\n");
+        StringBuffer msg = new StringBuffer("예약된 명령들 입니다.(" + reservationList.getReserveList().size() + "개)\n\n");
+        if(reservationList.getReserveList().size() == 0) {
+            msg.append("취소할 명령이 존재하지 않습니다.");
+        } else {
+            for(int i = 0; i < reservationList.getReserveList().size(); i++) {
+                msg.append((i + 1) + ". " +
+                        "시간설정(" + reservationList.getReserveList().get(i).getActionAt() + ")\n"); // 추후 수정
+            }
+            msg.append("\n예약 취소를 원하신다면 선택하세요.");
         }
-        msg.append("\n예약 취소를 원하신다면 선택하세요.");
-
 
         SimpleText simpleTextVo = new SimpleText();
         simpleTextVo.setText(msg.toString());
@@ -415,11 +419,11 @@ public class KakaoSimpleTextService {
         outputs.add(simpleText);
 
         ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
-        for(int i = 0; i < reservationList.getReservationDTOList().size(); i++) {
+        for(int i = 0; i < reservationList.getReserveList().size(); i++) {
             QuickReply quick = QuickReply.builder()
                     .label(Integer.toString(i + 1))
                     .messageText("취소할 예약 아이디 : " +
-                            reservationList.getReservationDTOList().get(i).getReservationId())
+                            reservationList.getReserveList().get(i).getReservationId())
                     .action("block")
                     .blockId(BLOCK_ID_RESERVATION_DELETION_RESULT)
                     .build();

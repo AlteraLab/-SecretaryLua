@@ -7,6 +7,7 @@ import chatbot.api.mappers.UserMapper;
 import chatbot.api.skillhub.domain.HubInfoDTO;
 import chatbot.api.role.domain.RoleDTO;
 import chatbot.api.skillhub.domain.HubVO;
+import chatbot.api.skillhub.domain.ResultByHub;
 import chatbot.api.user.domain.UserInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,7 +85,7 @@ public class HubRegisterService {
                 .lastUsedTime(Timestamp.valueOf(LocalDateTime.now()))
                 .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .createdAt(Timestamp.valueOf(LocalDateTime.now()))
-                .state(true)
+                .state(false)
                 .beforeIp(null)
                 .build();
 
@@ -119,16 +120,12 @@ public class HubRegisterService {
             roleMapper.save(role);
 
             String url = "http://"+ hubVo.getExternalIp()+":" + hubVo.getExternalPort() + "/hub";
-            log.info("URL -> " + url);
+            log.info("허브 등록 URL -> " + url);
 
-            String resultByHub = restTemplate.postForObject(url, null, String.class);
-
-            JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObject = (JSONObject) jsonParser.parse(resultByHub);
-            resultByHub = String.valueOf(jsonObject.get("status"));
+            ResultByHub resultByHub = restTemplate.postForObject(url, null, ResultByHub.class);
 
             log.info("Result By Hub -> " + resultByHub);
-            if(resultByHub != "true") {
+            if(resultByHub.getStatus() != true) {
                 responseDto.setMsg(EXCEPTION_MSG_DURING_REGISTER);
                 throw new Exception();
             }

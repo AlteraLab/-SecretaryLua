@@ -17,7 +17,7 @@
     <!-- establish -> state 를 true 로 만듬 -->
     <update id="editStateToTrueWhenEstablish" parameterType="hashmap">
 		UPDATE hub
-		SET    state = true
+		SET    state = 1
 		WHERE  mac_addr = #{macAddr}
 		AND    external_ip = #{externalIp}
 		AND    external_port = #{externalPort}
@@ -26,7 +26,7 @@
     <!-- key-expire -> state 를 false 로 만듬 -->
     <update id="editStateToFalseWhenKeyExpired" parameterType="String">
 		UPDATE hub
-		SET    state = false
+		SET    state = 0
 		WHERE  mac_addr = #{macAddr}
 	</update>
     <!-- ==================================================== -->
