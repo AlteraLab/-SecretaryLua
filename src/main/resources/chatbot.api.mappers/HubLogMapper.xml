@@ -37,34 +37,35 @@
 
 
     <!-- 특정 허브의 로그 조회 -->
-    <select id="getHubLog" resultMap="HubLogVo" parameterType="Long">
-        SELECT
+    <select id="getHubLog" resultMap="HubLogVo" parameterType="String">
+      SELECT
         u.name,
-        l.recorded_at,
-        l.hrdwr_id,
-        l.hrdwr_name,
-        l.content,
-        l.log_type
-        FROM (SELECT * FROM hub_log WHERE hub_id = #{hubId}) AS l INNER JOIN users AS u
-        ON l.requester_id = u.provider_id
+        hl.hrdwr_name,
+        hl.hrdwr_id,
+        hl.recorded_at,
+        hl.content,
+        hl.log_type
+      FROM
+      (
+        SELECT
+            h.hrdwr_name,
+            h.hrdwr_id,
+            l.recorded_at,
+            l.content,
+            l.log_type,
+            l.requester_id
+        FROM
+            (SELECT * FROM hub_log WHERE hub_mac = #{hubMac}) AS l, hrdwr AS h
+        WHERE l.auth_key = h.auth_key
+      ) AS hl, users AS u
+      WHERE hl.requester_id = u.provider_id
     </select>
 
 
-
-    <resultMap id="HubLogDto" type="chatbot.api.hublog.domain.HubLogDTO">
-        <result property="hubId" column="hub_id"/>
-        <result property="recordedAt" column="recorded_at"/>
-        <result property="hrdwrId" column="hrdwr_id"/>
-        <result property="hrdwrName" column="hrdwr_name"/>
-        <result property="requesterId" column="requester_id"/>
-        <result property="content" column="content"/>
-        <result property="logType" column="log_type"/>
-    </resultMap>
-
     <resultMap id="HubLogVo" type="chatbot.api.hublog.domain.HubLogVO">
         <result property="recordedAt" column="recorded_at"/>
-        <result property="hrdwrId" column="hrdwr_id"/>
         <result property="hrdwrName" column="hrdwr_name"/>
+        <result property="hrdwrId" column="hrdwr_id"/>
         <result property="requesterName" column="name"/>
         <result property="content" column="content"/>
         <result property="logType" column="log_type"/>

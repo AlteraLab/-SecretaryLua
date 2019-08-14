@@ -47,7 +47,6 @@ public class UserController {
         hubsInfoList = hubMapper.getHubsInfoByUserId(userInfoDto.getUserId());
         log.info("HubsInfo -> " + hubsInfoList);
         //hubsInfoList = hubMapper.getHubsInfoByUserId(new Long(1));
-        log.info(hubsInfoList.toString());
         return ResponseDTO.builder()
                 .msg("userInfoDto information")
                 .status(HttpStatus.OK)

@@ -17,13 +17,13 @@ public class HubLogController {
     private HubLogSelectService hubLogSelectService;
 
 
-    @GetMapping("/hubs/{hubId}/logs")
+    @GetMapping("/hubs/{hubMac}/logs")
     public ResponseDTO getLogs(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                               @PathVariable("hubId") Long hubId) {
+                               @PathVariable("hubMac") String hubMac) {
         System.out.println("\n");
         log.info("============= get Logs =============");
-        log.info("Info -> hubId : " + hubId);
+        log.info("Info -> hubMac : " + hubMac);
 
-        return hubLogSelectService.getHubLogByHubId(hubId);
+        return hubLogSelectService.getHubLogByHubMac(hubMac);
     }
 }

@@ -15,5 +15,5 @@ public interface HubLogMapper {
 
     void saveHubLog(HubLogMessage hubLogMessage);
 
-    List<HubLogVO> getHubLog(@Param("hubId") Long hubId);
+    List<HubLogVO> getHubLog(@Param("hubMac") String hubMac);
 }

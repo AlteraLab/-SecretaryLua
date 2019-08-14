@@ -22,9 +22,9 @@ public class HubLogSelectService {
 
 
 
-    public ResponseDTO getHubLogByHubId(Long hubId) {
+    public ResponseDTO getHubLogByHubMac(String hubMac) {
 
-        log.info("HubLogSelectService.getHubLogByHubId");
+        log.info("HubLogSelectService.getHubLogByhubMac");
         ResponseDTO responseDto = new ResponseDTO().builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
@@ -32,7 +32,9 @@ public class HubLogSelectService {
         // 로그 조회
         List<HubLogVO> hubLogs;
         try {
-            hubLogs = hubLogMapper.getHubLog(hubId);
+            hubLogs = hubLogMapper.getHubLog(hubMac);
+            log.info(hubLogs + "");
+            log.info(hubLogs.size() + "");
         } catch (Exception e) {
             log.info(EXCEPTION_MSG_FAILED_GET_HUB_LOG);
             responseDto.setMsg(EXCEPTION_MSG_FAILED_GET_HUB_LOG);
@@ -40,34 +42,27 @@ public class HubLogSelectService {
             return responseDto;
         }
 
-        // 하드웨어별로 로그 분류
-        HashMap<Integer, List<HubLogVO>> hubLogMap = new HashMap<Integer, List<HubLogVO>>();
-        List<HubLogVO> logs = null;
-        for(HubLogVO hubLog : hubLogs) {
-            if(hubLogMap.containsKey(hubLog.getHrdwrId())) logs = hubLogMap.get(hubLog.getHrdwrId());
-            else                                           logs = new ArrayList<HubLogVO>();
-            logs.add(hubLog);
-            hubLogMap.put(hubLog.getHrdwrId(), logs);
-        }
-
         // 정렬
-        Iterator<Integer> keys = hubLogMap.keySet().iterator();
-        List<HubLogVO> sortedLogs = null;
-        while(keys.hasNext()) {
-            sortedLogs = hubLogMap.get(keys.next());
-            Collections.sort(sortedLogs, new Comparator<HubLogVO>() {
-                @Override
-                public int compare(HubLogVO o1, HubLogVO o2) {
-                    return o1.getRecordedAt().compareTo(o2.getRecordedAt());
-                }
-            });
-            Collections.reverse(sortedLogs);
+        Collections.sort(hubLogs, new Comparator<HubLogVO>() {
+            @Override
+            public int compare(HubLogVO o1, HubLogVO o2) {
+                return o1.getRecordedAt().compareTo(o2.getRecordedAt());
+            }
+        });
+
+        // 앞에서 부터 데이터 100개 자르기
+        if(hubLogs.size() > 100) {
+            hubLogs = hubLogs.subList(0, 100);
         }
 
+        // 역순 정렬
+        Collections.reverse(hubLogs);
+
+        List<HubLogVO> returnLogs = hubLogs;
         responseDto.setStatus(HttpStatus.OK);
         responseDto.setMsg(SUCCESS_MSG_GET_FROM_HUB_LOG);
         responseDto.setData(new Object(){
-            public HashMap<Integer, List<HubLogVO>> logs = hubLogMap;
+            public List<HubLogVO> logs = returnLogs;
         });
         return responseDto;
     }
