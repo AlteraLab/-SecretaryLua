@@ -5,6 +5,12 @@
 
 <mapper namespace="chatbot.api.mappers.HubMapper">
 
+    <!-- Ip로 허브 검색 -->
+    <select id="getHubInfoByIp" resultMap="HubInfoDto" parameterType="String">
+        SELECT * FROM hub WHERE external_ip = #{hubIp}
+    </select>
+
+
     <!-- 허브 장소 변경 시 external Ip 주소 변경 -->
     <update id="editHubIp" parameterType="hashmap">
 		UPDATE hub

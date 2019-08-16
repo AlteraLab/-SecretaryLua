@@ -38,16 +38,17 @@ public interface HubMapper {
 
 
     // get HubInfo
-    HubInfoDTO getHubInfo(Long hubSeq);
+    HubInfoDTO getHubInfo(@Param("hubId") Long hubId);
 
+    HubInfoDTO getHubInfoByIp(@Param("hubIp") String hubIp);
 
     HubInfoDTO getHubInfoByMacAddr(@Param("macAddr") String macAddr);
 
 
     ArrayList<HubInfoDTO> getUserHubsByUserId(@Param("userId") Long userId);
 
-    // delete hub by hubSeq
-    void deleteHub(Long hubSeq);
+    // delete hub by hubId
+    void deleteHub(@Param("hubId") Long hubId);
 
 
     // Schedule query : implicit Delete Hub

@@ -4,11 +4,14 @@ import chatbot.api.common.domain.ResponseDTO;
 import chatbot.api.mappers.HrdwrMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @Slf4j
@@ -80,5 +83,19 @@ public class TestController {
             public HttpStatus status = HttpStatus.OK;
             public Object devDetail = dev;
         };
+    }
+
+    @GetMapping("/hub/hi")
+    public ResponseDTO hi() {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange("https://api.github.com/users/Coco0719/repos", HttpMethod.GET, null, String.class);
+
+        if(HttpStatus.OK == responseEntity.getStatusCode()) {
+            log.info("HttpStatus.OK == responseEntity.getStatusCode()");
+        }
+        log.info("responseEntity.getBody() -> " + responseEntity.getBody());
+        log.info("responseEntity.getStatusCode().toString() -> " + responseEntity.getStatusCode().toString());
+        return new ResponseDTO();
     }
 }

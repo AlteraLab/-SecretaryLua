@@ -42,6 +42,11 @@
           AND role = #{role}
     </delete>
 
+    <delete id="deleteRoleWithHubId" parameterType="chatbot.api.role.domain.RoleDTO">
+        DELETE FROM hub_user
+        WHERE hub_id = #{hubId}
+    </delete>
+
     <!-- 특정 허브 관리 페이지로 이동했을때 허브에 권한을 가진 role 들을 화면에 배치, 특정 허브에 대한 role 들을 모두 select -->
     <select id="getRolesInfoByHubId" resultMap="RoleInfoDto" parameterType="Long">
         SELECT *

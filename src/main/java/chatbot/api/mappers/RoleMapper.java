@@ -28,6 +28,8 @@ public interface RoleMapper {
     // 역할2 : admin 유저가 일반 유저를 삭제
     void deleteRoleUser(RoleDTO role);
 
+    void deleteRoleWithHubId(@Param("hubId") Long hubId);
+
 
     // 특정 허브에 대한 권한을 가진 유저들에 대한 정보를 get
     ArrayList<RoleDTO> getRolesInfoByHubId(Long hubId);

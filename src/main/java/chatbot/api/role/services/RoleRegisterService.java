@@ -30,9 +30,27 @@ public class RoleRegisterService {
 
     private RoleMapper roleMapper;
 
+    public ResponseDTO registerForUser(UserInfoDto user, HubInfoDTO hub) {
+        try {
+            RoleDTO role = RoleDTO.builder()
+                    .hubId(hub.getHubId())
+                    .userId(user.getUserId())
+                    .role(ROLE_USER)
+                    .build();
+            roleMapper.save(role);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return ResponseDTO.builder()
+                    .status(HttpStatus.EXPECTATION_FAILED)
+                    .msg("등록 실패")
+                    .build();
+        }
+        return ResponseDTO.builder()
+                .msg("그룹에 추가되었습니다.")
+                .status(HttpStatus.OK)
+                .build();
+    }
 
-
-    // userRegisterVo(hubId, userId), userprincipal.getId()
     public ResponseDTO register(UserRegisterVO userRegisterVo, Long adminId) {
 
 

@@ -32,6 +32,8 @@ public class RestTemplateService {
     private ReservationListRepository reservationListRepository;
 
 
+
+
     public ResponseHrdwrInfo requestHrdwrsInfo(String providerId) {
         log.info("=========== RestTemplate -> requestHrdwrsInfo 시작 ===========");
         Build reBuild = buildRepository.find(providerId);
