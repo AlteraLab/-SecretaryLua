@@ -108,7 +108,7 @@ public class HubController {
     @DeleteMapping("/hub/{hubId}")
     public ResponseDTO deleteHub(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                  @PathVariable("hubId") Long hubId) {
-
+        log.info("userInd -> " + userPrincipal.getId());
         return hubDeleteService.deleter(userPrincipal.getId(), hubId);
     }
 }

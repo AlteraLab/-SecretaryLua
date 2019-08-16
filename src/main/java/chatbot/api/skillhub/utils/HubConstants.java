@@ -29,7 +29,7 @@ public class HubConstants {
 
     public static final String SUCCESS_MSG_EXPLICIT_DEL = "success : Succesed to delete record in hub and role table";
 
-    public static final String EXCEPTION_MSG_DURING_DELETER = "exception : An exception occurred During deleter execution";
+    public static final String EXCEPTION_MSG_DURING_DELETER = "삭제 중에 예외가 발생했습니다.";
 
 
     public static final String FAIL_MSG_NO_EXIST_USER_FROM_USERS_TABLE = "fail : no exist user from user table";

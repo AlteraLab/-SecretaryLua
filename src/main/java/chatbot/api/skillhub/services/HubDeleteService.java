@@ -31,27 +31,20 @@ public class HubDeleteService {
 
 
     // admin이 해당 허브에 대한 정보 모두 삭제
-    // 나중에 허브에 대한 모듈 테이블이 자식 테이블로 생성될 시 자식 테이블으 모듈들도 제거해주는 코드 작성
     // https://enterkey.tistory.com/275
     // https://cakas.tistory.com/9
     // https://a1010100z.tistory.com/entry/Spring-ResponseEity%EB%8A%94-%EC%99%9C-%EC%93%B0%EB%8A%94-%EA%B2%83%EC%9D%B4%EB%A9%B0-%EC%96%B4%EB%96%BB%EA%B2%8C-%EC%93%B0%EB%8A%94%EA%B1%B8%EA%B9%8C
     @Transactional(rollbackFor = Exception.class)
     public ResponseDTO deleter(Long adminId, Long hubId) {
-        log.info("Deleter ");
-        ResponseDTO responseDTO = new ResponseDTO().builder()
-                    .status(HttpStatus.OK)
-                    .build();
-
+        ResponseDTO responseDTO = new ResponseDTO(null, HttpStatus.OK, null);
+        Boolean exceptionFlag = false;
         HubInfoDTO hub = hubMapper.getHubInfo(hubId);
-        log.info("Hub[" + hub + "]");
 
         if(hub == null) {
             responseDTO.setMsg("이미 존재하지 않는 허브 입니다.");
-            return responseDTO;
         }
-        if(hub.getAdminId() != adminId) {
+        if(!hub.getAdminId().equals(adminId)) {
             responseDTO.setMsg("권한이 없습니다.");
-            return responseDTO;
         }
 
         try {
@@ -59,7 +52,6 @@ public class HubDeleteService {
             hubMapper.deleteHub(hub.getHubId());
 
             String url = "http://" + hub.getExternalIp() + ":" + hub.getExternalPort() + "/hub";
-
             ResponseEntity<String> responseEntity =
                     restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
 
@@ -68,21 +60,18 @@ public class HubDeleteService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.info(EXCEPTION_MSG_DURING_DELETER);
-            responseDTO.setStatus(HttpStatus.EXPECTATION_FAILED);
             responseDTO.setMsg(EXCEPTION_MSG_DURING_DELETER);
-            return responseDTO;
+            exceptionFlag = true;
         }
 
-        responseDTO.setMsg("허브를 삭제했습니다.");
-        responseDTO.setData(new Object(){
-            Long data = new Long(1);
-        });
+        if(hub != null && exceptionFlag != true) {
+            responseDTO.setMsg("허브를 삭제했습니다.");
+            responseDTO.setData(hubId);
+        }
 
         return responseDTO;
     }
 }
-
 /*
     // 허브에 대한 일반 유저가 스스로 허브에 대한 권한을 스스로 ㄹ제거
     public ResponseDTO explicitDeleterByUser(RoleDTO role) {
