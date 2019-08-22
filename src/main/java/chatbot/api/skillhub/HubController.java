@@ -1,7 +1,6 @@
 package chatbot.api.skillhub;
 
 import chatbot.api.mappers.RoleMapper;
-import chatbot.api.role.domain.RoleDTO;
 import chatbot.api.common.domain.ResponseDTO;
 import chatbot.api.common.security.UserPrincipal;
 import chatbot.api.mappers.HubMapper;
@@ -9,24 +8,17 @@ import chatbot.api.skillhub.domain.*;
 import chatbot.api.skillhub.repository.KeepAliveRepository;
 import chatbot.api.skillhub.services.HubEditService;
 import chatbot.api.skillhub.services.HubDeleteService;
-import chatbot.api.skillhub.services.HubSelectService;
 import chatbot.api.skillhub.services.HubRegisterService;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import javax.print.DocFlavor;
 import javax.validation.Valid;
 import java.util.*;
-
-import static chatbot.api.role.utils.RoleConstants.*;
-import static chatbot.api.skillhub.utils.HubConstants.*;
 
 @SuppressWarnings("ALL")
 @RestController
@@ -39,9 +31,6 @@ public class HubController {
 
     @Autowired
     private HubDeleteService hubDeleteService;
-
-    @Autowired
-    private HubSelectService hubSelectService;
 
     @Autowired
     private HubEditService hubEditService;

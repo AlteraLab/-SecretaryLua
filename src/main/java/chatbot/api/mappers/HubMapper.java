@@ -23,10 +23,6 @@ public interface HubMapper {
     Optional<HubInfoDTO> getUserHub(Long userId);
 
 
-    // adminId를 가지고 허브info 조회
-    ArrayList<HubInfoDTO> getHubInfoByAdminId(Long adminId);
-
-
     // 사용자가 사용할 수 있는 허브들중에서 사용자가 요청한 장치 타입이 부착된 허브들을 조회
     ArrayList<HubInfoDTO> getHubInfoByDevCategory(@Param("userId") Long userId,
                                                   @Param("devCategory") String devCategory);

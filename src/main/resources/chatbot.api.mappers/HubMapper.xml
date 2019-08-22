@@ -89,13 +89,6 @@
 
 
 
-    <!-- 해당 adminId와 일치하는 레코드들을 모두 검색 -->
-    <select id="getHubInfoByAdminId" resultMap="HubInfoDto" parameterType="Long">
-        SELECT * FROM hub WHERE admin_id = #{adminId}
-    </select>
-
-
-
     <!-- hubSeq에 대한 hubInfo를  (사용자 추가할 때 쓰임) -->
     <select id="getHubInfo" resultMap="HubInfoDto" parameterType="Long">
         SELECT * FROM hub WHERE hub_id = #{hubId}
