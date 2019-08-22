@@ -20,9 +20,6 @@ import static chatbot.api.developer.utils.developerConstants.SUCCESS_MSG_DEPLOY;
 public class DeveloperController {
 
     @Autowired
-    private DeveloperMapper developerMapper;
-
-    @Autowired
     private TextBoxDeployService textBoxDeployService;
 
 
@@ -32,7 +29,10 @@ public class DeveloperController {
         log.info("==================== deploy 시작 ====================");
         log.info(dvlpDeploymentDTO.getDevice().toString());
         log.info(dvlpDeploymentDTO.getBoxDTOList().toString());
+        log.info(dvlpDeploymentDTO.getDataModelDTOList().toString());
         log.info(dvlpDeploymentDTO.getButtonDTOList().toString());
+        log.info(dvlpDeploymentDTO.getStateRuleDTOList().toString());
+        //log.info(dvlpDeploymentDTO.getEventDTOList().toString()); 이벤트 관련
         log.info(dvlpDeploymentDTO.getDerivationDTOList().toString());
 
         ResponseDTO responseDTO = ResponseDTO.builder()

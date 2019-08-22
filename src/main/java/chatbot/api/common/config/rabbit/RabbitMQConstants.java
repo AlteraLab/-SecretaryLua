@@ -16,4 +16,9 @@ public class RabbitMQConstants {
     public static final String SKILL_HUB_LOG_EXCHANGE = "skill.hublog";
     public static final String SKILL_HUB_LOG_ROUTE_KEY = "skill.hublog.route";
     public static final String SKILL_HUB_LOG_QUEUE = "skill.hublog.queue";
+
+    // dev
+    public static final String SKILL_DEV_EXCHANGE = "skill.dev";
+    public static final String SKILL_DEV_ROUTE_KEY = "skill.dev.route";
+    public static final String SKILL_DEV_QUEUE = "skill.dev.queue";
 }

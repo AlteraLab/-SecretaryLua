@@ -1,12 +1,7 @@
 package chatbot.api.common.config.rabbit.services.consumer;
 
-import chatbot.api.common.config.rabbit.RabbitMQConstants;
-import chatbot.api.common.config.rabbit.domain.sub.EstablishMessage;
-import chatbot.api.common.config.rabbit.domain.sub.HubLogMessage;
-import chatbot.api.common.config.rabbit.domain.sub.KeepAliveMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -44,12 +39,13 @@ public class testSender {
         log.info("Keep-Alive Msg -> " + keepAliveMessage);
         rabbitTemplate.convertAndSend(RabbitMQConstants.SKILL_EXCHANGE, RabbitMQConstants.SKILL_KEEP_ALIVE_ROUTE_KEY, keepAliveMessage);
     }
-
-    @Scheduled(fixedDelay = 3000L)
-    public void sendEstablishMessage() {
-        EstablishMessage establishMessage = new EstablishMessage("1", 0, "1");
-        log.info("Extablish Msg -> " + establishMessage);
-        rabbitTemplate.convertAndSend(RabbitMQConstants.SKILL_ESTABLISH_EXCHANGE, RabbitMQConstants.SKILL_ESTABLISH_ROUTE_KEY, establishMessage);
-    }
 */
+ /*   @Scheduled(fixedDelay = 10000L)
+    public void sendDevMessage() {
+        DevMessage devMessage = new DevMessage("b8:27:eb:96:e5:b4", "22:22:22:22:22:22", "aaaabbbbccccddddeeeeffffgggghhhh", "Hello");
+        log.info("Dev Msg -> " + devMessage);
+        rabbitTemplate.convertAndSend(RabbitMQConstants.SKILL_DEV_EXCHANGE, RabbitMQConstants.SKILL_DEV_ROUTE_KEY, devMessage);
+
+        //sendToUserService.sendDevMsgToUser(devMessage);
+    }*/
 }

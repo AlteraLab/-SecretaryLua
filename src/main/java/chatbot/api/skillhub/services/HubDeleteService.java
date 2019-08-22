@@ -36,6 +36,7 @@ public class HubDeleteService {
     // https://a1010100z.tistory.com/entry/Spring-ResponseEity%EB%8A%94-%EC%99%9C-%EC%93%B0%EB%8A%94-%EA%B2%83%EC%9D%B4%EB%A9%B0-%EC%96%B4%EB%96%BB%EA%B2%8C-%EC%93%B0%EB%8A%94%EA%B1%B8%EA%B9%8C
     @Transactional(rollbackFor = Exception.class)
     public ResponseDTO deleter(Long adminId, Long hubId) {
+        log.info("Deleter ");
         ResponseDTO responseDTO = new ResponseDTO(null, HttpStatus.OK, null);
         Boolean exceptionFlag = false;
         HubInfoDTO hub = hubMapper.getHubInfo(hubId);
@@ -52,20 +53,24 @@ public class HubDeleteService {
             hubMapper.deleteHub(hub.getHubId());
 
             String url = "http://" + hub.getExternalIp() + ":" + hub.getExternalPort() + "/hub";
-            ResponseEntity<String> responseEntity =
-                    restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
+           /* ResponseEntity<String> responseEntity =
+                    restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);*/
+            ResponseEntity<String> responseEntity = new ResponseEntity<String>(HttpStatus.OK); // 임시 코드
 
             if(responseEntity.getStatusCode() != HttpStatus.OK) {
+                log.info("responseEntity.getStatusCode() != HttpStatus.OK");
                 throw new Exception();
             }
         } catch (Exception e) {
             e.printStackTrace();
+            log.info(EXCEPTION_MSG_DURING_DELETER);
             responseDTO.setMsg(EXCEPTION_MSG_DURING_DELETER);
             exceptionFlag = true;
         }
 
         if(hub != null && exceptionFlag != true) {
             responseDTO.setMsg("허브를 삭제했습니다.");
+            log.info("허브를 삭제했습니다.");
             responseDTO.setData(hubId);
         }
 

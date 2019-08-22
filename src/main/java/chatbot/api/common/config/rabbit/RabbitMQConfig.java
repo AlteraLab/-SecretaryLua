@@ -75,6 +75,26 @@ public class RabbitMQConfig {
 
 //------------------------------------------------------------------------------------------------------------------
 
+    // dev
+    // exchange
+    @Bean
+    TopicExchange devExchange() {
+        return new TopicExchange(RabbitMQConstants.SKILL_DEV_EXCHANGE);
+    }
+    // 큐 생성
+    @Bean
+    Queue queueForDev() {
+        return new Queue(RabbitMQConstants.SKILL_DEV_QUEUE, false);
+    }
+    // exchange (라우터) 와 Dev Queue 를 바인딩 시키고, exchange 에게 Dev Queue 로 접근하기 위한 라우팅 키를 알려줌
+    @Bean
+    Binding bindingForDev(@Qualifier("queueForDev") Queue queueDev, @Qualifier("devExchange") TopicExchange exchange) {
+        return BindingBuilder.bind(queueDev).to(exchange).with(RabbitMQConstants.SKILL_DEV_ROUTE_KEY);
+    }
+
+//------------------------------------------------------------------------------------------------------------------
+
+
     // 메시지 컨버터
     @Bean
     public Jackson2JsonMessageConverter producerJackson2MessageConverter() {

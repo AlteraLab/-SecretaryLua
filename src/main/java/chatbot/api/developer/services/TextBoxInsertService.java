@@ -19,12 +19,18 @@ public class TextBoxInsertService {
         Long devId = dvlpDeploymentDTO.getDevice().getDevId();
         DvlpDevDTO device = dvlpDeploymentDTO.getDevice();
         List<DvlpBoxDTO> dvlpBoxList = dvlpDeploymentDTO.getBoxDTOList();
+        List<DvlpDataModelDTO> dvlpDataModelList = dvlpDeploymentDTO.getDataModelDTOList();
         List<DvlpButtonDTO> dvlpButtonList = dvlpDeploymentDTO.getButtonDTOList();
+        List<DvlpStateRuleDTO> dvlpStateRuleList = dvlpDeploymentDTO.getStateRuleDTOList();
+        // 이벤트 관련 코드 부분 ...
         List<DvlpDerivationDTO> dvlpDerivationList = dvlpDeploymentDTO.getDerivationDTOList();
 
         developerMapper.insertDevice(device);
         developerMapper.insertTextBoxes(dvlpBoxList, devId);
+        developerMapper.insertDataModels(dvlpDataModelList, devId);
         developerMapper.insertButtons(dvlpButtonList, devId);
+        developerMapper.insertRules(dvlpStateRuleList, devId);
+        // 이벤트 관련 코드 부분 ...
         developerMapper.insertDerivations(dvlpDerivationList, devId);
     }
 }

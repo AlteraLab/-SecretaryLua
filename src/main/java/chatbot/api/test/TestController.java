@@ -54,10 +54,11 @@ public class TestController {
         return new Object(){
             public HttpStatus status = HttpStatus.OK;
             public String msg = "디바이스 연결이 성공하였습니다.";
+            public String devType = "AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH";
         };
     }
 
-    @GetMapping("/hub/devs")
+    @GetMapping("/dev/detail")
     public Object requestrConnectedDevs() {
         log.info("Request Connected Devs");
 

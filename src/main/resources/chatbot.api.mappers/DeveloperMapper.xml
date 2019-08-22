@@ -12,7 +12,7 @@
 
     <!--
     삭제 순서
-    derivation -> btn -> box -> device
+    derivation -> (btn / rule / event) -> (box / data_model) -> device
     -->
 
     <!-- 1. derivations 삭제 -->
@@ -25,10 +25,25 @@
       DELETE FROM btn WHERE hrdwr_id=#{hrdwrId}
     </delete>
 
+    <!-- 룰 삭제 -->
+    <delete id="deleteRules" parameterType="Long">
+      DELETE FROM res_box_crs WHERE hrdwr_id=#{hrdwrId}
+    </delete>
+
+    <!-- 이벤트 삭제
+    <delete id="deleteEvents" parameterType="Long">
+      DELETE FROM event WHERE hrdwr_id=#{hrdwrId}
+    </delete>
+    -->
 
     <!-- box 삭제 -->
     <delete id="deleteTextBoxes" parameterType="Long">
       DELETE FROM box WHERE hrdwr_id=#{hrdwrId}
+    </delete>
+
+    <!-- 데이터 모델 삭제 -->
+    <delete id="deleteDataModels" parameterType="Long">
+      DELETE FROM data_model WHERE hrdwr_id=#{hrdwrId}
     </delete>
 
     <!-- device 삭제 -->
@@ -40,7 +55,7 @@
 
     <!--
     삽입 순서
-    device -> box -> btn -> derivation
+    device -> (box / data_model) -> (btn / rule / event) -> derivation
     -->
 
     <!-- device 삽입-->
@@ -80,6 +95,21 @@
         </foreach>
     </insert>
 
+    <!-- 데이터 모델 삽입 -->
+    <insert id="insertDataModels" parameterType="java.util.Map">
+        insert into data_model (data_type, mode_type, is_ev, data_key, hrdwr_id)
+        values
+        <foreach collection="dvlpDataModelDTOList" item="item" separator=" , ">
+            (
+            #{item.data_type},
+            #{item.mode_type},
+            #{item.is_ev},
+            #{item.data_key},
+            #{hrdwrId}
+            )
+        </foreach>
+    </insert>
+
     <!-- btns 삽입 -->
     <insert id="insertButtons" parameterType="java.util.Map">
         insert into btn (btn_code, btn_name, event_code, idx, box_id, is_spread, btn_type, hrdwr_id)
@@ -98,6 +128,28 @@
         </foreach>
     </insert>
 
+    <!-- 룰 삽입 -->
+    <insert id="insertRules" parameterType="java.util.Map">
+        insert into res_box_crs (rule_type, rule_value, rule_priority, map_val, mod_dev_id, box_id, data_key, mod_id, hrdwr_id)
+        values
+        <foreach collection="dvlpStateRuleDTOList" item="item" separator=" , ">
+            (
+            #{item.rule_type},
+            #{item.rule_value},
+            #{item.rule_priority},
+            #{item.map_val},
+            #{item.mod_dev_id},
+            #{item.box_id},
+            #{item.data_key},
+            #{item.mod_id},
+            #{hrdwrId}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 이벤트 삽입 -->
+
+
     <!-- derivations 삽입 -->
     <insert id="insertDerivations" parameterType="java.util.Map">
         insert into derivation (btn_code, upper_box_id, lower_box_id, hrdwr_id)
@@ -111,6 +163,7 @@
             )
         </foreach>
     </insert>
+
 
 
     <resultMap id="DvlpDevDTO" type="chatbot.api.developer.domain.DvlpDevDTO">

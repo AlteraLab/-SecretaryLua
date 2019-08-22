@@ -17,8 +17,11 @@ public class TextBoxDeleteService {
     public void multipleTableMultipleDelete(DvlpDeploymentDTO dvlpDeploymentDTO) {
         Long devId = dvlpDeploymentDTO.getDevice().getDevId();
         developerMapper.deleteDerivations(devId);
+        // 이벤트 관련 코드 부분 ...
+        developerMapper.deleteRules(devId);
         developerMapper.deleteButtons(devId);
         developerMapper.deleteTextBoxes(devId);
+        developerMapper.deleteDataModels(devId);
         developerMapper.deleteDevice(devId);
     }
 }
