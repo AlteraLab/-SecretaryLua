@@ -4,9 +4,7 @@ import chatbot.api.textbox.domain.blockid.BelowBlockIds;
 import chatbot.api.textbox.domain.path.HrdwrDTO;
 import chatbot.api.textbox.domain.path.Hub;
 import chatbot.api.textbox.domain.path.Path;
-import chatbot.api.textbox.domain.textboxdata.BoxDTO;
-import chatbot.api.textbox.domain.textboxdata.BtnDTO;
-import chatbot.api.textbox.domain.textboxdata.DerivationDTO;
+import chatbot.api.textbox.domain.textboxdata.*;
 import chatbot.api.textbox.domain.transfer.CmdList;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +35,8 @@ public class Build implements Serializable {
     private ArrayList<BoxDTO> boxs;
     private ArrayList<BtnDTO> btns;
     private ArrayList<DerivationDTO> derivations;
+    private ArrayList<StateRuleDTO> stateRules;
+    private ArrayList<DataModelDTO> dataModels;
 
     // 선택된 하드웨어
     private HrdwrDTO selectedHrdwr;

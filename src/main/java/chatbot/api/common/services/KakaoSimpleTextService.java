@@ -2,7 +2,6 @@ package chatbot.api.common.services;
 
 import chatbot.api.textbox.domain.*;
 import chatbot.api.textbox.domain.path.HrdwrDTO;
-import chatbot.api.textbox.domain.reservation.ReservationDTO;
 import chatbot.api.textbox.domain.reservation.ReservationListDTO;
 import chatbot.api.textbox.domain.textboxdata.BoxDTO;
 import chatbot.api.textbox.domain.textboxdata.BtnDTO;
@@ -366,7 +365,7 @@ public class KakaoSimpleTextService {
                 log.info(reBuild.getHControlBlocks().toString());
                 blockId = reBuild.getHControlBlocks().get(idx).getBlockIdOnebelow();
             } else { // 버튼의 타입에 따라서 어떤 센싱인지 혹은 예약 인지에 따라 blockid 할당
-                blockId = buildAllocaterService.allocateBlockIdByBtnTypeWhenNotControl(curBtnOfCurBtns);
+                blockId = buildAllocaterService.allocateBlockIdByBtnTypeWhenNotControlAndReservation(curBtnOfCurBtns);
             }
             log.info("Block Id -> " + blockId);
             QuickReply quick = QuickReply.builder()

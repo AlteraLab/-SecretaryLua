@@ -105,6 +105,47 @@ public class TextBoxController {
     }
 
 
+    // 센싱 조회
+    @PostMapping("/textbox/lookup/sensing")
+    public ResponseVerTwoDTO textBoxLookUpSensingFromAny(@RequestBody RequestDTO requestDTO) {
+        log.info("\n\n==================== from LookUp Sensing box to control box 시작 ====================");
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+        String blockId = requestDTO.getUserRequest().getBlock().getId();
+        log.info("Block Id -> " + blockId);
+        log.info(requestDTO.toString());
+
+        // 1. 사용자가 누른 버튼의 번호, curBtn, derivation 을 이용해서, lowerBox 를 구한다
+        // 2. lowerBox의 pre / post text 를 구해서 반환할 문자열을 만든다
+        // 3. 하드웨어 아이디를 이용해서 하드웨어의 데이터 모델 테이블에서 key 값들을 keySet 배열로 만든다
+        // 4. KeySet 배열을 허브로 넘긴다
+        // 5. 허브로 부터 key / value 로 이루어진 KeySet 배열을 응답으로 받는다
+
+        // 이제부터는 허브로 부터 받은 값들을 바탕으로 문자열을 치환해야 한다
+        // 6. Rules 배열을 만든다
+        // 7. KeySet 배열만큼 반복문을 돈다
+        // 7-? 는 반복문 루프 1회
+        // 7-1. StateRules 에서 "데이터 키" 가 같은 놈들을 모두 조회해서 Rules 배열에 넣는다 (아마 또 다른 반복문 일듯)
+        // ** 그냥 디비에서 꺼내는게 빠를 거 같은데 ;; 일단 고려
+        // 7-2. 우선순위 순으로 정렬한다
+        // 7-3. value 값이 우선순위 별로, 연산 타입과 적용 값에 동시에 해당하는지 비교한다
+        // 7-4. 해당한다면, value 값을 해당 치환 문자열로 변환한다
+        // 7-5. 반복문 종료 후, 다음 key 값 루프로 간다
+        return null;
+    }
+
+
+    // 디바이스 상태 조회
+    @PostMapping("/textbox/lookup/device")
+    public ResponseVerTwoDTO textBoxLookUpDeviceFromAny(@RequestBody RequestDTO requestDTO) {
+        log.info("\n\n==================== from LookUp Device box to control box 시작 ====================");
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+        String blockId = requestDTO.getUserRequest().getBlock().getId();
+        log.info("Block Id -> " + blockId);
+        log.info(requestDTO.toString());
+        return null;
+    }
+
+
     // 예약 리스트 중 취소 항목이 있을때 호출되는 메소드
     @PostMapping("/textbox/reservation/deletion/result")
     public ResponseVerTwoDTO textBoxReservationDeletionResult(@RequestBody RequestDTO requestDTO) {
@@ -524,69 +565,3 @@ public class TextBoxController {
         return kakaoSimpleTextService.makerCancleSelectCard();
     }
 }
-/*
-    // 이쪽으로 오는거 필요 없을수도 있음
-    @PostMapping("/textbox/lookup/sensing")
-    public ResponseVerTwoDTO textBoxLookUpSensingFromAny(@RequestBody RequestDTO requestDTO) {
-        log.info("\n\n==================== from LookUp Sensing box to control box 시작 ====================");
-        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-        String blockId = requestDTO.getUserRequest().getBlock().getId();
-        log.info("Block Id -> " + blockId);
-        log.info(requestDTO.toString());
-        return null;
-    }
-    // 이쪽으로 오는거 필요 없을수도 있음
-    @PostMapping("/textbox/lookup/device")
-    public ResponseVerTwoDTO textBoxLookUpDeviceFromAny(@RequestBody RequestDTO requestDTO) {
-        log.info("\n\n==================== from LookUp Device box to control box 시작 ====================");
-        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-        String blockId = requestDTO.getUserRequest().getBlock().getId();
-        log.info("Block Id -> " + blockId);
-        log.info(requestDTO.toString());
-        return null;
-    }
-    */
-
-
-/*
-    // from entry box to any box
-    // entry 박스에서 선택한 버튼의 타입이 무엇인지에 따라서 5개의 시나리오로 나뉘기 때문에 Any Box라고 명명함
-    @PostMapping("/textbox/any")
-    public ResponseVerTwoDTO textBoxAnyFromEntry(@RequestBody RequestDTO requestDto) {
-        log.info("\n\n"); log.info("==================== from entry box to any box 시작 ====================");
-        log.info("entry 박스에서 선택한 버튼의 타입이 무엇인지에 따라서 5개의 시나리오로 나뉘기 때문에 Any Box라고 명명함");
-        log.info("Any Box를 사용자에게 보여줌");
-        log.info("Any Box는 (제어 / 조회-허브-예약 / 조회-허브-센싱 / 조회-디바이스 / 예약) 5가지 중 하나임");
-        log.info("시나리오 1 : BUTTON_TYPE_CONTROL");
-        log.info("시나리오 2 : BUTTON_TYPE_LOOKUP_RESERVATION");
-        log.info("시나리오 3 : BUTTON_TYPE_LOOKUP_SENSING");
-        log.info("시나리오 4 : BUTTON_TYPE_LOOKUP_DEVICE");
-        log.info("시나리오 5 : BUTTON_TYPE_RESERVATION");
-        log.info(requestDto.toString());
-        String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
-        Integer btnIdx = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
-        log.info("INFO >> Btn Idx -> " + btnIdx);
-        //return textBoxResponseService.responserBtnBox(providerId, btnSeq);
-        return textBoxResponseService.responserAnyBoxFromEntry(providerId, btnIdx);
-    }*/
-
-/*
-    // from control + time
-    // from dynamic_context + time
-    // to end
-    // to control
-    // to dynamic
-    // 이 메소드는 control + time 경로를 통해서 오든가 dynamic_context + time 으로 올 수도 있다.
-    @PostMapping("/textbox/time")
-    public ResponseVerTwoDTO textBoxAnyFromTime(@RequestBody RequestDTO requestDto) {
-        log.info("==================== from Anys({control + time} or {dynamic_context + time}) to Any(end or dynamic or control) 시작 ====================");
-        log.info(requestDto.toString());
-        String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
-        Integer btnSeq = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
-        Object datetime = requestDto.getAction().getParams().get("datetime");
-        log.info("INFO >> Btn Seq -> " + btnSeq);
-        log.info("INFO >> Params -> " + datetime);
-        //return textBoxResponseService.responserBtnBoxFromTime(providerId, btnSeq, minute);
-        return null;
-    }
-*/

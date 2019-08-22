@@ -6,10 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
 import java.io.Serializable;
-
-import static chatbot.api.textbox.utils.TextBoxConstants.BUTTON_TYPE_CONTROL;
 
 @Data
 @Builder

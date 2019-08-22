@@ -282,8 +282,8 @@ public class BuildAllocaterService {
 
 
     // 버튼 타입이 제어가 아닐때, 해당 버튼의 타입에 따라서 blockId 할당
-    public String allocateBlockIdByBtnTypeWhenNotControl(BtnDTO curBtn) {
-        log.info("=========== allocate BlockId By Current Button Type When btnType is Not Control Type 시작 ===========");
+    public String allocateBlockIdByBtnTypeWhenNotControlAndReservation(BtnDTO curBtn) {
+        log.info("=========== allocate BlockId By Current Button Type When btnType is Not Control Type And Not Reservation Type 시작 ===========");
         String returnBlockId = null;
         if(curBtn.getBtnType() == BUTTON_TYPE_LOOKUP_RESERVATION) {
             returnBlockId = BLOCK_ID_TO_LOOKUP_RESERVATION;
@@ -294,11 +294,12 @@ public class BuildAllocaterService {
         } else if(curBtn.getBtnType() == BUTTON_TYPE_LOOKUP_DEVICE) {
             returnBlockId = BLOCK_ID_TO_LOOKUP_DEVICE;
             log.info("Block Id -> BLOCK_ID_TO_LOOKUP_DEVICE");
-        } else if(curBtn.getBtnType() == BUTTON_TYPE_RESERVATION) {
+        }
+        /*else if(curBtn.getBtnType() == BUTTON_TYPE_RESERVATION) {
             returnBlockId = BLOCK_ID_TO_ONLY_RESERVATION;
             log.info("Block Id -> BLOCK_ID_TO_ONLY_RESERVATION");
-        }
-        log.info("=========== allocate BlockId By Current Button Type When btnType is Not Control Type 종료 ===========");
+        }*/
+        log.info("=========== allocate BlockId By Current Button Type When btnType is Not Control Type And Not Reservation Type 종료 ===========");
         return returnBlockId;
     }
 

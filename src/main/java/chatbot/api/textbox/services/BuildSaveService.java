@@ -1,9 +1,6 @@
 package chatbot.api.textbox.services;
 
-import chatbot.api.mappers.BoxMapper;
-import chatbot.api.mappers.BtnMapper;
-import chatbot.api.mappers.DerivationMapper;
-import chatbot.api.mappers.HrdwrMapper;
+import chatbot.api.mappers.*;
 import chatbot.api.textbox.domain.*;
 import chatbot.api.textbox.domain.blockid.BelowBlockIds;
 import chatbot.api.textbox.domain.path.HrdwrDTO;
@@ -49,6 +46,12 @@ public class BuildSaveService {
 
     @Autowired
     private DerivationMapper derivationMapper;
+
+    @Autowired
+    private DataModelMapper dataModelMapper;
+
+    @Autowired
+    private StateRuleMapper stateRuleMapper;
 
     @Autowired
     private BuildAllocaterService buildAllocaterService;
@@ -177,7 +180,7 @@ public class BuildSaveService {
     }
 
 
-    // 명령을 빌드하는데 필요한 데이터들을 저장 - BOXS / BTNS / DERIVATIONS
+    // 명령을 빌드하는데 필요한 데이터들을 저장 - BOXS / BTNS / DERIVATIONS / DATA_MODELS / STATE_RULES
     public void saverMultipleData(String providerId) {
         log.info("=============== Saver Multiple Data 시작 ===============");
         Build reBuild = buildRepository.find(providerId);
@@ -185,6 +188,8 @@ public class BuildSaveService {
         reBuild.setBoxs(boxMapper.getBoxsByHrdwrId(hrdwrId));
         reBuild.setBtns(btnMapper.getBtnsByHrdwrId(hrdwrId));
         reBuild.setDerivations(derivationMapper.getDerivationsByHrdwrId(hrdwrId));
+        reBuild.setDataModels(dataModelMapper.getDataModelsByHrdwrId(hrdwrId));
+        reBuild.setStateRules(stateRuleMapper.getStateRulesByHrdwrId(hrdwrId));
         buildRepository.update(reBuild);
         log.info("Box List -> " + reBuild.getBoxs());
         log.info("Btn List -> " + reBuild.getBtns());

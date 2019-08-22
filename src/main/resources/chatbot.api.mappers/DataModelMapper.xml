@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.DataModelMapper">
+
+    <!-- hrdwrId 를 이용해서 모든 데이터 모델들 조회 -->
+    <select id="getDataModelsByHrdwrId" resultMap="DataModelDTO" parameterType="Long">
+        SELECT
+        data_key,
+        is_ev,
+        data_type,
+        mod_type
+        FROM data_model
+        WHERE hrdwr_id = #{hrdwrId}
+    </select>
+
+    <!-- hrdwrId 를 이용해서 허브에 테이블을 생성하기 위한 "데이터 키" / "데이터 타입" / "모델 타입" 조회 -->
+    <select id="getDataModelsForTableByHrdwrId" resultMap="DataModelDTO" parameterType="Long">
+        SELECT
+        data_key,
+        data_type,
+        mod_type
+        FROM data_model
+        WHERE hrdwr_id = #{hrdwrId}
+    </select>
+
+
+
+    <resultMap id="DataModelDTO" type="chatbot.api.textbox.domain.textboxdata.DataModelDTO">
+        <result property="dataKey" column="data_key"/>
+        <result property="isEv" column="is_ev"/>
+        <result property="dataType" column="data_type"/>
+        <result property="modType" column="mod_type"/>
+    </resultMap>
+</mapper>

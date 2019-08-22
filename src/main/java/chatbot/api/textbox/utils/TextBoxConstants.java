@@ -30,8 +30,8 @@ public class TextBoxConstants {
     // Button Type Scenarios Case
     public static final String BLOCK_ID_TO_CONTROL = "5d22a1bab617ea0001153bf4";
     public static final String BLOCK_ID_TO_LOOKUP_RESERVATION = "5d22a1d8ffa7480001c5b917";
-    public static final String BLOCK_ID_TO_LOOKUP_SENSING = "5d22a1e5ffa7480001c5b919";
-    public static final String BLOCK_ID_TO_LOOKUP_DEVICE = "5d22a1f4ffa7480001c5b91b";
+    public static final String BLOCK_ID_TO_LOOKUP_SENSING = "5d22a1e5ffa7480001c5b919";       // 센싱 조회
+    public static final String BLOCK_ID_TO_LOOKUP_DEVICE = "5d22a1f4ffa7480001c5b91b";        // 디바이스 조회
     public static final String BLOCK_ID_TO_ONLY_RESERVATION = "5d22a205ffa7480001c5b91d";
 
     // 제어 시나리오 블록s
