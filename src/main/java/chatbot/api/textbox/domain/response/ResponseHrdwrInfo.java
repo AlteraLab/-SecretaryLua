@@ -28,7 +28,8 @@ public class ResponseHrdwrInfo {
     }
 
     public Boolean hasNull() {
-        if(this.getDevInfo() == null) return true;
-        else                          return false;
+        if(this.getDevInfo() == null
+        || this.getDevInfo().length == 0) return true;
+        else                              return false;
     }
 }

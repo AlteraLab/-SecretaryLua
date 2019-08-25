@@ -84,7 +84,6 @@ public class TextBoxResponseService {
                     return kakaoSimpleTextService.responserShortMsg("허브와 연결된 장비가 없습니다.");
                 }
             } catch(ResourceAccessException e) { // 나중에 어떠한 이셉션이 나는지 자세히 체크해보기
-                e.printStackTrace();
                 return kakaoSimpleTextService.responserShortMsg("허브 연결 상태를 확인해주세요.");
             }
             return kakaoSimpleTextService.makerHrdwrsCard(providerId);

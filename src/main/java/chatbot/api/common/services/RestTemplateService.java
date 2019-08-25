@@ -46,11 +46,13 @@ public class RestTemplateService {
         log.info("하드웨어 목록 조회 URL -> " + url);
         log.info("=========== RestTemplate -> requestHrdwrsInfo 종료 ===========");
 
-        return restTemplate.getForObject(url, ResponseHrdwrInfo.class);
+       // return restTemplate.getForObject(url, ResponseHrdwrInfo.class);
 
         // 일단 데이터 받은걸로 가정합시다.
+
+        HrdwrDTO[] hrdwrs = null;
+        //HrdwrDTO[] hrdwrs = null;
 /*
-        HrdwrDTO[] hrdwrs = new HrdwrDTO[2];
         hrdwrs[0] = HrdwrDTO.builder()
                 .hrdwrMac("12:12:12:12:12:12")
                 .authKey("3c044bcb32124166bd7c1f68cc3a7adb")
@@ -59,13 +61,13 @@ public class RestTemplateService {
                 .hrdwrMac("72:72:72:72:72:72")
                 .authKey("3c044bcb32124166bd7c1f68cc3a7adb")
                 .build();
-
+*/
         ResponseHrdwrInfo hrdwrInfo = ResponseHrdwrInfo.builder()
                 .hrdwrsInfo(hrdwrs)
                 .status(true)
                 .build();
         log.info("INFO >> DEV INFO 확인 : " + hrdwrInfo.toString());
-        return hrdwrInfo;*/
+        return hrdwrInfo;
     }
 
 
