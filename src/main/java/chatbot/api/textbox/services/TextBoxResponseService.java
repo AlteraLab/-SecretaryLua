@@ -16,7 +16,9 @@ import chatbot.api.user.domain.UserInfoDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 
+import java.net.ConnectException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -77,8 +79,13 @@ public class TextBoxResponseService {
                             .externalPort(hubs.get(0).getExternalPort())
                             .build());
 
-            if (buildActionService.actionRequestAndSaverAboutHrdwr(providerId)) {
-                return kakaoSimpleTextService.responserShortMsg("허브와 연결된 장비가 없습니다.");
+            try {
+                if (buildActionService.actionRequestAndSaverAboutHrdwr(providerId)) {
+                    return kakaoSimpleTextService.responserShortMsg("허브와 연결된 장비가 없습니다.");
+                }
+            } catch(ResourceAccessException e) { // 나중에 어떠한 이셉션이 나는지 자세히 체크해보기
+                e.printStackTrace();
+                return kakaoSimpleTextService.responserShortMsg("허브 연결 상태를 확인해주세요.");
             }
             return kakaoSimpleTextService.makerHrdwrsCard(providerId);
         } else {
@@ -98,9 +105,14 @@ public class TextBoxResponseService {
                         .externalPort(reBuild.getHubs().get(hubSeq - 1).getExplicitPort())
                         .build());
 
-        if (buildActionService.actionRequestAndSaverAboutHrdwr(providerId)) {
-            return kakaoSimpleTextService.responserShortMsg("허브와 연결된 장비가 없습니다.");
+        try {
+            if (buildActionService.actionRequestAndSaverAboutHrdwr(providerId)) {
+                return kakaoSimpleTextService.responserShortMsg("허브와 연결된 장비가 없습니다.");
+            }
+        } catch(ResourceAccessException e) { // 나중에 어떠한 이셉션이 나는지 자세히 체크해보기
+            return kakaoSimpleTextService.responserShortMsg("허브 연결 상태를 확인해주세요.");
         }
+
         return kakaoSimpleTextService.makerHrdwrsCard(providerId);
     }
 
