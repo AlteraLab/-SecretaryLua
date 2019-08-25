@@ -74,4 +74,17 @@ public class TextBoxConstants {
     public static final Character EVERY_WEEK_TYPE = '3';
 
     public static final Character INTERVAL_TYPE = '4';
+
+    public static final String OP_NOT_RULE = "1";     // 규칙 없음, 허브로 부터 조호 한 값을 그대로 적용
+    public static final String OP_EQUAL = "2";        // ==
+    public static final String OP_NOT_EQUAL = "3";    // !=
+    public static final String OP_LEFT_BIGGER = "4";  // >
+    public static final String OP_RIGHT_BIGGER = "5"; // <
+
+    public static final String DT_BYTE = "1";
+    public static final String DT_INTEGER = "2";
+    public static final String DT_LONG = "3";
+    public static final String DT_DOUBLE = "4";
+    public static final String DT_STRING = "5";
+    public static final String DT_CHAR = "6";
 }

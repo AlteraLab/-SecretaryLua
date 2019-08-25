@@ -59,8 +59,8 @@ public class TextBoxController {
         log.info("\n\n"); log.info("==================== from \"시바\" to hubs box 시작 ====================");
         log.info(requestDto.toString());
         log.info("INFO >> Utterance -> " + requestDto.getUserRequest().getUtterance());
-
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
+
         return textBoxResponseService.responserHubsBox(providerId);
     }
 
@@ -110,27 +110,10 @@ public class TextBoxController {
     public ResponseVerTwoDTO textBoxLookUpSensingFromAny(@RequestBody RequestDTO requestDTO) {
         log.info("\n\n==================== from LookUp Sensing box to control box 시작 ====================");
         String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-        String blockId = requestDTO.getUserRequest().getBlock().getId();
-        log.info("Block Id -> " + blockId);
+        Integer btnIdx = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
         log.info(requestDTO.toString());
 
-        // 1. 사용자가 누른 버튼의 번호, curBtn, derivation 을 이용해서, lowerBox 를 구한다
-        // 2. lowerBox의 pre / post text 를 구해서 반환할 문자열을 만든다
-        // 3. 하드웨어 아이디를 이용해서 하드웨어의 데이터 모델 테이블에서 key 값들을 keySet 배열로 만든다
-        // 4. KeySet 배열을 허브로 넘긴다
-        // 5. 허브로 부터 key / value 로 이루어진 KeySet 배열을 응답으로 받는다
-
-        // 이제부터는 허브로 부터 받은 값들을 바탕으로 문자열을 치환해야 한다
-        // 6. Rules 배열을 만든다
-        // 7. KeySet 배열만큼 반복문을 돈다
-        // 7-? 는 반복문 루프 1회
-        // 7-1. StateRules 에서 "데이터 키" 가 같은 놈들을 모두 조회해서 Rules 배열에 넣는다 (아마 또 다른 반복문 일듯)
-        // ** 그냥 디비에서 꺼내는게 빠를 거 같은데 ;; 일단 고려
-        // 7-2. 우선순위 순으로 정렬한다
-        // 7-3. value 값이 우선순위 별로, 연산 타입과 적용 값에 동시에 해당하는지 비교한다
-        // 7-4. 해당한다면, value 값을 해당 치환 문자열로 변환한다
-        // 7-5. 반복문 종료 후, 다음 key 값 루프로 간다
-        return null;
+        return textBoxResponseService.responserSensingBox(providerId, btnIdx);
     }
 
 
@@ -139,10 +122,10 @@ public class TextBoxController {
     public ResponseVerTwoDTO textBoxLookUpDeviceFromAny(@RequestBody RequestDTO requestDTO) {
         log.info("\n\n==================== from LookUp Device box to control box 시작 ====================");
         String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-        String blockId = requestDTO.getUserRequest().getBlock().getId();
-        log.info("Block Id -> " + blockId);
+        Integer btnIdx = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
         log.info(requestDTO.toString());
-        return null;
+
+        return textBoxResponseService.responserDevInfoBox(providerId, btnIdx);
     }
 
 

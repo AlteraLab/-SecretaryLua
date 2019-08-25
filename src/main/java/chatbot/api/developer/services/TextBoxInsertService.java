@@ -19,9 +19,9 @@ public class TextBoxInsertService {
         Long devId = dvlpDeploymentDTO.getDevice().getDevId();
         DvlpDevDTO device = dvlpDeploymentDTO.getDevice();
         List<DvlpBoxDTO> dvlpBoxList = dvlpDeploymentDTO.getBoxDTOList();
-        List<DvlpDataModelDTO> dvlpDataModelList = dvlpDeploymentDTO.getDataModelDTOList();
+        List<DvlpDataModelDTO> dvlpDataModelList = dvlpDeploymentDTO.getDataModelList();
         List<DvlpButtonDTO> dvlpButtonList = dvlpDeploymentDTO.getButtonDTOList();
-        List<DvlpStateRuleDTO> dvlpStateRuleList = dvlpDeploymentDTO.getStateRuleDTOList();
+        List<DvlpStateRuleDTO> dvlpStateRuleList = dvlpDeploymentDTO.getRules();
         // 이벤트 관련 코드 부분 ...
         List<DvlpDerivationDTO> dvlpDerivationList = dvlpDeploymentDTO.getDerivationDTOList();
 

@@ -17,11 +17,11 @@ public class DvlpDeploymentDTO {
 
     private List<DvlpBoxDTO> boxDTOList;
 
-    private List<DvlpDataModelDTO> dataModelDTOList;
+    private List<DvlpDataModelDTO> dataModelList;
 
     private List<DvlpButtonDTO> buttonDTOList;
 
-    private List<DvlpStateRuleDTO> stateRuleDTOList;
+    private List<DvlpStateRuleDTO> rules;
 
     //private List<DvlpEventDTO> eventDTOList;   // 나중에 풀기
 

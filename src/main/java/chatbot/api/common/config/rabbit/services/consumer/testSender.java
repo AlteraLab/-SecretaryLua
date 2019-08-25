@@ -1,7 +1,10 @@
 package chatbot.api.common.config.rabbit.services.consumer;
 
+import chatbot.api.common.config.rabbit.RabbitMQConstants;
+import chatbot.api.common.config.rabbit.domain.sub.EstablishMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -47,5 +50,11 @@ public class testSender {
         rabbitTemplate.convertAndSend(RabbitMQConstants.SKILL_DEV_EXCHANGE, RabbitMQConstants.SKILL_DEV_ROUTE_KEY, devMessage);
 
         //sendToUserService.sendDevMsgToUser(devMessage);
+    }*/
+/*    @Scheduled(fixedDelay = 10000L)
+    public void sendEstablishMessage() {
+        EstablishMessage establishMessage = new EstablishMessage("39.117.253.166", 54326, "02:42:d1:63:c7:80");
+        log.info("Establish Message -> " + establishMessage);
+        rabbitTemplate.convertAndSend(RabbitMQConstants.SKILL_ESTABLISH_EXCHANGE, RabbitMQConstants.SKILL_ESTABLISH_ROUTE_KEY, establishMessage);
     }*/
 }

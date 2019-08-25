@@ -1,11 +1,11 @@
 package chatbot.api.common.services;
 
 import chatbot.api.textbox.domain.*;
+import chatbot.api.textbox.domain.datamodel.KeySet;
+import chatbot.api.textbox.domain.datamodel.KeySetListDTO;
 import chatbot.api.textbox.domain.path.HrdwrDTO;
 import chatbot.api.textbox.domain.reservation.ReservationListDTO;
-import chatbot.api.textbox.domain.textboxdata.BoxDTO;
-import chatbot.api.textbox.domain.textboxdata.BtnDTO;
-import chatbot.api.textbox.domain.textboxdata.DerivationDTO;
+import chatbot.api.textbox.domain.textboxdata.*;
 import chatbot.api.textbox.repository.BuildRepository;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.QuickReply;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import static chatbot.api.textbox.utils.TextBoxConstants.*;
 
@@ -35,9 +37,6 @@ public class KakaoSimpleTextService {
 
     @Autowired
     private BuildCheckerService buildCheckerService;
-
-
-
 
 
     public ResponseVerTwoDTO responserShortMsg(String msg) {
@@ -437,8 +436,148 @@ public class KakaoSimpleTextService {
                 .template(template)
                 .build();
     }
-        
-    
+
+
+    public ResponseVerTwoDTO makerLookUpDataCard(String providerId, KeySetListDTO keySet) {
+        log.info("\n\n================== maker Look Up Data Card 시작    ==================");
+        Build reBuild = buildRepository.find(providerId);
+        BoxDTO curBox = reBuild.getCurBox();
+        String msg = curBox.getPreText() + "\n\n" + curBox.getPostText();
+        log.info("\nText Msg-> " + msg);
+
+        // "Key - Value" 문자열 치환 작업-----------------------------------------------------
+        ArrayList<KeySet> keySets = keySet.getKeySet();
+        ArrayList<StateRuleDTO> stateRules = reBuild.getStateRules();
+        ArrayList<DataModelDTO> dataModels = reBuild.getDataModels();
+
+        String findDataKey = null; // msg 에서 찾아야 하는 데이터 키
+        ArrayList<StateRuleDTO> stateRulesOfDataModel = null;
+
+        for(KeySet tempKeySet : keySets) {
+
+            findDataKey = "#{" + tempKeySet.getKey() + "}";
+
+            if(msg.contains(findDataKey)) { // 찾아야 하는 문자열이 msg 에 포함되어 있는지 체크
+
+                stateRulesOfDataModel = new ArrayList<StateRuleDTO>();
+                for(StateRuleDTO tempRule : stateRules) {
+                    if(tempRule.getDataKey().equals(tempKeySet.getKey())) {
+                        stateRulesOfDataModel.add(tempRule);
+                    }
+                }
+
+                // 우선순위 별로 정렬
+                Collections.sort(stateRulesOfDataModel, new Comparator<StateRuleDTO>() {
+                    @Override
+                    public int compare(StateRuleDTO o1, StateRuleDTO o2) {
+                        return o1.getPriority().compareTo(o2.getPriority());
+                    }
+                });
+
+                // key 값의 데이터 타입 검색 (서로 비교해야 하는 값들의 데이터 타입을 알았다)
+                String keyDataType = null;
+                for(DataModelDTO tempDataModel : dataModels) {
+                    if(tempDataModel.getDataKey().equals(tempKeySet.getKey())) {
+                        keyDataType = tempDataModel.getDataType();
+                        break;
+                    }
+                }
+
+                // 우선순위 대로 정렬한 stateRulesOfDataModel 를 루프해서 조건이 맞는지 체크한다
+                for(StateRuleDTO tempStateRuleOfDataModel : stateRulesOfDataModel) {
+
+                    // 비교해야 하는 값의데이터 타입을 찾는다
+                    Double numRuleValue = null;
+                    Double numValueOfKey = null;
+
+                    String strRuleValue = null;
+                    String strValueOfKey = null;
+
+                    // 데이터 타입에 맞게 비교해야 하는 값들을 해당 타입으로 변환
+                    if(keyDataType.equals(DT_BYTE)
+                    || keyDataType.equals(DT_INTEGER)
+                    || keyDataType.equals(DT_LONG)
+                    || keyDataType.equals(DT_DOUBLE)) {
+                        if(!tempStateRuleOfDataModel.getRuleValue().equals("")) {
+                            numRuleValue = Double.parseDouble(tempStateRuleOfDataModel.getRuleValue());
+                            numValueOfKey = Double.parseDouble(tempKeySet.getValue());
+                        } else {
+                            numRuleValue = new Double(-1); // null 방지 값, numRuleValue != null 를 위해서
+                        }
+                    } else if(keyDataType.equals(DT_STRING)
+                            || keyDataType.equals(DT_CHAR)) {
+                        if(!tempStateRuleOfDataModel.getRuleValue().equals("")) {
+                            strRuleValue = tempStateRuleOfDataModel.getRuleValue();
+                            strValueOfKey = tempKeySet.getValue();
+                        } else {
+                            strRuleValue = new String(""); // null 방지 값, strRuleValue != null 를 위해서
+                        }
+                    }
+
+                    // 연산 타입에 따라서 그에 맞게 값을 비교해주고, 만약 값이 일치한다면 mapVal 로 치환해야겠지?
+                    String mapVal = null;
+                    if(numRuleValue != null) {        // 데이터 타입이 숫자인 경우
+                        switch (tempStateRuleOfDataModel.getRuleType()) {
+                            case OP_NOT_RULE:
+                                mapVal = tempKeySet.getValue();
+                                break;
+                            case OP_EQUAL:
+                                if(numRuleValue.equals(numValueOfKey)) mapVal = tempStateRuleOfDataModel.getMapVal();
+                                else                                   mapVal = tempKeySet.getValue();
+                                break;
+                            case OP_NOT_EQUAL:
+                                if(!numRuleValue.equals(numValueOfKey)) mapVal = tempStateRuleOfDataModel.getMapVal();
+                                else                                    mapVal = tempKeySet.getValue();
+                                break;
+                            case OP_LEFT_BIGGER:
+                                if(numRuleValue > numValueOfKey) mapVal = tempStateRuleOfDataModel.getMapVal();
+                                else                             mapVal = tempKeySet.getValue();
+                                break;
+                            case OP_RIGHT_BIGGER:
+                                if(numRuleValue < numValueOfKey) mapVal = tempStateRuleOfDataModel.getMapVal();
+                                else                             mapVal = tempKeySet.getValue();
+                                break;
+                        }
+                    } else if(strRuleValue != null) { // 데이터 타입이 문자인 경우
+                        switch (tempStateRuleOfDataModel.getRuleType()) {
+                            case OP_NOT_RULE:
+                                mapVal = tempKeySet.getValue();
+                                break;
+                            case OP_EQUAL:
+                                if(strValueOfKey.equals(strRuleValue)) mapVal = tempStateRuleOfDataModel.getMapVal();
+                                else                                   mapVal = tempKeySet.getValue();
+                                break;
+                            case OP_NOT_EQUAL:
+                                if(!strValueOfKey.equals(strRuleValue)) mapVal = tempStateRuleOfDataModel.getMapVal();
+                                else                                    mapVal = tempKeySet.getValue();
+                                break;
+                        }
+                    }
+
+                    if(mapVal != null) msg = msg.replace(findDataKey, mapVal); // 문자열 치환
+                }
+            }
+        }
+        ////////////////////
+        SimpleText simpleTextVo = new SimpleText();
+        simpleTextVo.setText(msg);
+
+        ComponentSimpleText simpleText = new ComponentSimpleText();
+        simpleText.setSimpleText(simpleTextVo);
+
+        ArrayList<Object> outputs = new ArrayList<>();
+        outputs.add(simpleText);
+
+        SkillTemplate template = new SkillTemplate(outputs, null);
+
+        log.info("================== maker Look Up Data Card 종료    ==================");
+        return new ResponseVerTwoDTO().builder()
+                .version("2.0")
+                .template(template)
+                .build();
+    }
+
+
     // 사용자에게 보여줄 동적 카드 When Dynamic From Time From Entry
     public ResponseVerTwoDTO makerDynamicCardWhenDynamicFrTimeFrEntry(String providerId) {
 
@@ -630,62 +769,3 @@ public class KakaoSimpleTextService {
                 .build();
     }
 }
-
-
-/*
-    public ResponseVerTwoDTO makerBtnsCard(String providerId) {
-
-        log.info("================== makerBtnsCard 시작 ==================");
-
-        Build reBuild = buildRepository.find(providerId);
-
-        TextBoxDTO curBox = reBuild.getBox();
-        ArrayList<BtnDTO> btns = reBuild.getBtns();
-
-        // 카드 만들기
-        SimpleText text = new SimpleText();
-        StringBuffer responseMsg = new StringBuffer(curBox.getPreText() + "\n\n");
-        for (int i = 0; i < btns.size(); i++) {
-            responseMsg.append((i + 1) + ". " + btns.get(i).getBtnName() + "\n");
-        }
-        responseMsg.append("\n" + curBox.getPostText());
-        text.setText(responseMsg.toString());
-
-        ComponentSimpleText simpleText = new ComponentSimpleText();
-        simpleText.setSimpleText(text);
-
-        ArrayList<Object> outputs = new ArrayList<Object>();
-        outputs.add(simpleText);
-
-        // 버튼 꾸미기
-        ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
-        for (int i = 0; i < btns.size(); i++) {
-            QuickReply quick = QuickReply.builder()
-                    .label(Integer.toString(i + 1))
-                    .messageText("버튼 " + (i + 1) + "번")
-                    .action("block")
-                    .blockId(btns.get(i).getBlockId())
-                    .build();
-
-            quickReplies.add(quick);
-        }
-
-        QuickReply transferBtn = QuickReply.builder()
-                .label("전송")
-                .messageText("명령 전송")
-                .action("block")
-                .blockId(BLOCK_ID_BUILDED_CODES)
-                .build();
-
-        quickReplies.add(transferBtn);
-
-        SkillTemplate template = new SkillTemplate(outputs, quickReplies);
-
-        log.info("================== makerBtnsCard 종료    ==================");
-
-        return new ResponseVerTwoDTO().builder()
-                .version("2.0")
-                .template(template)
-                .build();
-       return null;
-    }*/

@@ -459,7 +459,6 @@ public class BuildSaveService {
     public void saverCurBoxWhenEndFrDynamicFrEntry(String providerId) {
         log.info("=============== Save Current Box When End From Dynamic From Entry 시작 ===============");
         // CurBox 가 Dynamic Box 이기 때문에 한 단계 아래 박스로 조정해야함
-
         Build reBuild = buildRepository.find(providerId);
         ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
         BoxDTO curBox = reBuild.getCurBox();
@@ -474,45 +473,37 @@ public class BuildSaveService {
         buildRepository.update(reBuild);
         log.info("=============== Save Current Box When End From Dynamic From Entry 종료 ===============");
     }
-}
 
+    public void saverCurBoxWhenLookUpSensingAndDeviceInfo(String providerId, Integer btnIdx) {
+        log.info("=============== Save Current Box When Sensing And Device Info LookUp 시작 ===============");
 
-
-
-/*
-    // 이건 entry box에만 적용되는게 아님. makerTextCard 메소드를 만들거고
-    // makerTextCard 에서는 curbox를 먼저 구하는 함수를 쓰고, saverCurBtns 함수를 쓸거임.
-    public void saverCurBtns(String providerId) {
-
-        log.info("=============== Saver Current Btns 시작 ===============");
-
+        // 1. 사용자가 누른 버튼을 찾기 및 저장
         Build reBuild = buildRepository.find(providerId);
-
-        Integer curBoxId = reBuild.getCurBox().getBoxId();
-        ArrayList<BtnDTO> btns = reBuild.getBtns();
         ArrayList<BtnDTO> curBtns = reBuild.getCurBtns();
-
-        // 정렬
-        Collections.sort(curBtns, new Comparator<BtnDTO>() {
-            @Override
-            public int compare(BtnDTO o1, BtnDTO o2) {
-                return o1.getIdx().compareTo(o2.getIdx());
-            }
-        });
-        // 정렬 확인
-        log.info("정렬 확인 정렬 확인 정렬 확인 정렬 확인 정렬 확인 정렬 확인 정렬 확인 정렬 확인 정렬 확인 정렬 확인 정렬 확인 정렬 확인 ");
-        for(BtnDTO temp : curBtns) {
-            temp.setIdx(temp.getIdx() + 1);
-            log.info(temp.getIdx().toString());
-        }
-
-        for(BtnDTO tempBtn : btns) {
-            if(tempBtn.getBoxId() == curBoxId) {
-                curBtns.add(tempBtn);
+        BtnDTO curBtn = null;
+        for(BtnDTO tempBtn : curBtns) {
+            if(btnIdx == tempBtn.getIdx()) {
+                reBuild.setSelectedBtn(tempBtn);
+                curBtn = tempBtn;
+                break;
             }
         }
+        log.info("Selected Button -> " + curBtn);
 
+        // 2. 현재 박스를 찾고, 저장한다
+        ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
+        BtnDTO selectedBtn = reBuild.getSelectedBtn();
+        BoxDTO curBox = reBuild.getCurBox();
+        BoxDTO lowerBox = null;
+        for(DerivationDTO tempDerivation : derivations) {
+            if(curBox.getBoxId() == tempDerivation.getUpperBoxId() &&
+            selectedBtn.getBtnCode() == tempDerivation.getBtnCode()) {
+                lowerBox = buildAllocaterService.allocateBoxByBoxId(providerId, tempDerivation.getLowerBoxId());
+                break;
+            }
+        }
+        reBuild.setCurBox(lowerBox);
         buildRepository.update(reBuild);
-
-        log.info("=============== Saver Current Btns 종료 ===============");
-    }*/
+        log.info("=============== Save Current Box When Sensing And Device Info LookUp 종료 ===============");
+    }
+}

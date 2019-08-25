@@ -13,5 +13,7 @@ public interface DataModelMapper {
 
     ArrayList<DataModelDTO> getDataModelsByHrdwrId(@Param("hrdwrId") Long hrdwrId);
 
-    ArrayList<DataModelDTO> getDataModelsForTableByHrdwrId(@Param("hrdwrId") Long hrdwrId);
+    ArrayList<String> getSensingKeySet(@Param("hrdwrId") Long hrdwrId, @Param("modType") Character modType);
+
+    ArrayList<String> getDevInfoKeySet(@Param("hrdwrId") Long hrdwrId, @Param("modType") Character modType);
 }

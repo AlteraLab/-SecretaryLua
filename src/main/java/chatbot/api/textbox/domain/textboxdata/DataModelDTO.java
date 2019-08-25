@@ -17,7 +17,7 @@ public class DataModelDTO implements Serializable {
 
     private Boolean isEv;
 
-    private Character dataType; // 데이터 타입
+    private String dataType; // 데이터 타입
     /*
     '1' - byte
     '2' - integer

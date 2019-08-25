@@ -16,17 +16,21 @@
         WHERE hrdwr_id = #{hrdwrId}
     </select>
 
-    <!-- hrdwrId 를 이용해서 허브에 테이블을 생성하기 위한 "데이터 키" / "데이터 타입" / "모델 타입" 조회 -->
-    <select id="getDataModelsForTableByHrdwrId" resultMap="DataModelDTO" parameterType="Long">
+
+    <select id="getSensingKeySet" resultType="String" parameterType="hashmap">
         SELECT
-        data_key,
-        data_type,
-        mod_type
+        data_key
         FROM data_model
-        WHERE hrdwr_id = #{hrdwrId}
+        WHERE hrdwr_id = #{hrdwrId} AND mod_type = #{modType}
     </select>
 
 
+    <select id="getDevInfoKeySet" resultType="String" parameterType="hashmap">
+        SELECT
+        data_key
+        FROM data_model
+        WHERE hrdwr_id = #{hrdwrId} AND mod_type = #{modType}
+    </select>
 
     <resultMap id="DataModelDTO" type="chatbot.api.textbox.domain.textboxdata.DataModelDTO">
         <result property="dataKey" column="data_key"/>

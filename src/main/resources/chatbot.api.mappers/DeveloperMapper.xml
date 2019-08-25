@@ -97,14 +97,14 @@
 
     <!-- 데이터 모델 삽입 -->
     <insert id="insertDataModels" parameterType="java.util.Map">
-        insert into data_model (data_type, mode_type, is_ev, data_key, hrdwr_id)
+        insert into data_model (data_type, mod_type, is_ev, data_key, hrdwr_id)
         values
         <foreach collection="dvlpDataModelDTOList" item="item" separator=" , ">
             (
-            #{item.data_type},
-            #{item.mode_type},
-            #{item.is_ev},
-            #{item.data_key},
+            #{item.dataType},
+            #{item.modType},
+            #{item.isEv},
+            #{item.dataKey},
             #{hrdwrId}
             )
         </foreach>
@@ -130,18 +130,18 @@
 
     <!-- 룰 삽입 -->
     <insert id="insertRules" parameterType="java.util.Map">
-        insert into res_box_crs (rule_type, rule_value, rule_priority, map_val, mod_dev_id, box_id, data_key, mod_id, hrdwr_id)
+        insert into res_box_crs (rule_type, rule_value, priority, map_val, mod_dev_id, box_id, data_key, mod_id, hrdwr_id)
         values
         <foreach collection="dvlpStateRuleDTOList" item="item" separator=" , ">
             (
-            #{item.rule_type},
-            #{item.rule_value},
-            #{item.rule_priority},
-            #{item.map_val},
-            #{item.mod_dev_id},
-            #{item.box_id},
-            #{item.data_key},
-            #{item.mod_id},
+            #{item.ruleType},
+            #{item.ruleValue},
+            #{item.priority},
+            #{item.mapVal},
+            #{item.modDevId},
+            #{item.boxId},
+            #{item.dataKey},
+            #{item.modId},
             #{hrdwrId}
             )
         </foreach>

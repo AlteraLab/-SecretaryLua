@@ -1,8 +1,12 @@
 package chatbot.api.common.services;
 
 import chatbot.api.common.domain.ResponseDTO;
+import chatbot.api.mappers.DataModelMapper;
 import chatbot.api.skillhub.domain.ResultAboutReservationDelete;
 import chatbot.api.textbox.domain.Build;
+import chatbot.api.textbox.domain.datamodel.KeyListDTO;
+import chatbot.api.textbox.domain.datamodel.KeySet;
+import chatbot.api.textbox.domain.datamodel.KeySetListDTO;
 import chatbot.api.textbox.domain.path.HrdwrDTO;
 import chatbot.api.textbox.domain.reservation.ReservationDTO;
 import chatbot.api.textbox.domain.reservation.ReservationListDTO;
@@ -31,7 +35,7 @@ public class RestTemplateService {
 
     private ReservationListRepository reservationListRepository;
 
-
+    private DataModelMapper dataModelMapper;
 
 
     public ResponseHrdwrInfo requestHrdwrsInfo(String providerId) {
@@ -44,15 +48,15 @@ public class RestTemplateService {
         return restTemplate.getForObject(url, ResponseHrdwrInfo.class);
 
         // 일단 데이터 받은걸로 가정합시다.
-        /*
+/*
         HrdwrDTO[] hrdwrs = new HrdwrDTO[2];
         hrdwrs[0] = HrdwrDTO.builder()
                 .hrdwrMac("12:12:12:12:12:12")
-                .authKey("b776d155a4d44816969408f831600e2d")
+                .authKey("3c044bcb32124166bd7c1f68cc3a7adb")
                 .build();
         hrdwrs[1] = HrdwrDTO.builder()
                 .hrdwrMac("72:72:72:72:72:72")
-                .authKey("aaaabbbbccccddddeeeeffffgggghhhh")
+                .authKey("3c044bcb32124166bd7c1f68cc3a7adb")
                 .build();
 
         ResponseHrdwrInfo hrdwrInfo = ResponseHrdwrInfo.builder()
@@ -60,8 +64,38 @@ public class RestTemplateService {
                 .status(true)
                 .build();
         log.info("INFO >> DEV INFO 확인 : " + hrdwrInfo.toString());
-        return hrdwrInfo;
-        */
+        return hrdwrInfo;*/
+    }
+
+
+    public KeySetListDTO requestKeySets(String providerId, Character modType) {
+        log.info("=========== RestTemplate -> requestKeySets 시작 ===========");
+        Build reBuild = buildRepository.find(providerId);
+        String url = "http://" + reBuild.getPath().getExternalIp() + ":" + reBuild.getPath().getExternalPort() + "/dev/" + reBuild.getPath().getHrdwrMacAddr() + "/state";
+        log.info("조회 URL -> " + url);
+
+        ArrayList<String> keys = null;
+        KeyListDTO keySet = new KeyListDTO();
+        if(modType == '1') {
+            keys = dataModelMapper.getSensingKeySet(reBuild.getSelectedHrdwr().getHrdwrId(), '1'); // 1, 센싱 정보에 관한 Key 조회
+        } else if(modType == '0') {
+            keys = dataModelMapper.getDevInfoKeySet(reBuild.getSelectedHrdwr().getHrdwrId(), '0'); // 0, 디바이스 정보에 관한 Key 조회
+        }
+        keySet.setKeySet(keys);
+        log.info("Keys -> " + keys);
+        log.info("Key Set -> " + keySet );
+        // 2
+        KeySetListDTO keySetList = restTemplate.postForObject(
+                url,
+                keySet,
+                KeySetListDTO.class);
+        log.info("Key Set -> " + keySetList);
+        log.info("=========== RestTemplate -> requestKeySets 종료 ===========");
+/*        KeySetListDTO keySet = new KeySetListDTO();
+        keySet.setKeySet(new ArrayList<KeySet>());
+        keySet.getKeySet().add(new KeySet("humi", "27"));
+        keySet.getKeySet().add(new KeySet("temp", "50"));*/
+        return keySetList;
     }
 
 
@@ -69,7 +103,7 @@ public class RestTemplateService {
         log.info("=========== RestTemplate -> requestReservationList 시작 ===========");
         Build reBuild = buildRepository.find(providerId);
         String url = "http://" + reBuild.getPath().getExternalIp() + ":" + reBuild.getPath().getExternalPort() + "/hub/" + reBuild.getPath().getHrdwrMacAddr() + "/reservation";
-        log.info("예약 목록 조회 URL -> " + url);
+        log.info("조회 URL -> " + url);
         log.info("=========== RestTemplate -> requestReservationList 종료 ===========");
         // 나중에 주석 풀기
         ReservationListDTO reservationList = restTemplate.getForObject(url, ReservationListDTO.class);

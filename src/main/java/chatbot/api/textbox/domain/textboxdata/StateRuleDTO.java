@@ -15,9 +15,9 @@ public class StateRuleDTO implements Serializable {
 
     // 결과 박스 데이터 모델
 
-    private Integer rulePriority;
+    private Integer priority;
 
-    private Character ruleType;
+    private String ruleType;
 
     private String ruleValue;
 

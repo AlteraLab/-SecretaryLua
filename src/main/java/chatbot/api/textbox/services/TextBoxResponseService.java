@@ -2,6 +2,7 @@ package chatbot.api.textbox.services;
 
 import chatbot.api.common.services.RestTemplateService;
 import chatbot.api.textbox.domain.*;
+import chatbot.api.textbox.domain.datamodel.KeySetListDTO;
 import chatbot.api.textbox.domain.path.Path;
 import chatbot.api.textbox.domain.reservation.ReservationListDTO;
 import chatbot.api.textbox.repository.BuildRepository;
@@ -15,7 +16,6 @@ import chatbot.api.user.domain.UserInfoDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -153,7 +153,7 @@ public class TextBoxResponseService {
         log.info("================== Responser End Box From Dynamic From Time From Entry 시작 ==================");
         // 1. 동적 입력 데이터를 Additonal 에 추가해야 한다
         // 2. 하위 박스가 있는지 없는지 체크한다
-        //      2-1. 하위 박스가 없다면 -> End Box 라는 의미이니까, 사용자에게 명령을 전달할거냐고 묻는다
+        //      2-1. 하위- 박스가 없다면 -> End Box 라는 의미이니까, 사용자에게 명령을 전달할거냐고 묻는다
         //      2-2. 하위 박스가 있다면 -> End Box 가 아니라는 의미이니까, Entry Box 때 했던것과 비슷한 작업을 수행한다
         buildSaveService.saverDynamicValue(providerId, dynamicValue);
         buildSaveService.saverCurBoxWhenEndFrDynamicFrTimeFrEntry(providerId); // curBox를 null 혹은 control box로 초기화 시킴.
@@ -272,12 +272,22 @@ public class TextBoxResponseService {
         // 장치에 대한 예약 목록 박스 만들어서 반환
         return kakaoSimpleTextService.makerReservationListCard(reservationList);
     }
-}
 
-/*
-    // when before box type is entry, excute
-    public ResponseVerTwoDTO responserAnyBoxFromEntry(String providerId, Integer btnIdx) {
-        Character btnType = buildAllocaterService.allocateBtnTypeAccrdToBtnIdx(providerId, btnIdx);
-        ResponseVerTwoDTO responseVerTwoDTO = buildAllocaterService.allocateJsonAboutAnyBoxAccrdToBtnType(providerId, btnType);
-        return responseVerTwoDTO;
-    }*/
+
+    public ResponseVerTwoDTO responserSensingBox(String providerId, Integer btnIdx) {
+        log.info("================== Responser Sensing Box 시작 ==================");
+        Build reBuild = buildRepository.find(providerId);
+        KeySetListDTO keySet = restTemplateService.requestKeySets(providerId, '1'); // 센싱 key 조회
+        buildSaveService.saverCurBoxWhenLookUpSensingAndDeviceInfo(providerId, btnIdx);
+        return kakaoSimpleTextService.makerLookUpDataCard(providerId, keySet);
+    }
+
+
+    public ResponseVerTwoDTO responserDevInfoBox(String providerId, Integer btnIdx) {
+        log.info("================== Responser Device Info Box 시작 ==================");
+        Build reBuild = buildRepository.find(providerId);
+        KeySetListDTO keySet = restTemplateService.requestKeySets(providerId, '0'); // 디바이스 key 조회
+        buildSaveService.saverCurBoxWhenLookUpSensingAndDeviceInfo(providerId, btnIdx);
+        return kakaoSimpleTextService.makerLookUpDataCard(providerId, keySet);
+    }
+}

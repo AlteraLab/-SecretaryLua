@@ -8,7 +8,7 @@
     <!-- hrdwrId를 이용해서 모든 룰 조회 -->
     <select id="getStateRulesByHrdwrId" resultMap="StateRuleDTO" parameterType="Long">
         SELECT
-        rule_priority,
+        priority,
         rule_type,
         rule_value,
         map_val,
@@ -22,7 +22,7 @@
 
 
     <resultMap id="StateRuleDTO" type="chatbot.api.textbox.domain.textboxdata.StateRuleDTO">
-        <result property="rulePriority" column="rule_priority"/>
+        <result property="priority" column="priority"/>
         <result property="ruleType" column="rule_type"/>
         <result property="ruleValue" column="rule_value"/>
         <result property="mapVal" column="map_val"/>

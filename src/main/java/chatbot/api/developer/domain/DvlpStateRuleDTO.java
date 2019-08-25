@@ -51,5 +51,5 @@ public class DvlpStateRuleDTO {
     ruleType, ruleValue 규칙에 부합한다면 mapVal로 치환
      */
 
-    private Integer rulePriority; // 규칙 우선순위
+    private Integer priority; // 규칙 우선순위
 }
