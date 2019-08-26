@@ -32,6 +32,34 @@
         WHERE hrdwr_id = #{hrdwrId} AND mod_type = #{modType}
     </select>
 
+
+    <select id="getAllEvents" parameterType="Long" resultMap="EventVO">
+        SELECT *
+        FROM event as e
+            LEFT OUTER JOIN notify_box as n ON n.event_id = e.event_id
+            LEFT OUTER JOIN third_ser as t ON t.event_id = e.event_id
+            LEFT OUTER JOIN control as c ON c.event_id = e.event_id
+        WHERE e.hrdwr_id = #{hrdwrId}
+        ORDER BY e.priority ASC;
+    </select>
+
+
+    <resultMap id="EventVO" type="chatbot.api.dev.domain.EventVO">
+        <result property="eventId" column="event_id" javaType="Integer" />
+        <result property="priority" column="priority" javaType="Integer" />
+        <result property="dataKey" column="data_key" javaType="String" />
+        <result property="outputType" column="output_type" javaType="String" />
+        <result property="ruleType" column="rule_type" javaType="String" />
+        <result property="ruleValue" column="rule_value" javaType="String" />
+        <result property="preText" column="pre_text" javaType="String" />
+        <result property="postText" column="post_text" javaType="String" />
+        <result property="host" column="host" javaType="String" />
+        <result property="port" column="port" javaType="String" />
+        <result property="path" column="path" javaType="String" />
+        <result property="evCode" column="event_code" javaType="Integer" />
+        <result property="authKey" column="auth_key" javaType="String" />
+    </resultMap>
+
     <resultMap id="DataModelDTO" type="chatbot.api.textbox.domain.textboxdata.DataModelDTO">
         <result property="dataKey" column="data_key"/>
         <result property="isEv" column="is_ev"/>

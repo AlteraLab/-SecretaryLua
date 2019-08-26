@@ -30,11 +30,10 @@
       DELETE FROM res_box_crs WHERE hrdwr_id=#{hrdwrId}
     </delete>
 
-    <!-- 이벤트 삭제
+    <!-- 이벤트 삭제 -->
     <delete id="deleteEvents" parameterType="Long">
       DELETE FROM event WHERE hrdwr_id=#{hrdwrId}
     </delete>
-    -->
 
     <!-- box 삭제 -->
     <delete id="deleteTextBoxes" parameterType="Long">
@@ -148,6 +147,61 @@
     </insert>
 
     <!-- 이벤트 삽입 -->
+    <insert id="insertEvents" parameterType="java.util.Map">
+        insert into event (output_type, rule_type, rule_value, data_key, priority, event_id, hrdwr_id)
+        values
+        <foreach collection="dvlpEventDTOList" item="item" separator=" , ">
+            (
+            #{item.outputType},
+            #{item.ruleType},
+            #{item.ruleValue},
+            #{item.dataKey},
+            #{item.priority},
+            #{item.eventId},
+            #{hrdwrId}
+            )
+        </foreach>
+    </insert>
+
+    <!--  알림 박스 삽입 (이벤트 하위 테이블)  -->
+    <insert id="insertNotifyBoxs" parameterType="java.util.Map">
+        insert into notify_box (event_id, pre_text, post_text)
+        values
+        <foreach collection="dvlpNotifyBoxDTOList" item="item" separator=" , ">
+            (
+            #{item.eventId},
+            #{item.preText},
+            #{item.postText}
+            )
+        </foreach>
+    </insert>
+
+    <!--  서드 파티 서버 삽입 (이벤트 하위 테이블)  -->
+    <insert id="insertThirdServers" parameterType="java.util.Map">
+        insert into third_ser (event_id, host, port, path)
+        values
+        <foreach collection="dvlpThirdServerDTOList" item="item" separator=" , ">
+            (
+            #{item.eventId},
+            #{item.host},
+            #{item.port},
+            #{item.path}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 제어 삽입 (이벤트 하위 테이블)  -->
+    <insert id="insertControls" parameterType="java.util.Map">
+        insert into control (event_id, event_code, auty_key)
+        values
+        <foreach collection="dvlpControlDTOList" item="item" separator=" , ">
+            (
+            #{item.eventId},
+            #{item.evCode},
+            #{item.authKey}
+            )
+        </foreach>
+    </insert>
 
 
     <!-- derivations 삽입 -->

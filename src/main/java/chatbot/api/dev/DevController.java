@@ -1,6 +1,5 @@
 package chatbot.api.dev;
 
-import chatbot.api.common.domain.ResponseDTO;
 import chatbot.api.dev.services.DevSelectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

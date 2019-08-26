@@ -32,7 +32,7 @@ public class DeveloperController {
         log.info(dvlpDeploymentDTO.getDataModelList().toString());
         log.info(dvlpDeploymentDTO.getButtonDTOList().toString());
         log.info(dvlpDeploymentDTO.getRules().toString());
-        //log.info(dvlpDeploymentDTO.getEventDTOList().toString()); 이벤트 관련
+        log.info(dvlpDeploymentDTO.getEvents().toString());
         log.info(dvlpDeploymentDTO.getDerivationDTOList().toString());
 
         ResponseDTO responseDTO = ResponseDTO.builder()

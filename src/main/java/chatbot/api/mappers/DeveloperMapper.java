@@ -20,7 +20,7 @@ public interface DeveloperMapper {
 
     void deleteRules(@Param("hrdwrId") Long devId);
 
-    //void deleteEvents(@Param("hrdwrId") Long devId);    // 나중에 주석 풀기
+    void deleteEvents(@Param("hrdwrId") Long devId);
 
     void deleteTextBoxes(@Param("hrdwrId") Long devId);
 
@@ -66,9 +66,30 @@ public interface DeveloperMapper {
     );
 
     // 이벤트
-    /*void insertEvents(
+    void insertEvents(
+        @Param("dvlpEventDTOList")
+        List<DvlpEventDTO> dvlpEventDTOList,
+        @Param("hrdwrId")
+        Long devId
+    );
 
-    )*/
+    // 알림 박스 (이벤트 하위 테이블)
+    void insertNotifyBoxs(
+        @Param("dvlpNotifyBoxDTOList")
+        List<DvlpNotifyBoxDTO> dvlpNotifyBoxDTOList
+    );
+
+    // 서드 파티 (이벤트 하위 테이블)
+    void insertThirdServers(
+        @Param("dvlpThirdServerDTOList")
+        List<DvlpThirdServerDTO> dvlpThirdServerDTOList
+    );
+
+    // 제어 (이벤트 하위 테이블)
+    void insertControls(
+        @Param("dvlpControlDTOList")
+        List<DvlpControlDTO> dvlpControlDTOList
+    );
 
     void insertDerivations(
             @Param("dvlpDerivationDTOList")
