@@ -1,5 +1,6 @@
 package chatbot.api.textbox;
 
+import chatbot.api.common.services.KakaoBasicCardService;
 import chatbot.api.common.services.RestTemplateService;
 import chatbot.api.common.services.TimeService;
 import chatbot.api.textbox.domain.*;
@@ -51,6 +52,9 @@ public class TextBoxController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private KakaoBasicCardService kakaoBasicCardService;
 
 
     // from "시바" to hubs box
@@ -546,5 +550,12 @@ public class TextBoxController {
         // 사용자가 취소 명령을 눌렀다면
         // 취소 선택 버튼 3가지 경우의 수를 리턴한다.
         return kakaoSimpleTextService.makerCancleSelectCard();
+    }
+
+
+    @PostMapping("/web")
+    public ResponseVerTwoDTO textBoxToWebLink() {
+        log.info("\n\n"); log.info("==================== to web link 시작 ====================");
+        return kakaoBasicCardService.responserSibaWebLink();
     }
 }
