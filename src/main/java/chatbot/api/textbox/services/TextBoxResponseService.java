@@ -118,8 +118,10 @@ public class TextBoxResponseService {
 
     public ResponseVerTwoDTO responserEntryBox(String providerId, Integer hrdwrSeq) {
         log.info("================== Responser EntryBox 시작 ==================");
-        buildSaveService.saverSelectedHrdwr(providerId, hrdwrSeq);// 선택된 하드웨어 저장
-        buildSaveService.saverPathAboutMac(providerId);           // 하드웨어 맥주소 저장
+        if(hrdwrSeq != null) {
+            buildSaveService.saverSelectedHrdwr(providerId, hrdwrSeq);// 선택된 하드웨어 저장
+            buildSaveService.saverPathAboutMac(providerId);           // 하드웨어 맥주소 저장
+        }
         buildSaveService.saverMultipleData(providerId);           // 데이터를 빌드하는데 필요한 boxs, btns, derivations, dataModels, stateRules 저장
         buildSaveService.initCmdListWhenEntry(providerId);        // When Create Entry, cmdList 초기화(객체 할당)
         buildSaveService.initCurBoxWhenEntry(providerId);         // When Create Entry Box, 엔트리 박스(현재 박스) 구하기

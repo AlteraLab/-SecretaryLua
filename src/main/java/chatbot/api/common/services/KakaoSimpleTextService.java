@@ -139,20 +139,25 @@ public class KakaoSimpleTextService {
     }
 
 
-    public ResponseVerTwoDTO makerCancleSelectCard() {
+    public ResponseVerTwoDTO makerCancleSelectCard(Character caseCode) {
 
-        StringBuffer msg = new StringBuffer("명령을 취소하였습니다.\n\n");
+        StringBuffer msg = new StringBuffer("수행할 명령을 선택하세요.\n\n");
 
-        msg.append("1. 허브 재선택\n");
-        msg.append("2. 명령 재선택\n");
-        msg.append("3. 취소\n\n");
+        msg.append("1. 허브 선택\n");
+        msg.append("- 사용할 허브를 다시 선택합니다.\n\n");
 
-        msg.append("1. 허브 재선택\n모든 명령을 취소하고 사용하고자 하는 허브까지 모두 다시 선택합니다.\n\n");
-        msg.append("2. 명령 재선택\n선택한 허브와 모듈은 그대로 입니다. 전송하고자 하는 명령만 다시 선택합니다.\n\n");
-        msg.append("3. 취소\n허브, 모듈, 명령에 대한 내용 모두 취소합니다.\n\n");
+        if(caseCode == null) {
+            msg.append("2. 명령 선택\n");
+            msg.append("- 명령을 다시 선택합니다.\n\n");
 
-        msg.append("선택해주세요.\n");
+            msg.append("3. 취소\n");
+            msg.append("- 모든 제어를 취소합니다.\n\n");
+        } else if(caseCode == '0'){
+            msg.append("2. 취소\n");
+            msg.append("- 모든 제어를 취소합니다.\n\n");
+        }
 
+        msg.append("버튼을 선택해주세요.");
 
         SimpleText simpleTextVo = new SimpleText();
         simpleTextVo.setText(msg.toString());
@@ -176,21 +181,28 @@ public class KakaoSimpleTextService {
 
         QuickReply cancleBtnToCodeList = QuickReply.builder()
                 .label("2")
-                .messageText("명령 재선택")
-                .action("block")
-                .blockId(BLOCK_ID_TO_ANY_BOX)
-                .build();
-
-   /*     QuickReply cancleBtn = QuickReply.builder()
-                .label("3")
                 .messageText("취소")
                 .action("block")
-                .blockId(BLOCK_ID_CANCLE_COMPLETE)
-                .build();*/
+                //.blockId(BLOCK_ID_TO_ANY_BOX)
+                .blockId(BLOCK_ID_TO_ENTRY_BOX)
+                .build();
+
+        QuickReply allCancleBtn = QuickReply.builder()
+                .label("3")
+                .messageText("모두 취소")
+                .action("block")
+                .blockId(BLOCK_ID_CANCLE_ALL)
+                .build();
 
         quickReplies.add(cancleBtnToControlHubs);
-        quickReplies.add(cancleBtnToCodeList);
-        //quickReplies.add(cancleBtn);
+
+        if(caseCode == null) {
+            quickReplies.add(cancleBtnToCodeList);
+            quickReplies.add(allCancleBtn);
+        } else if(caseCode == '0'){
+            allCancleBtn.setLabel("2");
+            quickReplies.add(allCancleBtn);
+        }
 
         template.setQuickReplies(quickReplies);
 

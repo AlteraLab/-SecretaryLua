@@ -64,7 +64,7 @@ public class TextBoxController {
         log.info(requestDto.toString());
         log.info("INFO >> Utterance -> " + requestDto.getUserRequest().getUtterance());
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
-
+        log.info(providerId + "");
         return textBoxResponseService.responserHubsBox(providerId);
     }
 
@@ -90,7 +90,11 @@ public class TextBoxController {
         log.info(requestDto.toString());
 
         String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
-        Integer hrdwrSeq = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        Integer hrdwrSeq = null;
+
+        if(!(requestDto.getUserRequest().getUtterance().contains("취소"))) {
+            hrdwrSeq = Integer.parseInt(requestDto.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        }
         log.info("INFO >> Hrdwr Seq -> " + hrdwrSeq);
 
         return textBoxResponseService.responserEntryBox(providerId, hrdwrSeq);
@@ -539,7 +543,7 @@ public class TextBoxController {
 
             StringBuffer msg = new StringBuffer("");
             if(result.getStatus() == HttpStatus.OK) {
-                msg.append("명령 전송이 성공적으로 수행 되었습니다.\n\n");
+                msg.append("명령 전송이 성공적으로 수행 되었습니다,.\n\n");
             } else {
                 msg.append("명령 전송이 실패하였습니다.\n\n");
             }
@@ -548,14 +552,46 @@ public class TextBoxController {
         }
 
         // 사용자가 취소 명령을 눌렀다면
-        // 취소 선택 버튼 3가지 경우의 수를 리턴한다.
-        return kakaoSimpleTextService.makerCancleSelectCard();
+        // 취소 선택 버튼 3가지 경우의 수를 리턴한다.secu
+        return kakaoSimpleTextService.makerCancleSelectCard(null);
     }
 
 
-    @PostMapping("/web")
+    @PostMapping("/textbox/web")
     public ResponseVerTwoDTO textBoxToWebLink() {
         log.info("\n\n"); log.info("==================== to web link 시작 ====================");
         return kakaoBasicCardService.responserSibaWebLink();
+    }
+
+
+    @PostMapping("/textbox/cancle")
+    public ResponseVerTwoDTO textBoxToCancle(@RequestBody RequestDTO requestDto) {
+        log.info("\n\n"); log.info("==================== to Cancle 시작 ====================");
+        String providerId = requestDto.getUserRequest().getUser().getProperties().getAppUserId();
+        Build reBuild = buildRepository.find(providerId);
+
+        // 허브를 선택하지도 않았을때
+        if(reBuild == null
+        || reBuild.getPath() == null) { // 허브를 선택하지도 않았을때
+            return kakaoSimpleTextService.responserShortMsg("취소할 명령이 없습니다.");
+        }
+
+        // 허브는 선택했으나, 하드웨어는 선택하지 않았을때, "허브 선택" 만 보여주기
+        if(reBuild.getPath().getHrdwrMacAddr() == null) {
+            return kakaoSimpleTextService.makerCancleSelectCard('0');
+        }
+
+        // 허브와 하드웨어는 선택했으나, 명령을 빌드 중이거나 명령을 빌드한것이 없다면, 모든 버튼 보여주기
+        return kakaoSimpleTextService.makerCancleSelectCard(null);
+    }
+
+
+    @PostMapping("/textbox/cancle/all")
+    public ResponseVerTwoDTO textBoxCompleteCancle(@RequestBody RequestDTO requestDTO) {
+        log.info("\n\n"); log.info("==================== Complete Cancle 시작 ====================");
+        log.info(requestDTO.getUserRequest().getBlock() + "");
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+        buildRepository.delete(providerId);
+        return kakaoSimpleTextService.responserShortMsg("모든 명령을 취소하였습니다.");
     }
 }

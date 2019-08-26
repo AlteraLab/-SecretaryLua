@@ -63,6 +63,9 @@ public class TextBoxConstants {
     public static final String BLOCK_ID_DY_ENTRY = "5d3d905d92690d000124ce0d";
     public static final String BLOCK_ID_END_RESERVATION_DY_ENTRY = "5d3d908fb617ea00018377d4";
 
+    // etc
+    public static final String BLOCK_ID_CANCLE_ALL = "5d6396b5ffa7480001c1c089";
+
     public static final String BLOCK_ID_RESERVATION_DELETION_RESULT = "5d3e35ddffa7480001de2d1c";
 
     public static final String ONLY_ONE_EXECUTE = "1회 실행";

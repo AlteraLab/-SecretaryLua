@@ -71,26 +71,22 @@ public class RoleController {
     // 관리자가 새로운 그룹 유저를 추가해주기 위해 호출하는 메소드
     // 일단은 invite 메시지 전송 기능을 생각하지 않고 기능 구현
     @PostMapping("/role")
-    public ResponseDTO addRole(//@PathVariable("userId") Long userId,
-                               @AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseDTO addRole(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                @RequestBody UserRegisterVO userRegisterVo) {
         log.info(userRegisterVo.toString());
 
         return roleRegisterService.register(userRegisterVo, userPrincipal.getId());
-        //return roleRegister.register(userRegisterVo, userId);
     }
 
 
 
     // 관리자가 허브에 대한 ROLE_USER 권한을 가진 사용자를 삭제하는 기능
     @DeleteMapping("/role")
-    public ResponseDTO deleteRoleUser(//@PathVariable("adminId") Long adminId,
-                                      @AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseDTO deleteRoleUser(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                       @RequestBody UserRegisterVO userRegisterVo) {
 
         log.info(userRegisterVo.toString());
         return roleDeleteService.deleterRoleUserByAdmin(userRegisterVo, userPrincipal.getId());
-        //return roleDeleter.deleterRoleUserByAdmin(userRegisterVo, adminId);
     }
 
 
