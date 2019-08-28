@@ -39,9 +39,6 @@ public class DvlpDeploymentDTO {
             }
         }
 
-        if(dvlpNotifyBoxs.size() == 0) {
-            return null;
-        }
         return dvlpNotifyBoxs;
     }
 
@@ -55,9 +52,6 @@ public class DvlpDeploymentDTO {
             }
         }
 
-        if(dvlpThirdServers.size() == 0) {
-            return null;
-        }
         return dvlpThirdServers;
     }
 
@@ -71,9 +65,6 @@ public class DvlpDeploymentDTO {
             }
         }
 
-        if(dvlpControls.size() == 0) {
-            return null;
-        }
         return dvlpControls;
     }
 

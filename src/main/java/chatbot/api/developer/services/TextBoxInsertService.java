@@ -35,31 +35,31 @@ public class TextBoxInsertService {
         if(device != null) {
             developerMapper.insertDevice(device);
         }
-        if(dvlpBoxList != null) {
+        if(dvlpBoxList.size() != 0) {
             developerMapper.insertTextBoxes(dvlpBoxList, devId);
         }
-        if(dvlpDataModelList != null) {
+        if(dvlpDataModelList.size() != 0) {
             developerMapper.insertDataModels(dvlpDataModelList, devId);
         }
-        if(dvlpButtonList != null) {
+        if(dvlpButtonList.size() != 0) {
             developerMapper.insertButtons(dvlpButtonList, devId);
         }
-        if(dvlpStateRuleList != null) {
-            developerMapper.insertRules(dvlpStateRuleList, devId);
-        }
-        if(dvlpEventList != null) {
+        if(dvlpEventList.size() != 0) {
             developerMapper.insertEvents(dvlpEventList, devId);
         }
-        if(dvlpNotifyBoxList != null) {
+        if(dvlpStateRuleList.size() != 0) {
+            developerMapper.insertRules(dvlpStateRuleList, devId);
+        }
+        if(dvlpNotifyBoxList.size() != 0) {
             developerMapper.insertNotifyBoxs(dvlpNotifyBoxList);
         }
-        if(dvlpThirdServerList != null) {
+        if(dvlpThirdServerList.size() != 0) {
             developerMapper.insertThirdServers(dvlpThirdServerList);
         }
-        if(dvlpControlList != null) {
+        if(dvlpControlList.size() != 0) {
             developerMapper.insertControls(dvlpControlList);
         }
-        if(dvlpDerivationList != null) {
+        if(dvlpDerivationList.size() != 0) {
             developerMapper.insertDerivations(dvlpDerivationList, devId);
         }
     }
