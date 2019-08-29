@@ -10,12 +10,14 @@ import chatbot.api.textbox.domain.datamodel.KeySetListDTO;
 import chatbot.api.textbox.domain.path.HrdwrDTO;
 import chatbot.api.textbox.domain.reservation.ReservationDTO;
 import chatbot.api.textbox.domain.reservation.ReservationListDTO;
+import chatbot.api.textbox.domain.response.JudgeResponseDTO;
 import chatbot.api.textbox.domain.response.ResponseHrdwrInfo;
 import chatbot.api.textbox.domain.transfer.CmdReservationDeletion;
 import chatbot.api.textbox.repository.BuildRepository;
 import chatbot.api.textbox.repository.ReservationListRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -46,20 +48,20 @@ public class RestTemplateService {
         log.info("하드웨어 목록 조회 URL -> " + url);
         log.info("=========== RestTemplate -> requestHrdwrsInfo 종료 ===========");
 
-        return restTemplate.getForObject(url, ResponseHrdwrInfo.class);
+        //return restTemplate.getForObject(url, ResponseHrdwrInfo.class);
 
         // 일단 데이터 받은걸로 가정합시다.
-/*
+
         HrdwrDTO[] hrdwrs = new HrdwrDTO[2];
         //HrdwrDTO[] hrdwrs = null;
 
         hrdwrs[0] = HrdwrDTO.builder()
                 .hrdwrMac("12:12:12:12:12:12")
-                .authKey("3c044bcb32124166bd7c1f68cc3a7adb")
+                .authKey("d30f07be0626461c80eb78e83cc32cfb")
                 .build();
         hrdwrs[1] = HrdwrDTO.builder()
                 .hrdwrMac("72:72:72:72:72:72")
-                .authKey("721ebcf02bc64ef89f698cc26dca7992")
+                .authKey("d30f07be0626461c80eb78e83cc32cfb")
                 .build();
 
         ResponseHrdwrInfo hrdwrInfo = ResponseHrdwrInfo.builder()
@@ -68,7 +70,7 @@ public class RestTemplateService {
                 .build();
         log.info("INFO >> DEV INFO 확인 : " + hrdwrInfo.toString());
         return hrdwrInfo;
-        */
+
     }
 
 
@@ -162,5 +164,29 @@ public class RestTemplateService {
 
         log.info("=========== RestTemplate -> requestReservationIdForDeletion 종료 ===========");
         return resultAboutReservationDelete.getMsg();
+    }
+
+
+    public Integer requestJudgeStatus(String providerId, String preText) {
+        log.info("=========== RestTemplate -> request Judge Status 시작 ===========");
+
+        Build reBuild = buildRepository.find(providerId);
+        String url = "http://" + reBuild.getPath().getExternalIp() + ":" + reBuild.getPath().getExternalPort() + "/dev/" + reBuild.getPath().getHrdwrMacAddr() + "/judge";
+
+        /*JudgeResponseDTO judgeResponseDTO = restTemplate.postForObject(
+                url,
+                new Object(){
+                    public String statement = preText;
+                }, JudgeResponseDTO.class);*/
+        JudgeResponseDTO judgeResponseDTO = JudgeResponseDTO.builder()
+                .msg("")
+                .status(0)
+                .build();
+        log.info("=========== RestTemplate -> request Judge Status 종료 ===========");
+
+        if(HttpStatus.valueOf(judgeResponseDTO.getStatus()) == HttpStatus.OK) {
+            return 0;  // judgeStatus 가 true 이면 -> 버튼의 인덱스가 0
+        }
+        return 1;  // judgeStatus 가 false 이면 -> 버튼의 인덱스가 1
     }
 }

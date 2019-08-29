@@ -12,6 +12,9 @@ public class TextBoxConstants {
     public static final Integer BOX_TYPE_TIME = 3;
     public static final Integer BOX_TYPE_END = 4;
     public static final Integer BOX_TYPE_ENTRY = 5;
+    public static final Integer BOX_TYPE_JUDGE = 7;
+    public static final Integer BOX_TYPE_JUDGE_END = 8;
+
 
     public static final Character BUTTON_TYPE_CONTROL = '1';
     public static final Character BUTTON_TYPE_LOOKUP_RESERVATION = '2';
@@ -19,6 +22,7 @@ public class TextBoxConstants {
     public static final Character BUTTON_TYPE_LOOKUP_DEVICE = '4';
     public static final Character BUTTON_TYPE_RESERVATION = '5';
     public static final Character BUTTON_TYPE_RESERVATION_DELETION = '6';
+    public static final Character BUTTON_TYPE_JUDGE = '7';
 
     // Destination
     public static final String BLOCK_ID_TO_HRDWRS_BOX = "5c7670efe821274ba78984c4"; // to hrdwrs box

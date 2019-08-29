@@ -8,7 +8,6 @@ import chatbot.api.textbox.domain.textboxdata.BoxDTO;
 import chatbot.api.textbox.domain.textboxdata.BtnDTO;
 import chatbot.api.textbox.domain.textboxdata.DerivationDTO;
 import chatbot.api.textbox.repository.BuildRepository;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +33,8 @@ public class BuildAllocaterService {
     @Autowired
     private BuildSaveService buildSaveService;
 
+    @Autowired
+    private JudgeService judgeService;
 
 
     public Character allocateBtnTypeAccrdToBtnIdx(String providerId, Integer btnIdx) {
@@ -295,10 +296,6 @@ public class BuildAllocaterService {
             returnBlockId = BLOCK_ID_TO_LOOKUP_DEVICE;
             log.info("Block Id -> BLOCK_ID_TO_LOOKUP_DEVICE");
         }
-        /*else if(curBtn.getBtnType() == BUTTON_TYPE_RESERVATION) {
-            returnBlockId = BLOCK_ID_TO_ONLY_RESERVATION;
-            log.info("Block Id -> BLOCK_ID_TO_ONLY_RESERVATION");
-        }*/
         log.info("=========== allocate BlockId By Current Button Type When btnType is Not Control Type And Not Reservation Type 종료 ===========");
         return returnBlockId;
     }
@@ -307,7 +304,19 @@ public class BuildAllocaterService {
     // 하위 박스가 있다면 Control Box, 하위 박스가 없다면 End Box 를 보여줘야한다
     public ResponseVerTwoDTO allocaterResponseVerTwoDtoByExistLowerBox(String providerId) {
         log.info("=========== allocate ResponseVerTwoDto By Exist Lower Box 시작 ===========");
-        ResponseVerTwoDTO responseVerTwoDTO = null;
+
+        Boolean isJudgeBox = true;
+
+        while(isJudgeBox) {
+            isJudgeBox = judgeService.execute(providerId);
+        }
+
+        log.info("=========== allocate ResponseVerTwoDto By Exist Lower Box 종료 ===========");
+
+        return judgeService.executeByCurBoxType(providerId);
+
+// 이게 필요한 코드인지 나중에 고민해보기..., 지우지는 말기 중요한 코드인 것만은 확실함
+        /*
         if(buildCheckerService.existLowerBox(providerId)) { // 하위 박스가 존재한다면(Control Type Box 라면...)
             // 현재 박스는 위에서 이미 초기화 되어있는 상태임
             // 1. HControlBlocks 에 객체를 새로 할당
@@ -317,66 +326,12 @@ public class BuildAllocaterService {
             buildSaveService.initCurBtns(providerId);           // 2 + 여기서 버튼들의 인덱스 값도 증가 시킴
             buildSaveService.initSelectedBtnToNull(providerId); // 3
             responseVerTwoDTO = kakaoSimpleTextService.makerEntryAndControlCard(providerId);
-        } else { // 하위 박스가 존재하지 않는다면
+        }
+        else { // 하위 박스가 존재하지 않는다면
             responseVerTwoDTO = kakaoSimpleTextService.makerTransferSelectCard();
         }
         log.info("=========== allocate ResponseVerTwoDto By Exist Lower Box 종료 ===========");
         return responseVerTwoDTO;
+        */
     }
 }
-
-
-/*
-    // 버튼 타입에 따라서 다른 카드를 반환
-    public ResponseVerTwoDTO allocateJsonAboutAnyBoxAccrdToBtnType(String providerId, Character btnType) {
-        log.info("========= Allocate Json About Any Box According To Botton Type 시작 =========");
-        ResponseVerTwoDTO responseVerTwoDTO = null;
-        if(btnType == BUTTON_TYPE_CONTROL) {
-            // 제어 버튼 박스를 리턴
-            log.info("=== (제어) 시나리오 ===");
-            responseVerTwoDTO = kakaoSimpleTextService.responserShortMsg("제어");
-            // 사용자가 선택한 버튼의 이벤트 코드를 cmdList에 빌드한다.
-            // 하위 박스를 체크한다.
-            // 하위 박스가 시간 타입이면,
-            // 하위 박스가 입력 타입이면,
-            // 하위 박스가 없으면,
-        } else if(btnType == BUTTON_TYPE_LOOKUP_RESERVATION) {
-            // 허브의 예약 조회 박스를 리턴
-            log.info("=== (조회-허브-예약) 시나리오 ===");
-            responseVerTwoDTO = kakaoSimpleTextService.responserShortMsg("조회-허브-예약");
-        } else if(btnType == BUTTON_TYPE_LOOKUP_SENSING) {
-            // 허브의
-            log.info("=== (조회-허브-센싱) 시나리오 ===");
-            responseVerTwoDTO = kakaoSimpleTextService.responserShortMsg("조회-허브-센싱");
-        } else if(btnType == BUTTON_TYPE_LOOKUP_DEVICE) {
-            //
-            log.info("=== (조회-디바이스) 시나리오 ===");
-            responseVerTwoDTO = kakaoSimpleTextService.responserShortMsg("조회-디바이스");
-        } else if(btnType == BUTTON_TYPE_RESERVATION) {
-            log.info("=== (예약) 시나리오 ===");
-            responseVerTwoDTO = kakaoSimpleTextService.responserShortMsg("예약");
-        }
-
-        log.info("========= Allocate Any Box 종료 =========");
-        return responseVerTwoDTO;
-    }
-*/
-
-/*
-    // 제어 / 허브 예약 조회 / 센싱 데이터 조회 / 장치 상태 조회 / 예약
-    public String allocateBlockIdByEntryLowerBoxId(Integer lowerBoxType) {
-        log.info("=========== allocate BlockId By Lower Box Type 시작 ===========");
-        String blockId = null;
-        if (lowerBoxType == BOX_TYPE_TIME) {
-            log.info("BLOCK_ID_ADDITIONAL_RESERVATION_TEXTBOX");
-        } else if (lowerBoxType == BOX_TYPE_DYNAMIC) {
-            log.info("BLOCK_ID_ADDITIONAL_INPUT_TEXTBOX");
-        } else if (lowerBoxType == BOX_TYPE_END){
-            log.info("");
-        } else {
-            log.info("BLOCK_ID_TO_ANY_BOX");
-        }
-        log.info("Block Id -> " + blockId);
-        log.info("=========== allocate BlockId By Lower Box Type 종료 ===========");
-        return blockId;
-    }*/
