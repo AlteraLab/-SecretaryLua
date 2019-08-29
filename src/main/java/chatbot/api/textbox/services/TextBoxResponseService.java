@@ -162,7 +162,7 @@ public class TextBoxResponseService {
         return kakaoSimpleTextService.makerDynamicCardWhenDynamicFrTimeFrEntry(providerId);
     }
     // Entry -> Time -> Dynamic -> (End Or Control), 하위 박스가 있다면 Control Box, 하위 박스가 없다면 End Box 를 보여줘야할 차례
-    public ResponseVerTwoDTO responserEndBoxFrDynamicFrTimeFrEntry(String providerId, Integer dynamicValue) {
+    public ResponseVerTwoDTO responserEndBoxFrDynamicFrTimeFrEntry(String providerId, Long dynamicValue) {
         log.info("================== Responser End Box From Dynamic From Time From Entry 시작 ==================");
         // 1. 동적 입력 데이터를 Additonal 에 추가해야 한다
         // 2. 하위 박스가 있는지 없는지 체크한다
@@ -188,7 +188,7 @@ public class TextBoxResponseService {
         return kakaoSimpleTextService.makerDynamicCardWhenUDynamicFrEntry(providerId);
     }
     // Entry -> _Dynamic -> Time -> (End Or Control), 하위 박스가 있다면 Control Box, 하위 박스가 없다면 End Box 를 보여줘야할 차례
-    public ResponseVerTwoDTO responserEndBoxFrTimeFrUDynamicFrEntry(String providerId, Integer dynamicValue, Timestamp timeStamp) {
+    public ResponseVerTwoDTO responserEndBoxFrTimeFrUDynamicFrEntry(String providerId, Long dynamicValue, Timestamp timeStamp) {
         log.info("================== Responser End Box From Time From _Dynamic Box From Entry 시작 ==================");
         // 1. timestamp 를 저장해야 한다
         // 2. 동적 입력 데이터를 저장해야 한다.
@@ -249,7 +249,7 @@ public class TextBoxResponseService {
         return kakaoSimpleTextService.makerDynamicCardWhenDynamicFrEntry(providerId);
     }
     // Entry -> Dynamic -> (End Or Control), 하위 박스가 있다면 Control Box, 하위 박스가 없다면 End Box 를 보내줘야할 차례
-    public ResponseVerTwoDTO responserEndBoxFrDynamicFrEntry(String providerId, Integer dynamicValue) {
+    public ResponseVerTwoDTO responserEndBoxFrDynamicFrEntry(String providerId, Long dynamicValue) {
         // 1. 동적 입력 데이터를 저장해야 한다
         // 2. curBox 를 조정해야 한다
         // 3. 하위 박스가 있는지 없는지 체크한다
@@ -276,12 +276,9 @@ public class TextBoxResponseService {
 
     public ResponseVerTwoDTO responserReservationListBox(String providerId) {
         log.info("================== Responser Reservation List Box 시작 ==================");
-        Build reBuild = buildRepository.find(providerId);
         ReservationListDTO reservationList = restTemplateService.requestReservationList(providerId);
-
         // redis 에 데이터 저장
         reservationListRepository.save(providerId, reservationList);
-
         // 장치에 대한 예약 목록 박스 만들어서 반환
         return kakaoSimpleTextService.makerReservationListCard(reservationList);
     }

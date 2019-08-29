@@ -348,7 +348,7 @@ public class BuildSaveService {
     }
 
 
-    public void saverDynamicValue(String providerId, Integer dynamicValue) {
+    public void saverDynamicValue(String providerId, Long dynamicValue) {
         log.info("=============== Save Dynamic Value 시작 ===============");
         Build reBuild = buildRepository.find(providerId);
         ArrayList<CmdList> cmdList = reBuild.getCmdList();

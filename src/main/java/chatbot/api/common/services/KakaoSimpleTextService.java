@@ -346,11 +346,9 @@ public class KakaoSimpleTextService {
         ArrayList<Object> outputs = new ArrayList<Object>();
         outputs.add(simpleText);
 
-
         // 2. 버튼 만들기
-        // 적어도 entry box 에서는 하나의 버튼이 갖는 blockId 값을 할당하기 위해서
         // 텍스트 박스 타입이 아닌 현재 텍스트 박스내의 각 버튼의 타입으로 할당해줘야 한다.
-        // 그렇지만 만약 버튼 타입이 '1'(제어)인 경우에는 하위 박스들을 조회하여 5가지 하위 시나리오에 맞춰서 blockId를 할당 해줘야 한다.
+        // 그렇지만 만약 특정 버튼 타입이 '1'(제어)인 경우에는 하위 박스들을 조회하여 5가지 하위 시나리오에 맞춰서 blockId를 할당 해줘야 한다.
         ArrayList<QuickReply> quickReplies = new ArrayList<QuickReply>();
         String blockId = null;
         BtnDTO curBtnOfCurBtns = null;
@@ -375,7 +373,7 @@ public class KakaoSimpleTextService {
                 log.info("IDX (" + idx + ") -> " + reBuild.getHControlBlocks().get(idx));
                 log.info(reBuild.getHControlBlocks().toString());
                 blockId = reBuild.getHControlBlocks().get(idx).getBlockIdOnebelow();
-            } else { // 버튼의 타입에 따라서 어떤 센싱인지 혹은 예약 인지에 따라 blockid 할당
+            } else { // 버튼의 타입에 따라 센싱인지 혹은 예약 인지에 따라 blockid 할당
                 blockId = buildAllocaterService.allocateBlockIdByBtnTypeWhenNotControlAndReservation(curBtnOfCurBtns);
             }
             log.info("Block Id -> " + blockId);

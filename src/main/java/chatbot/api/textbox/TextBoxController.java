@@ -101,62 +101,6 @@ public class TextBoxController {
     }
 
 
-    // 예약 목록 조회
-    @PostMapping("/textbox/lookup/reservation")
-    public ResponseVerTwoDTO textBoxLookUpReservationFromAny(@RequestBody RequestDTO requestDTO) {
-        log.info("\n\n"); log.info("==================== from entry box to LookUp Reservation box 시작 ====================");
-        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-        String blockId = requestDTO.getUserRequest().getBlock().getId();
-        log.info("Block Id -> " + blockId);
-        log.info(requestDTO.toString());
-        return textBoxResponseService.responserReservationListBox(providerId);
-    }
-
-
-    // 센싱 조회
-    @PostMapping("/textbox/lookup/sensing")
-    public ResponseVerTwoDTO textBoxLookUpSensingFromAny(@RequestBody RequestDTO requestDTO) {
-        log.info("\n\n==================== from LookUp Sensing box to control box 시작 ====================");
-        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-        Integer btnIdx = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
-        log.info(requestDTO.toString());
-
-        return textBoxResponseService.responserSensingBox(providerId, btnIdx);
-    }
-
-
-    // 디바이스 상태 조회
-    @PostMapping("/textbox/lookup/device")
-    public ResponseVerTwoDTO textBoxLookUpDeviceFromAny(@RequestBody RequestDTO requestDTO) {
-        log.info("\n\n==================== from LookUp Device box to control box 시작 ====================");
-        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-        Integer btnIdx = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
-        log.info(requestDTO.toString());
-
-        return textBoxResponseService.responserDevInfoBox(providerId, btnIdx);
-    }
-
-
-    // 예약 리스트 중 취소 항목이 있을때 호출되는 메소드
-    @PostMapping("/textbox/reservation/deletion/result")
-    public ResponseVerTwoDTO textBoxReservationDeletionResult(@RequestBody RequestDTO requestDTO) {
-        // 5d3e35ddffa7480001de2d1c
-        log.info("\n\n"); log.info("==================== from LookUp Reservation box to Reservation Delete Result 시작 ====================");
-        log.info(requestDTO.toString());
-        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-
-        // 사용자가 취소하기러 한 명령이 무엇인지 뽑아낸다
-        Integer resIdForDeletion =
-                Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
-
-        // 선택한 명령을 취소하기 위해서 명령 아이디를 허브로 보냄
-        String resultMsgAboutReservaionDeletion =
-                restTemplateService.requestForReservationDeletion(providerId, resIdForDeletion);
-
-        return kakaoSimpleTextService.responserShortMsg(resultMsgAboutReservaionDeletion);
-    }
-
-
     // 1. (제어) 시나리오
     @PostMapping("/textbox/end/entry")
     public ResponseVerTwoDTO textBoxEndFrEntry(@RequestBody RequestDTO requestDTO) {
@@ -215,7 +159,7 @@ public class TextBoxController {
 
         String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
         String blockId = requestDTO.getUserRequest().getBlock().getId();
-        Integer dynamicValue = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        Long dynamicValue = Long.parseLong(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
 
         log.info("Block Id -> " + blockId);
         log.info("INFO >> 사용자가 입력한 dynamicValue -> " + dynamicValue);
@@ -253,7 +197,7 @@ public class TextBoxController {
 
         String blockId = requestDTO.getUserRequest().getBlock().getId();
         String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-        Integer dynamicValue = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        Long dynamicValue = Long.parseLong(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
         Object dateTimeParams = requestDTO.getAction().getParams().get("datetime");
         Timestamp timeStamp = timeService.convertTimeStampFromObject(dateTimeParams);
 
@@ -328,12 +272,69 @@ public class TextBoxController {
 
         String blockId = requestDTO.getUserRequest().getBlock().getId();
         String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-        Integer dynamicValue = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        Long dynamicValue = Long.parseLong(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
 
         log.info("Block Id -> " + blockId);
         log.info("INFO >> 사용자가 입력한 dynamicValue -> " + dynamicValue);
 
         return textBoxResponseService.responserEndBoxFrDynamicFrEntry(providerId, dynamicValue);
+    }
+
+
+
+    // 센싱 조회
+    @PostMapping("/textbox/lookup/sensing")
+    public ResponseVerTwoDTO textBoxLookUpSensingFromAny(@RequestBody RequestDTO requestDTO) {
+        log.info("\n\n==================== from LookUp Sensing box to control box 시작 ====================");
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+        Integer btnIdx = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        log.info(requestDTO.toString());
+
+        return textBoxResponseService.responserSensingBox(providerId, btnIdx);
+    }
+
+
+    // 디바이스 상태 조회
+    @PostMapping("/textbox/lookup/device")
+    public ResponseVerTwoDTO textBoxLookUpDeviceFromAny(@RequestBody RequestDTO requestDTO) {
+        log.info("\n\n==================== from LookUp Device box to control box 시작 ====================");
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+        Integer btnIdx = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        log.info(requestDTO.toString());
+
+        return textBoxResponseService.responserDevInfoBox(providerId, btnIdx);
+    }
+
+
+    // 예약 목록 조회
+    @PostMapping("/textbox/lookup/reservation")
+    public ResponseVerTwoDTO textBoxLookUpReservationFromAny(@RequestBody RequestDTO requestDTO) {
+        log.info("\n\n"); log.info("==================== from entry box to LookUp Reservation box 시작 ====================");
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+        String blockId = requestDTO.getUserRequest().getBlock().getId();
+        log.info("Block Id -> " + blockId);
+        log.info(requestDTO.toString());
+        return textBoxResponseService.responserReservationListBox(providerId);
+    }
+
+
+    // 예약 리스트 중 취소 항목이 있을때 호출되는 메소드
+    @PostMapping("/textbox/reservation/deletion/result")
+    public ResponseVerTwoDTO textBoxReservationDeletionResult(@RequestBody RequestDTO requestDTO) {
+        // 5d3e35ddffa7480001de2d1c
+        log.info("\n\n"); log.info("==================== from LookUp Reservation box to Reservation Delete Result 시작 ====================");
+        log.info(requestDTO.toString());
+        String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
+
+        // 사용자가 취소하기러 한 명령이 무엇인지 뽑아낸다
+        Integer resIdForDeletion =
+                Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+
+        // 선택한 명령을 취소하기 위해서 명령 아이디를 허브로 보냄
+        String resultMsgAboutReservaionDeletion =
+                restTemplateService.requestForReservationDeletion(providerId, resIdForDeletion);
+
+        return kakaoSimpleTextService.responserShortMsg(resultMsgAboutReservaionDeletion);
     }
 
 
@@ -410,7 +411,7 @@ public class TextBoxController {
 
         String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
         String blockId = requestDTO.getUserRequest().getBlock().getId();
-        Integer dynamicValue = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        Long dynamicValue = Long.parseLong(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
 
         log.info("Block Id -> " + blockId);
         log.info("INFO >> 사용자가 입력한 dynamicValue -> " + dynamicValue);
@@ -452,7 +453,7 @@ public class TextBoxController {
 
         String blockId = requestDTO.getUserRequest().getBlock().getId();
         String providerId = requestDTO.getUserRequest().getUser().getProperties().getAppUserId();
-        Integer dynamicValue = Integer.parseInt(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
+        Long dynamicValue = Long.parseLong(requestDTO.getUserRequest().getUtterance().replaceAll("[^0-9]", ""));
         Object dateTimeParams = requestDTO.getAction().getParams().get("datetime");
         Timestamp timeStamp = timeService.convertTimeStampFromObject(dateTimeParams);
 

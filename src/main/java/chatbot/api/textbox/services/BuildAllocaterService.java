@@ -153,17 +153,24 @@ public class BuildAllocaterService {
                     }
                 }
             }
+
             depth++; //end에 속할 수도 있으니 그냥 무조건 depth + 1 시킴
-            if(lowerBoxId == null) { // lowerBoxId 가 null 이면, 하위 박스가 없는 거임, 즉 end 박스란 거임.
+
+            // 하나의 시나리오 청크 이후에 Judge Box 혹은 어떠한 박스도 없을 수도 있다
+            if(lowerBoxId != null){  // 하위 박스 아이디가 null 이 아니라면, lowerBox 를 할당
+                lowerBox = this.allocateBoxByBoxId(providerId, lowerBoxId);
+            } else {   // 하위 박스가 null 이면 break
                 break;
-            } else {
-                boxId = lowerBoxId;
             }
-            // boxId 를 이용해서 박스를 얻은 후 -> 박스 타입을 체크한다. control이면 end 랑 같으니까, break 검
-            lowerBox = this.allocateBoxByBoxId(providerId, boxId);
-            if(lowerBox.getBoxType() == BOX_TYPE_CONTROL) {   // 만약 하위 박스의 박스 타입이 Control 이였다면,
-                hBoxTypeOfDepth.put(depth, BOX_TYPE_CONTROL);
-                break;
+
+            // 하위 박스가 있지만, 박스 타입이 Judge 타입이라면,
+            if(lowerBox.getBoxType() == BOX_TYPE_JUDGE) {
+                break; // hBoxTypeOfDepth.put(depth, BOX_TYPE_JUDGE);
+            }
+
+            // 박스 타입을 체크한다. Judge 타입이면 하나의 시나리오 청크가 끝난 것이기  때문에 break 건다
+            if(lowerBox.getBoxType() == BOX_TYPE_JUDGE) {   // 만약 하위 박스의 박스 타입이 Judge 이였다면,
+                break; // hBoxTypeOfDepth.put(depth, BOX_TYPE_JUDGE);
             } else if(lowerBox.getBoxType() == BOX_TYPE_TIME) {
                 hBoxTypeOfDepth.put(depth, BOX_TYPE_TIME);
             } else if(lowerBox.getBoxType() == BOX_TYPE_DYNAMIC) {
@@ -177,7 +184,7 @@ public class BuildAllocaterService {
         BelowBlockIds belowBlockIds = new BelowBlockIds();
         Integer tempOneBelowBoxType = null;
         if(depth == 1) {  // 1. (제어) 시나리오
-            // depth == 1, 이란 것은 단순히 버튼 제어라는 의미임. additional도 없고, 추가 텍스트 박스도 없는 경우임.
+            // depth == 1, 이란 것은 Judge Box 혹은 하위 박스가 없는 경우를 뜻함
             belowBlockIds.setBlockIdOnebelow(BLOCK_ID_END_ENTRY);
             belowBlockIds.setBlockIdTwobelow(null);
         } else if(depth == 2) {
@@ -205,7 +212,6 @@ public class BuildAllocaterService {
         buildRepository.update(reBuild);
         log.info("=========== allocate HControl BlockIDs By lower box type When btnType is Control Type 종료 ===========");
     }
-
 
 
     public void allocateHControlBlocksBycBoxTypeWhenReservationType(String providerId, BtnDTO curBtn) {
@@ -304,34 +310,11 @@ public class BuildAllocaterService {
     // 하위 박스가 있다면 Control Box, 하위 박스가 없다면 End Box 를 보여줘야한다
     public ResponseVerTwoDTO allocaterResponseVerTwoDtoByExistLowerBox(String providerId) {
         log.info("=========== allocate ResponseVerTwoDto By Exist Lower Box 시작 ===========");
-
         Boolean isJudgeBox = true;
-
         while(isJudgeBox) {
             isJudgeBox = judgeService.execute(providerId);
         }
-
         log.info("=========== allocate ResponseVerTwoDto By Exist Lower Box 종료 ===========");
-
         return judgeService.executeByCurBoxType(providerId);
-
-// 이게 필요한 코드인지 나중에 고민해보기..., 지우지는 말기 중요한 코드인 것만은 확실함
-        /*
-        if(buildCheckerService.existLowerBox(providerId)) { // 하위 박스가 존재한다면(Control Type Box 라면...)
-            // 현재 박스는 위에서 이미 초기화 되어있는 상태임
-            // 1. HControlBlocks 에 객체를 새로 할당
-            // 2. 제어 박스 내에 현재 버튼 목록을 초기화
-            // 3. selectedBtn 초기화
-            buildSaveService.initHControlBlocks(providerId);    // 1
-            buildSaveService.initCurBtns(providerId);           // 2 + 여기서 버튼들의 인덱스 값도 증가 시킴
-            buildSaveService.initSelectedBtnToNull(providerId); // 3
-            responseVerTwoDTO = kakaoSimpleTextService.makerEntryAndControlCard(providerId);
-        }
-        else { // 하위 박스가 존재하지 않는다면
-            responseVerTwoDTO = kakaoSimpleTextService.makerTransferSelectCard();
-        }
-        log.info("=========== allocate ResponseVerTwoDto By Exist Lower Box 종료 ===========");
-        return responseVerTwoDTO;
-        */
     }
 }

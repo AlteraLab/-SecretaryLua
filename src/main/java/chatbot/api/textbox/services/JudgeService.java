@@ -43,11 +43,15 @@ public class JudgeService {
 
 
     public Boolean execute(String providerId) {
-        log.info("Judge Service - execute 시작");
 
         Build reBuild = buildRepository.find(providerId);
 
-        // 1. 문자열 관련
+        // 0. 만약 curBox 가 null 이라면 return false, (각 시나리오의 끝에 Judge가 없는 경우)
+        if(reBuild.getCurBox() == null) {
+            return false;
+        }
+
+        // 1. 문자열 치환
         String preText = this.ProcessStringForJudge(providerId);
 
         // 2. 허브로 데이터 전송 및 응답
@@ -76,13 +80,10 @@ public class JudgeService {
         reBuild.setCurBox(lowerBox);
         buildRepository.update(reBuild);
 
-        log.info("Judge Service - execute 종료");
-
         // 6. 하위 박스가 Judge Box 인 경우 -> true 리턴
         if(lowerBox != null && lowerBox.getBoxType() == BOX_TYPE_JUDGE) {
             return true;
         }
-
         // 하위 박스가 없거나, JudgeBox 가 아니라면, false 리턴
         return false;
     }
@@ -100,8 +101,9 @@ public class JudgeService {
             // 하위 박스가 없는 경우 -> cmdList 를 추가로 만들 필요 없이, cmdList 를 허브에게 보냄
             responseVerTwoDTO = kakaoSimpleTextService.makerTransferSelectCard();
         } else if(lowerBox.getBoxType() == BOX_TYPE_JUDGE_END) {
-            // 하위 박스 타입이 End 박스인 경우 -> End Box 를 단순히 표출하고 끝
-            responseVerTwoDTO = kakaoSimpleTextService.responserShortMsg(lowerBox.getPreText() + lowerBox.getPostText());
+            // 하위 박스 타입이 End (type 8) 박스인 경우 -> End Box 를 단순히 표출하고 끝
+            responseVerTwoDTO = kakaoSimpleTextService.responserShortMsg(lowerBox.getPreText());
+            buildRepository.delete(providerId);
         } else {
             // 하위 박스가 있는데 End 박스가 아닌 경우 -> 명령을 계속 빌딩
             buildSaveService.initHControlBlocks(providerId);    // 1
