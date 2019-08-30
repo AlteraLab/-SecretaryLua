@@ -171,6 +171,11 @@ public class RestTemplateService {
 
         Build reBuild = buildRepository.find(providerId);
         String url = "http://" + reBuild.getPath().getExternalIp() + ":" + reBuild.getPath().getExternalPort() + "/dev/" + reBuild.getPath().getHrdwrMacAddr() + "/judge";
+        log.info("preText -> " + preText);
+        log.info("preText -> " + preText);
+        log.info("preText -> " + preText);
+        log.info("preText -> " + preText);
+        log.info("preText -> " + preText);
         JudgeResponseDTO judgeResponseDTO = restTemplate.postForObject(
                 url,
                 new Object(){
@@ -182,7 +187,7 @@ public class RestTemplateService {
                 .build();*/
         log.info("=========== RestTemplate -> request Judge Status 종료 ===========");
 
-        if(judgeResponseDTO.getStatus() == 1) {
+        if(judgeResponseDTO.getStatus() == 200) {
             return 0;  // judgeStatus 가 true 이면 -> 버튼의 인덱스가 0
         }
         return 1;  // judgeStatus 가 false 이면 -> 버튼의 인덱스가 1

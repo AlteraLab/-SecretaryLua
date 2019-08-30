@@ -5,6 +5,8 @@ import chatbot.api.textbox.domain.*;
 import chatbot.api.textbox.domain.datamodel.KeySetListDTO;
 import chatbot.api.textbox.domain.path.Path;
 import chatbot.api.textbox.domain.reservation.ReservationListDTO;
+import chatbot.api.textbox.domain.textboxdata.BoxDTO;
+import chatbot.api.textbox.domain.textboxdata.DerivationDTO;
 import chatbot.api.textbox.repository.BuildRepository;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
 import chatbot.api.common.services.KakaoBasicCardService;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.net.ConnectException;
+import java.sql.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -268,8 +271,22 @@ public class TextBoxResponseService {
     }
 
 
-    public ResponseVerTwoDTO responserIntervalBox() {
+    public ResponseVerTwoDTO responserIntervalBox(String providerId) {
         log.info("================== Responser Interval Box 시작 ==================");
+        Build reBuild = buildRepository.find(providerId);
+        ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
+        BoxDTO curBox = reBuild.getCurBox();
+        BoxDTO lowerBox = null;
+
+        for(DerivationDTO tempDerivation : derivations) {
+            if(tempDerivation.getUpperBoxId() == curBox.getBoxId()
+                    && tempDerivation.getBtnCode() == reBuild.getSelectedBtn().getBtnCode()) {
+                lowerBox = buildAllocaterService.allocateBoxByBoxId(providerId, tempDerivation.getLowerBoxId());
+            }
+        }
+        reBuild.setCurBox(lowerBox);
+        buildRepository.update(reBuild);
+
         return kakaoSimpleTextService.makerIntervalCard();
     }
 
@@ -286,7 +303,6 @@ public class TextBoxResponseService {
 
     public ResponseVerTwoDTO responserSensingBox(String providerId, Integer btnIdx) {
         log.info("================== Responser Sensing Box 시작 ==================");
-        Build reBuild = buildRepository.find(providerId);
         KeySetListDTO keySet = restTemplateService.requestKeySets(providerId, '1'); // 센싱 key 조회
         buildSaveService.saverCurBoxWhenLookUpSensingAndDeviceInfo(providerId, btnIdx);
         return kakaoSimpleTextService.makerLookUpDataCard(providerId, keySet);
@@ -295,7 +311,6 @@ public class TextBoxResponseService {
 
     public ResponseVerTwoDTO responserDevInfoBox(String providerId, Integer btnIdx) {
         log.info("================== Responser Device Info Box 시작 ==================");
-        Build reBuild = buildRepository.find(providerId);
         KeySetListDTO keySet = restTemplateService.requestKeySets(providerId, '0'); // 디바이스 key 조회
         buildSaveService.saverCurBoxWhenLookUpSensingAndDeviceInfo(providerId, btnIdx);
         return kakaoSimpleTextService.makerLookUpDataCard(providerId, keySet);

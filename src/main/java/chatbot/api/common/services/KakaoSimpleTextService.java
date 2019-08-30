@@ -471,7 +471,7 @@ public class KakaoSimpleTextService {
 
                 stateRulesOfDataModel = new ArrayList<StateRuleDTO>();
                 for(StateRuleDTO tempRule : stateRules) {
-                    if(tempRule.getDataKey().equals(tempKeySet.getKey())) {
+                    if(tempRule.getDataKey().equals(tempKeySet.getKey()) && tempRule.getRuleValue().equals(tempKeySet.getValue())) {
                         stateRulesOfDataModel.add(tempRule);
                     }
                 }
@@ -484,7 +484,7 @@ public class KakaoSimpleTextService {
                     }
                 });
 
-                // key 값의 데이터 타입 검색 (서로 비교해야 하는 값들의 데이터 타입을 알았다)
+                // key 값의 데이터 타입 검색 (서로 비교해야 하는 d값들의 데이터 타입을 알았다)
                 String keyDataType = null;
                 for(DataModelDTO tempDataModel : dataModels) {
                     if(tempDataModel.getDataKey().equals(tempKeySet.getKey())) {

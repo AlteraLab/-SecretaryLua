@@ -6,9 +6,11 @@ import chatbot.api.common.services.TimeService;
 import chatbot.api.textbox.domain.*;
 import chatbot.api.textbox.domain.path.Path;
 import chatbot.api.textbox.domain.response.HrdwrControlResult;
+import chatbot.api.textbox.domain.textboxdata.BoxDTO;
 import chatbot.api.textbox.domain.transfer.CmdList;
 import chatbot.api.textbox.repository.BuildRepository;
 import chatbot.api.textbox.services.BuildSaveService;
+import chatbot.api.textbox.services.JudgeService;
 import chatbot.api.textbox.services.TextBoxResponseService;
 import chatbot.api.common.domain.kakao.openbuilder.RequestDTO;
 import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
@@ -55,6 +57,9 @@ public class TextBoxController {
 
     @Autowired
     private KakaoBasicCardService kakaoBasicCardService;
+
+    @Autowired
+    private JudgeService judgeService;
 
 
     // from "시바" to hubs box
@@ -369,7 +374,7 @@ public class TextBoxController {
         buildSaveService.initAdditional(providerId);
         buildSaveService.saverTimeStamp(providerId, timeStamp);
 
-        return textBoxResponseService.responserIntervalBox();
+        return textBoxResponseService.responserIntervalBox(providerId);
     }
 
 
@@ -416,7 +421,7 @@ public class TextBoxController {
         log.info("Block Id -> " + blockId);
         log.info("INFO >> 사용자가 입력한 dynamicValue -> " + dynamicValue);
         buildSaveService.saverDynamicValue(providerId, dynamicValue);
-        return textBoxResponseService.responserIntervalBox();
+        return textBoxResponseService.responserIntervalBox(providerId);
     }
 
 
@@ -466,7 +471,7 @@ public class TextBoxController {
         buildSaveService.saverTimeStamp(providerId, timeStamp);
         buildSaveService.saverDynamicValue(providerId, dynamicValue);
 
-        return textBoxResponseService.responserIntervalBox();
+        return textBoxResponseService.responserIntervalBox(providerId);
     }
 
 
@@ -503,6 +508,20 @@ public class TextBoxController {
 
             if(utterance.equals(ONLY_ONE_EXECUTE) || utterance.equals(EVERY_DAY_EXECUTE) || utterance.equals(EVERY_WEEK_EXECUTE)) {
                 buildSaveService.saverIntervalSetting(providerId, utterance);
+                buildSaveService.saverCurBoxWhenInterval(providerId); // 현재 박스의 위치를 하위 박스로 조정
+
+                // 현재 박스에서의 하위 박스를 확인하고
+                Build reBuild = buildRepository.find(providerId);
+                BoxDTO curBox = reBuild.getCurBox();
+
+                if(curBox != null) { // 있다면 -> 그 박스는 100% Judge Box
+                    String judgeText = null;
+                    judgeText = judgeService.executeWhenReservation(providerId);
+                    if(judgeText != null) {
+                        return kakaoSimpleTextService.responserShortMsg(judgeText);
+                    }
+                }
+                // 없다면 -> Judge 가 없는 예약 시나리오
             }
             Build reBuild = buildRepository.find(providerId);
             Path path = reBuild.getPath();

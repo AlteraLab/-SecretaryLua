@@ -135,7 +135,7 @@ public class BuildAllocaterService {
         BoxDTO curBox = reBuild.getCurBox();
         Integer depth = 0;
         Integer lowerBoxId = null;
-        Integer boxId = null;
+        Integer curBoxId = null;
         BoxDTO lowerBox = null;
 
         while (depth < MAX_DEPTH) {
@@ -146,8 +146,8 @@ public class BuildAllocaterService {
                         lowerBoxId = tempDerivation.getLowerBoxId();
                         break;
                     }
-                } else if(depth != 0){ // depth 가 0 이 아닐때, derivation 과 boxId 를 이용해서 lowerBoxId 를 구한다
-                    if(tempDerivation.getUpperBoxId() == boxId) {
+                }else if(depth != 0){ // depth 가 0 이 아닐때, derivation 과 boxId 를 이용해서 lowerBoxId 를 구한다
+                    if(tempDerivation.getUpperBoxId() == curBoxId) {
                         lowerBoxId = tempDerivation.getLowerBoxId();
                         break;
                     }
@@ -163,8 +163,8 @@ public class BuildAllocaterService {
                 break;
             }
 
-            // 하위 박스가 있지만, 박스 타입이 Judge 타입이라면,
-            if(lowerBox.getBoxType() == BOX_TYPE_JUDGE) {
+            // 하위 박스가 있지만, 박스 타입이 Judge 타입 혹은 Control 타입 이라면,
+            if(lowerBox.getBoxType() == BOX_TYPE_JUDGE || lowerBox.getBoxType() == BOX_TYPE_CONTROL) {
                 break; // hBoxTypeOfDepth.put(depth, BOX_TYPE_JUDGE);
             }
 
@@ -176,7 +176,8 @@ public class BuildAllocaterService {
             } else if(lowerBox.getBoxType() == BOX_TYPE_DYNAMIC) {
                 hBoxTypeOfDepth.put(depth, BOX_TYPE_DYNAMIC);
             }
-            // init lowerBoxId
+            // init boxId and lowerBoxId
+            curBoxId = lowerBox.getBoxId(); // ADD
             lowerBoxId = null;
         }
 
@@ -254,6 +255,11 @@ public class BuildAllocaterService {
                 log.info("Break :: " + depth + " Lower Box Id == NULL");
                 break;
             } else {
+                BoxDTO filterBoxForFindingJudge = null;
+                filterBoxForFindingJudge = this.allocateBoxByBoxId(providerId, lowerBoxId);
+                if(filterBoxForFindingJudge.getBoxType() == BOX_TYPE_JUDGE) {
+                    break;
+                }
                 boxId = lowerBoxId;
             }
 
@@ -312,7 +318,7 @@ public class BuildAllocaterService {
         log.info("=========== allocate ResponseVerTwoDto By Exist Lower Box 시작 ===========");
         Boolean isJudgeBox = true;
         while(isJudgeBox) {
-            isJudgeBox = judgeService.execute(providerId);
+            isJudgeBox = judgeService.executeWhenControl(providerId);
         }
         log.info("=========== allocate ResponseVerTwoDto By Exist Lower Box 종료 ===========");
         return judgeService.executeByCurBoxType(providerId);

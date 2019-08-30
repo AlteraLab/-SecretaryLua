@@ -42,12 +42,57 @@ public class JudgeService {
     private RestTemplate restTemplate;
 
 
-    public Boolean execute(String providerId) {
+    public String executeWhenReservation(String providerId) {
+        while(true) {
+            Build reBuild = buildRepository.find(providerId);
+
+            // 1. 문자열 치환
+            String preText = this.ProcessStringForJudge(providerId);
+
+            // 2. 허브로 데이터 전송 및 응답
+            Integer judgeStatus = restTemplateService.requestJudgeStatus(providerId, preText);
+
+            // 3. 현재 박스 아이디 + JudgeStatus 를 이용해서 버튼을 찾음
+            BtnDTO curBtn = null;
+            for(BtnDTO tempBtn : reBuild.getBtns()) {
+                if(tempBtn.getBoxId() == reBuild.getCurBox().getBoxId()
+                        && tempBtn.getIdx() == judgeStatus) {
+                    curBtn = tempBtn;
+                    break;
+                }
+            }
+
+            // 4. derivation, boxId, btnCode 를 이용해서 하위 박스를 찾는다
+            ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
+            BoxDTO lowerBox = null;
+            for(DerivationDTO tempDerivation : derivations) {
+                if(tempDerivation.getUpperBoxId() == reBuild.getCurBox().getBoxId()
+                        && tempDerivation.getBtnCode() == curBtn.getBtnCode()) {
+                    lowerBox = buildAllocaterService.allocateBoxByBoxId(providerId, tempDerivation.getLowerBoxId());
+                    break;
+                }
+            }
+
+            // 5. 하위 박스 업데이트
+            reBuild.setCurBox(lowerBox);
+            buildRepository.update(reBuild);
+
+            if(lowerBox == null) { // 하위 박스가 없다면
+                return null;
+            }
+            if(lowerBox.getBoxType() == BOX_TYPE_JUDGE_END) {
+                return lowerBox.getPreText() + "\n\n" + lowerBox.getPostText();
+            }
+        }
+    }
+
+
+    public Boolean executeWhenControl(String providerId) {
 
         Build reBuild = buildRepository.find(providerId);
 
-        // 0. 만약 curBox 가 null 이라면 return false, (각 시나리오의 끝에 Judge가 없는 경우)
-        if(reBuild.getCurBox() == null) {
+        // 0. 만약 curBox 가 null 혹은 제어 타입이라면 return false, (각 시나리오의 끝에 Judge가 없는 경우)
+        if(reBuild.getCurBox() == null || reBuild.getCurBox().getBoxType() == 1) { //
             return false;
         }
 
@@ -57,12 +102,13 @@ public class JudgeService {
         // 2. 허브로 데이터 전송 및 응답
         Integer judgeStatus = restTemplateService.requestJudgeStatus(providerId, preText);
 
-        // 3. 현재 박스 아이디 + JudgfeStatus 를 이용해서 버튼을 찾음
+        // 3. 현재 박스 아이디 + JudgeStatus 를 이용해서 버튼을 찾음
         BtnDTO curBtn = null;
         for(BtnDTO tempBtn : reBuild.getBtns()) {
             if(tempBtn.getBoxId() == reBuild.getCurBox().getBoxId()
-            && tempBtn.getIdx() ==  judgeStatus) {
+                    && tempBtn.getIdx() == judgeStatus) {
                 curBtn = tempBtn;
+                break;
             }
         }
 
@@ -71,8 +117,9 @@ public class JudgeService {
         BoxDTO lowerBox = null;
         for(DerivationDTO tempDerivation : derivations) {
             if(tempDerivation.getUpperBoxId() == reBuild.getCurBox().getBoxId()
-            && tempDerivation.getBtnCode() == curBtn.getBtnCode()) {
+                    && tempDerivation.getBtnCode() == curBtn.getBtnCode()) {
                 lowerBox = buildAllocaterService.allocateBoxByBoxId(providerId, tempDerivation.getLowerBoxId());
+                break;
             }
         }
 
@@ -84,8 +131,7 @@ public class JudgeService {
         if(lowerBox != null && lowerBox.getBoxType() == BOX_TYPE_JUDGE) {
             return true;
         }
-        // 하위 박스가 없거나, JudgeBox 가 아니라면, false 리턴
-        return false;
+        return false; // 하위 박스가 없거나, JudgeBox 가 아니라면, false 리턴
     }
 
 
@@ -102,7 +148,7 @@ public class JudgeService {
             responseVerTwoDTO = kakaoSimpleTextService.makerTransferSelectCard();
         } else if(lowerBox.getBoxType() == BOX_TYPE_JUDGE_END) {
             // 하위 박스 타입이 End (type 8) 박스인 경우 -> End Box 를 단순히 표출하고 끝
-            responseVerTwoDTO = kakaoSimpleTextService.responserShortMsg(lowerBox.getPreText());
+            responseVerTwoDTO = kakaoSimpleTextService.responserShortMsg(lowerBox.getPreText() + "\n\n" + lowerBox.getPostText());
             buildRepository.delete(providerId);
         } else {
             // 하위 박스가 있는데 End 박스가 아닌 경우 -> 명령을 계속 빌딩

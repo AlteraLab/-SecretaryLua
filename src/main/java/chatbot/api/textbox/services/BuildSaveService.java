@@ -79,6 +79,27 @@ public class BuildSaveService {
     }
 
 
+    public void saverCurBoxWhenInterval(String providerId) {
+        log.info("=============== Saver Cur Box When Interval 시작 ===============");
+        Build reBuild = buildRepository.find(providerId);
+
+        ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
+        BoxDTO curBox = reBuild.getCurBox();
+        BoxDTO lowerBox = null;
+
+        for(DerivationDTO tempDerivation : derivations) {
+            if(tempDerivation.getUpperBoxId() == curBox.getBoxId()) {
+                lowerBox = buildAllocaterService.allocateBoxByBoxId(providerId, tempDerivation.getLowerBoxId());
+            }
+        }
+
+        reBuild.setCurBox(lowerBox);
+        buildRepository.update(reBuild);
+
+        log.info("=============== Saver Cur Box When Interval 종료 ===============");
+    }
+
+
     public void saverProviderId(String providerId) {
 
         log.info("=============== Saver ProviderId 시작 ===============");
