@@ -1,7 +1,7 @@
 package chatbot.api.mappers;
 
-import chatbot.api.skillHub.domain.HubInfoDto;
-import chatbot.api.skillHub.domain.HubVo;
+import chatbot.api.skillhub.domain.HubInfoDTO;
+import chatbot.api.skillhub.domain.HubVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -16,38 +16,35 @@ import java.util.Optional;
 public interface HubMapper {
 
     // 허브 삽입
-    void save(HubInfoDto hub);
+    void save(HubInfoDTO hub);
 
 
     // 인자로 넣은 userId가 사용할 수 있는 모든 허브 검색
-    Optional<HubInfoDto> getUserHub(Long userId);
-
-
-    // adminId를 가지고 허브info 조회
-    ArrayList<HubInfoDto> getHubInfoByAdminId(Long adminId);
+    Optional<HubInfoDTO> getUserHub(Long userId);
 
 
     // 사용자가 사용할 수 있는 허브들중에서 사용자가 요청한 장치 타입이 부착된 허브들을 조회
-    ArrayList<HubInfoDto> getHubInfoByDevCategory(@Param("userId") Long userId,
+    ArrayList<HubInfoDTO> getHubInfoByDevCategory(@Param("userId") Long userId,
                                                   @Param("devCategory") String devCategory);
 
 
     // 메인 페이지에서 보여줄 허브 목록에 대한 데이터를 가져온다.
     //ArrayList<HubVo> getHubsInfoByUserId(Long userId);
-    ArrayList<HubVo> getHubsInfoByUserId(Long userId);
+    ArrayList<HubVO> getHubsInfoByUserId(@Param("userId") Long userId);
 
 
     // get HubInfo
-    HubInfoDto getHubInfo(Long hubSeq);
+    HubInfoDTO getHubInfo(@Param("hubId") Long hubId);
+
+    HubInfoDTO getHubInfoByIp(@Param("hubIp") String hubIp);
+
+    HubInfoDTO getHubInfoByMacAddr(@Param("macAddr") String macAddr);
 
 
-    HubInfoDto getHubInfoByMacAddr(@Param("macAddr") String macAddr);
+    ArrayList<HubInfoDTO> getUserHubsByUserId(@Param("userId") Long userId);
 
-
-    ArrayList<HubInfoDto> getUserHubsByUserId(@Param("userId") Long userId);
-
-    // delete hub by hubSeq
-    void deleteHub(Long hubSeq);
+    // delete hub by hubId
+    void deleteHub(@Param("hubId") Long hubId);
 
 
     // Schedule query : implicit Delete Hub
@@ -60,6 +57,20 @@ public interface HubMapper {
                  @Param("searchId") String searchId,
                  @Param("desc") String hubDescription,
                  @Param("externalIp") String externalIp,
-                 @Param("externalPort") int externalPort,
+                 @Param("externalPort") Integer externalPort,
                  @Param("beforeIp") String beforeIp);
+
+
+    // edit upnpIp
+    void editHubIp(@Param("macAddr") String macAddr,
+                   @Param("externalIp") String externalIp,
+                   @Param("externalPort") Integer externalPort);
+
+    // establish -> state 를 true 로 만듬
+    void editStateToTrueWhenEstablish(@Param("macAddr") String macAddr,
+                                      @Param("externalIp") String externalIp,
+                                      @Param("externalPort") Integer externalPort);
+
+    // key-expire -> state 를 false 로 만듬
+    void editStateToFalseWhenKeyExpired(@Param("macAddr") String macAddr);
 }

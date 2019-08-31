@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.BoxMapper">
+
+    <!-- hrdwrId를 이용해서 모든 박스를 조회 -->
+    <select id="getBoxsByHrdwrId" resultMap="BoxDto" parameterType="Long">
+        SELECT
+        box_id,
+        pre_text,
+        post_text,
+        box_type
+        FROM box
+        WHERE hrdwr_id = #{hrdwrId}
+    </select>
+
+
+
+    <resultMap id="BoxDto" type="chatbot.api.textbox.domain.textboxdata.BoxDTO">
+        <result property="boxId" column="box_id"/>
+        <result property="preText" column="pre_text"/>
+        <result property="postText" column="post_text"/>
+        <result property="boxType" column="box_type"/>
+    </resultMap>
+</mapper>

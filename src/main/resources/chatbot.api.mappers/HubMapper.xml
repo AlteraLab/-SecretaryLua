@@ -5,10 +5,41 @@
 
 <mapper namespace="chatbot.api.mappers.HubMapper">
 
+    <!-- Ip로 허브 검색 -->
+    <select id="getHubInfoByIp" resultMap="HubInfoDto" parameterType="String">
+        SELECT * FROM hub WHERE external_ip = #{hubIp}
+    </select>
 
+
+    <!-- 허브 장소 변경 시 external Ip 주소 변경 -->
+    <update id="editHubIp" parameterType="hashmap">
+		UPDATE hub
+		SET
+		external_ip = #{externalIp},
+		external_port = #{externalPort}
+		WHERE mac_addr = #{macAddr}
+	</update>
+
+    <!-- establish -> state 를 true 로 만듬 -->
+    <update id="editStateToTrueWhenEstablish" parameterType="hashmap">
+		UPDATE hub
+		SET    state = 1
+		WHERE  mac_addr = #{macAddr}
+		AND    external_ip = #{externalIp}
+		AND    external_port = #{externalPort}
+	</update>
+
+    <!-- key-expire -> state 를 false 로 만듬 -->
+    <update id="editStateToFalseWhenKeyExpired" parameterType="String">
+		UPDATE hub
+		SET    state = 0
+		WHERE  mac_addr = #{macAddr}
+	</update>
+    <!-- ==================================================== -->
+    <!-- ==================================================== -->
 
     <!-- hub 레코드 추가, useGeneratedKeys를 사용하면 데이터를 저장할때 keyproperty 컬럼 값이 초기화된 값을 알 수 있다. -->
-    <insert id="save" useGeneratedKeys="true" keyProperty="hubId" parameterType="chatbot.api.skillHub.domain.HubInfoDto">
+    <insert id="save" useGeneratedKeys="true" keyProperty="hubId" parameterType="chatbot.api.skillhub.domain.HubInfoDTO">
         INSERT INTO hub
         (
         hub_id,
@@ -58,13 +89,6 @@
 
 
 
-    <!-- 해당 adminId와 일치하는 레코드들을 모두 검색 -->
-    <select id="getHubInfoByAdminId" resultMap="HubInfoDto" parameterType="Long">
-        SELECT * FROM hub WHERE admin_id = #{adminId}
-    </select>
-
-
-
     <!-- hubSeq에 대한 hubInfo를  (사용자 추가할 때 쓰임) -->
     <select id="getHubInfo" resultMap="HubInfoDto" parameterType="Long">
         SELECT * FROM hub WHERE hub_id = #{hubId}
@@ -109,8 +133,7 @@
     </select>
 
 
-    <!-- 처음 메인 페이지로 접속 했을때, 유저가 사용 가능한 허브 목록들 모두 select
-    <select id="getHubsInfoByUserId" resultType="chatbot.api.skillHub.domain.HubVo" parameterType="Long">-->
+    <!-- 처음 메인 페이지로     -->
     <select id="getHubsInfoByUserId" resultMap="HubVo" parameterType="Long">
         SELECT
         h.hub_id,
@@ -133,6 +156,10 @@
         ON r.hub_id = h.hub_id
         WHERE r.user_id = #{userId}
     </select>
+    <!--
+    접속 했을때, 유저가 사용 가능한 허브 목록들 모두 select
+    <select id="getHubsInfoByUserId" resultType="chatbot.api.skillHub.domain.HubVo" parameterType="Long">
+    -->
 
 
     <select id="getUserHubsByUserId" resultMap="HubInfoDto" parameterType="Long">
@@ -145,22 +172,10 @@
         FROM hub, (SELECT hub_id FROM hub_user WHERE user_id = #{userId}) AS owner
         where hub.hub_id = owner.hub_id
     </select>
-<!--
-    이거 쓸일 없을듯 ㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠ
-    &lt;!&ndash; 사용자가 사용할 수 있는 허브들중에서 사용자가 요청한 장치 타입이 부착된 허브들을 조회 &ndash;&gt;
-    &lt;!&ndash; 1. role.user_id = #{userId} , hub_name, external_ip, external_port&ndash;&gt;
-    <select id="getHubInfoByDevCategory" resultMap="HubInfoDto" parameterType="hashmap">
-      SELECT h.hub_id, h.hub_name, h.external_ip, h.external_port
-      FROM dev AS d,
-      (SELECT hub.hub_id, hub.hub_name, hub.external_ip, hub.external_port FROM hub,
-      (SELECT * FROM hub_user WHERE user_id = #{userId}) AS r WHERE hub.hub_id = r.hub_id) AS h
-      WHERE d.hub_id = h.hub_id AND d.dev_category = #{devCategory}
-    </select>
--->
 
 
 
-    <resultMap id="HubInfoDto" type="chatbot.api.skillHub.domain.HubInfoDto">
+    <resultMap id="HubInfoDto" type="chatbot.api.skillhub.domain.HubInfoDTO">
         <result property="hubId" column="hub_id"/>
         <result property="adminId" column="admin_id"/>
         <result property="hubName" column="hub_name"/>
@@ -179,7 +194,7 @@
     </resultMap>
 
 
-    <resultMap id="HubVo" type="chatbot.api.skillHub.domain.HubVo">
+    <resultMap id="HubVo" type="chatbot.api.skillhub.domain.HubVO">
         <result property="hubId" column="hub_id"/>
         <result property="adminId" column="admin_id"/>
         <result property="name" column="hub_name"/>
@@ -199,7 +214,7 @@
     </resultMap>
 
 
-    <parameterMap id="HubInfoDto" type="chatbot.api.skillHub.domain.HubInfoDto">
+    <parameterMap id="HubInfoDto" type="chatbot.api.skillhub.domain.HubInfoDTO">
         <parameter property="hubId"/>
         <parameter property="adminId"/>
         <parameter property="hubName"/>

@@ -1,20 +1,20 @@
 package chatbot.api.role.services;
 
-import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.common.domain.ResponseDTO;
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.mappers.RoleMapper;
 import chatbot.api.mappers.UserMapper;
-import chatbot.api.skillHub.domain.HubInfoDto;
-import chatbot.api.role.domain.RoleDto;
+import chatbot.api.skillhub.domain.HubInfoDTO;
+import chatbot.api.role.domain.RoleDTO;
 import chatbot.api.user.domain.UserInfoDto;
-import chatbot.api.user.domain.UserRegisterVo;
+import chatbot.api.user.domain.UserRegisterVO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import static chatbot.api.role.utils.RoleConstants.*;
-import static chatbot.api.skillHub.utils.HubConstants.*;
+import static chatbot.api.skillhub.utils.HubConstants.*;
 import static chatbot.api.user.utils.UserConstants.FAIL_MSG_SELECT_BY_EMAIL;
 
 
@@ -30,19 +30,37 @@ public class RoleRegisterService {
 
     private RoleMapper roleMapper;
 
+    public ResponseDTO registerForUser(UserInfoDto user, HubInfoDTO hub) {
+        try {
+            RoleDTO role = RoleDTO.builder()
+                    .hubId(hub.getHubId())
+                    .userId(user.getUserId())
+                    .role(ROLE_USER)
+                    .build();
+            roleMapper.save(role);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return ResponseDTO.builder()
+                    .status(HttpStatus.EXPECTATION_FAILED)
+                    .msg("등록 실패")
+                    .build();
+        }
+        return ResponseDTO.builder()
+                .msg("그룹에 추가되었습니다.")
+                .status(HttpStatus.OK)
+                .build();
+    }
+
+    public ResponseDTO register(UserRegisterVO userRegisterVo, Long adminId) {
 
 
-    // userRegisterVo(hubId, userId), userprincipal.getId()
-    public ResponseDto register(UserRegisterVo userRegisterVo, Long adminId) {
-
-
-        ResponseDto responseDto = new ResponseDto().builder()
+        ResponseDTO responseDto = new ResponseDTO().builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
 
         try {
             responseDto.setMsg(FAIL_MSG_NO_EXIST_HUB);
-            HubInfoDto hub = hubMapper.getHubInfo(userRegisterVo.getHubId());
+            HubInfoDTO hub = hubMapper.getHubInfo(userRegisterVo.getHubId());
             if(hub == null)                  return responseDto;
             log.info(hub.toString());
 
@@ -55,7 +73,7 @@ public class RoleRegisterService {
             log.info(user.toString());
 
             responseDto.setMsg(FAIL_MSG_ALREADY_ROLE_USER);
-            RoleDto role = roleMapper.getRoleInfo(userRegisterVo.getHubId(), user.getUserId());
+            RoleDTO role = roleMapper.getRoleInfo(userRegisterVo.getHubId(), user.getUserId());
             if(role != null)                 return responseDto;
 
 
@@ -68,7 +86,7 @@ public class RoleRegisterService {
             responseDto.setMsg(SUCCESS_MSG_ADD_ROLE_USER);
             responseDto.setStatus(HttpStatus.CREATED);
             responseDto.setData(new Object(){
-                public RoleDto roleDto = RoleDto.builder()
+                public RoleDTO roleDto = RoleDTO.builder()
                         .hubId(userRegisterVo.getHubId())
                         .userId(user.getUserId())
                         .role(ROLE_USER)
