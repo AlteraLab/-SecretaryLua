@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.StateRuleMapper">
+
+    <!-- hrdwrId를 이용해서 모든 룰 조회 -->
+    <select id="getStateRulesByHrdwrId" resultMap="StateRuleDTO" parameterType="Long">
+        SELECT
+        priority,
+        rule_type,
+        rule_value,
+        map_val,
+        data_key,
+        mod_id,
+        box_id,
+        mod_dev_id
+        FROM res_box_crs
+        WHERE hrdwr_id = #{hrdwrId}
+    </select>
+
+
+    <resultMap id="StateRuleDTO" type="chatbot.api.textbox.domain.textboxdata.StateRuleDTO">
+        <result property="priority" column="priority"/>
+        <result property="ruleType" column="rule_type"/>
+        <result property="ruleValue" column="rule_value"/>
+        <result property="mapVal" column="map_val"/>
+        <result property="dataKey" column="data_key"/>
+        <result property="modId" column="mod_id"/>
+        <result property="boxId" column="box_id"/>
+        <result property="modDevId" column="mod_dev_id"/>
+    </resultMap>
+</mapper>

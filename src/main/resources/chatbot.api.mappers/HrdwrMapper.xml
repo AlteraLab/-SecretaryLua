@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.HrdwrMapper">
+
+    <!-- auty 을 이용해서 사용자가 선택한 하드웨어의 Auth Key 를 알아낸다. -->
+    <select id="getHrdwrByAuthKey" resultMap="HrdwrDto" parameterType="String">
+        SELECT
+        h.hrdwr_name,
+        h.user_defined_name,
+        h.hrdwr_type,
+        h.category,
+        h.hrdwr_id
+        FROM   hrdwr AS h
+        WHERE  h.auth_key = #{authKey}
+    </select>
+
+
+
+    <resultMap id="HrdwrDto" type="chatbot.api.textbox.domain.path.HrdwrDTO">
+        <result property="hrdwrName" column="hrdwr_name"/>
+        <result property="userDefinedName" column="user_defined_name"/>
+        <result property="hrdwrType" column="hrdwr_type"/>
+        <result property="category" column="category"/>
+        <result property="hrdwrId" column="hrdwr_id"/>
+    </resultMap>
+</mapper>

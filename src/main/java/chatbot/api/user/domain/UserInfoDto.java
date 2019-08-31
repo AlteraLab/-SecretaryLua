@@ -21,7 +21,7 @@ public class UserInfoDto {
 
     private String profileImage;
 
-    private Timestamp createdAt;
+    private Timestamp joinedAt;
 
-    private Timestamp updatedAt;
+    //private Timestamp updatedAt;
 }

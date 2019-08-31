@@ -1,8 +1,8 @@
 package chatbot.api.role.services;
 
-import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.common.domain.ResponseDTO;
 import chatbot.api.mappers.RoleMapper;
-import chatbot.api.role.domain.RoleVo;
+import chatbot.api.role.domain.RoleDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,14 +23,14 @@ public class RoleSelectService {
 
 
 
-    public ResponseDto getRoles(Long hubId) {
+    public ResponseDTO getRoles(Long hubId) {
 
-        ResponseDto responseDto = ResponseDto.builder()
+        ResponseDTO responseDto = ResponseDTO.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
 
         try {
-            List<RoleVo> roleInfoList = roleMapper.getRolesInfoByHubId(hubId);
+            List<RoleDTO> roleInfoList = roleMapper.getRolesInfoByHubId(hubId);
             if(roleInfoList == null) {
                 responseDto.setMsg(FAIL_MSG_GET_ROLE_BECAUSE_NO_EXIST);
                 responseDto.setStatus(HttpStatus.NO_CONTENT);

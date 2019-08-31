@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.HubLogMapper">
+
+    <!-- 명령 수행 결과 로그 저장 -->
+    <insert id="saveHubLog" parameterMap="HubLogMessage">
+        INSERT INTO hub_log
+        (
+        <!-- hub_id,  삭제 -->
+        <!-- hrdwr_id, 삭제 -->
+        <!-- hrdwr_name, 삭제 -->
+        requester_id,
+        content,
+        log_type,
+        recorded_at,
+        hub_mac,
+        hrdwr_mac,
+        auth_key
+        )
+        VALUES
+        (
+        <!-- #{hubId}, 삭제 -->
+        <!-- #{hrdwrId}, 삭제 -->
+        <!-- #{hrdwrName}, 삭제 -->
+        #{requesterId},
+        #{content},
+        #{logType},
+        #{recordedAt},
+        #{hubMac},
+        #{devMac},
+        #{devType}
+        )
+    </insert>
+
+
+    <!-- 특정 허브의 로그 조회 -->
+    <select id="getHubLog" resultMap="HubLogVo" parameterType="String">
+      SELECT
+        u.name,
+        hl.hrdwr_name,
+        hl.hrdwr_id,
+        hl.recorded_at,
+        hl.content,
+        hl.log_type
+      FROM
+      (
+        SELECT
+            h.hrdwr_name,
+            h.hrdwr_id,
+            l.recorded_at,
+            l.content,
+            l.log_type,
+            l.requester_id
+        FROM
+            (SELECT * FROM hub_log WHERE hub_mac = #{hubMac}) AS l, hrdwr AS h
+        WHERE l.auth_key = h.auth_key
+      ) AS hl, users AS u
+      WHERE hl.requester_id = u.provider_id
+    </select>
+
+
+    <resultMap id="HubLogVo" type="chatbot.api.hublog.domain.HubLogVO">
+        <result property="recordedAt" column="recorded_at"/>
+        <result property="hrdwrName" column="hrdwr_name"/>
+        <result property="hrdwrId" column="hrdwr_id"/>
+        <result property="requesterName" column="name"/>
+        <result property="content" column="content"/>
+        <result property="logType" column="log_type"/>
+    </resultMap>
+
+    <!--<parameterMap id="HubLogDto" type="chatbot.api.hublog.domain.HubLogDTO">-->
+    <parameterMap id="HubLogMessage" type="chatbot.api.common.config.rabbit.domain.sub.HubLogMessage">
+        <parameter property="recordedAt"/>
+        <parameter property="hubMac"/>
+        <parameter property="devType"/>
+        <parameter property="requesterId"/>
+        <parameter property="content"/>
+        <parameter property="devMac"/>
+        <parameter property="logType"/>
+    </parameterMap>
+</mapper>

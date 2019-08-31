@@ -1,6 +1,5 @@
 package chatbot.api.common.domain.kakao.openbuilder.responseVer2;
 
-import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseJsonFormat.Component.basicCard.Component;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,14 +14,10 @@ import java.util.ArrayList;
 @Builder
 public class SkillTemplate {
 
-    //private BasicCard outputs;
+    private ArrayList<Object> outputs;
 
-    private ArrayList<Component> outputs;
-
-    //private ArrayList<BasicCard> outputs;
+    private ArrayList<QuickReply> quickReplies;
     /*
     output : simpleText / simpleImage / basicCard / commnerceCard / listCard
      */
-
-    //private ArrayList<QuickReply> quickReplies;
 }

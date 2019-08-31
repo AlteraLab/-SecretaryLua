@@ -1,18 +1,18 @@
 package chatbot.api.role.services;
 
-import chatbot.api.common.domain.ResponseDto;
+import chatbot.api.common.domain.ResponseDTO;
 import chatbot.api.mappers.HubMapper;
 import chatbot.api.mappers.RoleMapper;
-import chatbot.api.role.domain.RoleDto;
-import chatbot.api.skillHub.domain.HubInfoDto;
-import chatbot.api.user.domain.UserRegisterVo;
+import chatbot.api.role.domain.RoleDTO;
+import chatbot.api.skillhub.domain.HubInfoDTO;
+import chatbot.api.user.domain.UserRegisterVO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import static chatbot.api.role.utils.RoleConstants.*;
-import static chatbot.api.skillHub.utils.HubConstants.ROLE_USER;
+import static chatbot.api.skillhub.utils.HubConstants.ROLE_USER;
 
 @Service
 @Slf4j
@@ -26,16 +26,16 @@ public class RoleDeleteService {
 
 
     // 관리자가 허브에 대한 ROLE_USESR 권한을 가진 사용자를 삭제하는 기능
-    public ResponseDto deleterRoleUserByAdmin(UserRegisterVo userRegisterVo, Long adminId) {
+    public ResponseDTO deleterRoleUserByAdmin(UserRegisterVO userRegisterVo, Long adminId) {
 
-        ResponseDto responseDto = ResponseDto.builder()
+        ResponseDTO responseDto = ResponseDTO.builder()
                 .data(null)
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
 
         try {
             // 1. userPrincipal.getId()가 허브에 대해서 admin인지 검증
-            HubInfoDto hub = hubMapper.getHubInfo(userRegisterVo.getHubId());
+            HubInfoDTO hub = hubMapper.getHubInfo(userRegisterVo.getHubId());
             if(hub == null)       return responseDto;
 
             log.info(hub.toString());
@@ -46,7 +46,7 @@ public class RoleDeleteService {
             }
 
             // 2. 해당 유저가 허브를 사용가능한지 확인
-            RoleDto roleUser = roleMapper.getRoleInfo(userRegisterVo.getHubId(), userRegisterVo.getUserId());
+            RoleDTO roleUser = roleMapper.getRoleInfo(userRegisterVo.getHubId(), userRegisterVo.getUserId());
             if(roleUser == null) {
                 responseDto.setMsg(FAIL_MSG_NO_ROLE_USER);
                 responseDto.setStatus(HttpStatus.NO_CONTENT);

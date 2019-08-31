@@ -8,6 +8,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import javax.annotation.PostConstruct;
+import java.util.TimeZone;
+
 @Slf4j
 @SpringBootApplication
 @MapperScan(basePackages="chatbot.api.mappers")
@@ -20,13 +23,6 @@ public class LuaChatbotApplication {
 			"/app/config/lua-skill-server/production-application.yml";
 
 	public static void main(String[] args) {
-
-		/*log.trace("Hello World");
-		log.debug("Hello World");
-		log.info("Hello World");
-		log.warn("Hello World");
-		log.error("Hello World");*/
-
 		new SpringApplicationBuilder(LuaChatbotApplication.class)
 				.properties(APP_LOCATIONS)
 				.run(args);
