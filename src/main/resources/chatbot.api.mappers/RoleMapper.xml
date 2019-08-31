@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.RoleMapper">
+
+    <!-- hubUser 레코드 추가 -->
+    <insert id="save" parameterMap="RoleInfoDto">
+        INSERT INTO hub_user
+        (
+        hub_id,
+        user_id,
+        role
+        )
+        VALUES
+        (
+        #{hubId},
+        #{userId},
+        #{role}
+        )
+    </insert>
+
+    <!-- 레코드 검색 : (userSeq, hubSeq) -->
+    <select id="getRoleInfo" resultMap="RoleInfoDto" parameterType="map">
+        SELECT * FROM hub_user WHERE user_id = #{userId} AND hub_id = #{hubId}
+    </select>
+
+    <!-- delete hubuser record -->
+    <delete id="deleteAllRoleByAdmin" parameterType="chatbot.api.role.domain.RoleDTO">
+        DELETE FROM hub_user WHERE hub_id = #{hubId}
+    </delete>
+
+    <!--
+    // 역할1 : 일반 유저 스스로 허브 권한 삭제
+    // 역할2 : admin 유저가 일반 유저를 삭제
+    -->
+    <delete id="deleteRoleUser" parameterType="chatbot.api.role.domain.RoleDTO">
+        DELETE FROM hub_user
+        WHERE hub_id = #{hubId}
+          AND user_id = #{userId}
+          AND role = #{role}
+    </delete>
+
+    <delete id="deleteRoleWithHubId" parameterType="chatbot.api.role.domain.RoleDTO">
+        DELETE FROM hub_user
+        WHERE hub_id = #{hubId}
+    </delete>
+
+    <!-- 특정 허브 관리 페이지로 이동했을때 허브에 권한을 가진 role 들을 화면에 배치, 특정 허브에 대한 role 들을 모두 select -->
+    <select id="getRolesInfoByHubId" resultMap="RoleInfoDto" parameterType="Long">
+        SELECT *
+        FROM hub_user AS r
+        WHERE r.hub_id = #{hubId}
+    </select>
+
+
+
+
+    <resultMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDTO">
+        <result property="hubId" column="hub_id"/>
+        <result property="userId" column="user_id"/>
+        <!-- role_type-->
+        <result property="role" column="role"/>
+    </resultMap>
+
+    <parameterMap id="RoleInfoDto" type="chatbot.api.role.domain.RoleDTO">
+        <parameter property="hubId"/>
+        <parameter property="userId"/>
+        <!-- role_type-->
+        <parameter property="role"/>
+    </parameterMap>
+
+</mapper>

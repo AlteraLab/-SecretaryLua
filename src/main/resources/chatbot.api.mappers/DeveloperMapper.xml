@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.DeveloperMapper">
+
+    <select id="getDevice" resultMap="DvlpDevDTO" parameterType="Long">
+        SELECT * FROM hrdwr WHERE hrdwr_id=#{hrdwrId}
+    </select>
+
+
+    <!--
+    삭제 순서
+    derivation -> (btn / rule / event) -> (box / data_model) -> device
+    -->
+
+    <!-- 1. derivations 삭제 -->
+    <delete id="deleteDerivations" parameterType="Long">
+      DELETE FROM derivation WHERE hrdwr_id=#{hrdwrId}
+    </delete>
+
+    <!-- btn 삭제 -->
+    <delete id="deleteButtons" parameterType="Long">
+      DELETE FROM btn WHERE hrdwr_id=#{hrdwrId}
+    </delete>
+
+    <!-- 룰 삭제 -->
+    <delete id="deleteRules" parameterType="Long">
+      DELETE FROM res_box_crs WHERE hrdwr_id=#{hrdwrId}
+    </delete>
+
+    <!-- 이벤트 삭제 -->
+    <delete id="deleteEvents" parameterType="Long">
+      DELETE FROM event WHERE hrdwr_id=#{hrdwrId}
+    </delete>
+
+    <!-- box 삭제 -->
+    <delete id="deleteTextBoxes" parameterType="Long">
+      DELETE FROM box WHERE hrdwr_id=#{hrdwrId}
+    </delete>
+
+    <!-- 데이터 모델 삭제 -->
+    <delete id="deleteDataModels" parameterType="Long">
+      DELETE FROM data_model WHERE hrdwr_id=#{hrdwrId}
+    </delete>
+
+    <!-- device 삭제 -->
+    <delete id="deleteDevice" parameterType="Long">
+      DELETE FROM hrdwr WHERE hrdwr_id=#{hrdwrId}
+    </delete>
+
+
+
+    <!--
+    삽입 순서
+    device -> (box / data_model) -> (btn / rule / event) -> derivation
+    -->
+
+    <!-- device 삽입-->
+    <insert id="insertDevice" parameterType="chatbot.api.developer.domain.DvlpDevDTO">
+        INSERT INTO hrdwr
+        (
+        hrdwr_id,
+        auth_key,
+        hrdwr_name,
+        user_defined_name,
+        hrdwr_type,
+        category
+        )
+        VALUES
+        (
+        #{dvlpDevDTO.devId},
+        #{dvlpDevDTO.authKey},
+        #{dvlpDevDTO.devName},
+        #{dvlpDevDTO.devDefName},
+        #{dvlpDevDTO.devType},
+        #{dvlpDevDTO.category}
+        )
+    </insert>
+
+    <!-- boxes 삽입 -->
+    <insert id="insertTextBoxes" parameterType="java.util.Map">
+        insert into box (box_id, pre_text, post_text, box_type, hrdwr_id)
+        values
+        <foreach collection="dvlpBoxDTOList" item="item" separator=" , ">
+            (
+            #{item.boxId},
+            #{item.preText},
+            #{item.postText},
+            #{item.boxType},
+            #{hrdwrId}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 데이터 모델 삽입 -->
+    <insert id="insertDataModels" parameterType="java.util.Map">
+        insert into data_model (data_type, mod_type, is_ev, data_key, hrdwr_id)
+        values
+        <foreach collection="dvlpDataModelDTOList" item="item" separator=" , ">
+            (
+            #{item.dataType},
+            #{item.modType},
+            #{item.isEv},
+            #{item.dataKey},
+            #{hrdwrId}
+            )
+        </foreach>
+    </insert>
+
+    <!-- btns 삽입 -->
+    <insert id="insertButtons" parameterType="java.util.Map">
+        insert into btn (btn_code, btn_name, event_code, idx, box_id, is_spread, btn_type, hrdwr_id)
+        values
+        <foreach collection="dvlpButtonDTOList" item="item" separator=" , ">
+            (
+            #{item.btnCode},
+            #{item.btnName},
+            #{item.evCode},
+            #{item.idx},
+            #{item.boxId},
+            #{item.isSpread},
+            #{item.btnType},
+            #{hrdwrId}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 룰 삽입 -->
+    <insert id="insertRules" parameterType="java.util.Map">
+        insert into res_box_crs (rule_type, rule_value, priority, map_val, mod_dev_id, box_id, data_key, mod_id, hrdwr_id)
+        values
+        <foreach collection="dvlpStateRuleDTOList" item="item" separator=" , ">
+            (
+            #{item.ruleType},
+            #{item.ruleValue},
+            #{item.priority},
+            #{item.mapVal},
+            #{item.modDevId},
+            #{item.boxId},
+            #{item.dataKey},
+            #{item.modId},
+            #{hrdwrId}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 이벤트 삽입 -->
+    <insert id="insertEvents" parameterType="java.util.Map">
+        insert into event (output_type, rule_type, rule_value, data_key, priority, event_id, hrdwr_id)
+        values
+        <foreach collection="dvlpEventDTOList" item="item" separator=" , ">
+            (
+            #{item.outputType},
+            #{item.ruleType},
+            #{item.ruleValue},
+            #{item.dataKey},
+            #{item.priority},
+            #{item.eventId},
+            #{hrdwrId}
+            )
+        </foreach>
+    </insert>
+
+    <!--  알림 박스 삽입 (이벤트 하위 테이블)  -->
+    <insert id="insertNotifyBoxs" parameterType="java.util.Map">
+        insert into notify_box (event_id, pre_text, post_text)
+        values
+        <foreach collection="dvlpNotifyBoxDTOList" item="item" separator=" , ">
+            (
+            #{item.eventId},
+            #{item.preText},
+            #{item.postText}
+            )
+        </foreach>
+    </insert>
+
+    <!--  서드 파티 서버 삽입 (이벤트 하위 테이블)  -->
+    <insert id="insertThirdServers" parameterType="java.util.Map">
+        insert into third_ser (event_id, host, port, path)
+        values
+        <foreach collection="dvlpThirdServerDTOList" item="item" separator=" , ">
+            (
+            #{item.eventId},
+            #{item.host},
+            #{item.port},
+            #{item.path}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 제어 삽입 (이벤트 하위 테이블)  -->
+    <insert id="insertControls" parameterType="java.util.Map">
+        insert into control (event_id, event_code, auty_key)
+        values
+        <foreach collection="dvlpControlDTOList" item="item" separator=" , ">
+            (
+            #{item.eventId},
+            #{item.evCode},
+            #{item.authKey}
+            )
+        </foreach>
+    </insert>
+
+
+    <!-- derivations 삽입 -->
+    <insert id="insertDerivations" parameterType="java.util.Map">
+        insert into derivation (btn_code, upper_box_id, lower_box_id, hrdwr_id)
+        values
+        <foreach collection="dvlpDerivationDTOList" item="item" separator=" , ">
+            (
+            #{item.btnCode},
+            #{item.upperBoxId},
+            #{item.lowerBoxId},
+            #{hrdwrId}
+            )
+        </foreach>
+    </insert>
+
+
+
+    <resultMap id="DvlpDevDTO" type="chatbot.api.developer.domain.DvlpDevDTO">
+        <result property="devId" column="hrdwr_id"/>
+        <result property="authKey" column="auth_key"/>
+        <result property="devName" column="hrdwr_name"/>
+        <result property="devDefName" column="user_defined_name"/>
+        <result property="devType" column="hrdwr_type"/>
+        <result property="category" column="category"/>
+    </resultMap>
+</mapper>

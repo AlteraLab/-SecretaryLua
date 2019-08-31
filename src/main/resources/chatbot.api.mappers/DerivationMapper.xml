@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.DerivationMapper">
+
+    <!-- hrdwr을 이용해서 모든 파생 조회 -->
+    <select id="getDerivationsByHrdwrId" resultMap="DerivationDto" parameterType="Long">
+        SELECT
+        d.upper_box_id,
+        d.btn_code,
+        d.lower_box_id
+        FROM derivation AS d
+        WHERE d.hrdwr_id = #{hrdwrId}
+    </select>
+
+
+    <resultMap id="DerivationDto" type="chatbot.api.textbox.domain.textboxdata.DerivationDTO">
+        <result property="upperBoxId" column="upper_box_id"/>
+        <result property="btnCode" column="btn_code"/>
+        <result property="lowerBoxId" column="lower_box_id"/>
+    </resultMap>
+
+    <parameterMap id="DerivationDto" type="chatbot.api.textbox.domain.textboxdata.DerivationDTO">
+        <parameter property="upperBoxId"/>
+        <parameter property="btnCode"/>
+        <parameter property="lowerBoxId"/>
+    </parameterMap>
+</mapper>

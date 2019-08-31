@@ -1,93 +1,105 @@
 package chatbot.api.user;
 
 
-import chatbot.api.common.RequestDto;
-import chatbot.api.common.ResponseDto;
-import chatbot.api.user.domain.LoginRequestDto;
-import chatbot.api.user.domain.LoginResponseDto;
-import chatbot.api.user.utils.UserConstants;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import sun.misc.Request;
+import chatbot.api.common.domain.ResponseDTO;
+import chatbot.api.common.domain.kakao.openbuilder.RequestDTO;
+import chatbot.api.common.domain.kakao.openbuilder.responseVer2.ResponseVerTwoDTO;
+import chatbot.api.common.services.KakaoBasicCardService;
+import chatbot.api.mappers.HubMapper;
+import chatbot.api.skillhub.domain.HubVO;
+import chatbot.api.user.domain.UserInfoDto;
+import chatbot.api.common.security.UserPrincipal;
+import chatbot.api.mappers.UserMapper;
 
-/*
-service
-1. response BotUserKey
-2. response msg_enroll_guide
-3. response msg_enroll_result
- */
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static chatbot.api.user.utils.UserConstants.*;
 
 @RestController
+@Slf4j
 public class UserController {
 
-    // lua response botUserKey service
-    @PostMapping(value = "/user/key")
-    public ResponseDto getBotUserKey(@RequestBody RequestDto requestDto) {
-        String msg = requestDto.getUserRequest().getUser().getId();
-        return ResponseDto.builder().msg(msg).status(HttpStatus.OK).data(null).build();
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private HubMapper hubMapper;
+
+    @Autowired
+    private KakaoBasicCardService kakaoBasicCardService;
+
+
+
+    // 메인 페이지에 보여질 사용 가능한 허브들에 대한 정보들을 반환하는 기능
+    @GetMapping(value = "/user")
+    public ResponseDTO kakaoAuthoriaztion(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        log.info("" + userPrincipal);
+        UserInfoDto userInfoDto = userMapper.getUser(userPrincipal.getId()).get();
+        //UserInfoDto userInfoDto = userMapper.getUser(new Long(1)).get();
+
+        List<HubVO> hubsInfoList;
+        hubsInfoList = hubMapper.getHubsInfoByUserId(userInfoDto.getUserId());
+        log.info("HubsInfo -> " + hubsInfoList);
+        //hubsInfoList = hubMapper.getHubsInfoByUserId(new Long(1));
+        return ResponseDTO.builder()
+                .msg("userInfoDto information")
+                .status(HttpStatus.OK)
+                .data(new Object(){
+                    public UserInfoDto user = userInfoDto;
+                    public List<HubVO> hubs = hubsInfoList;
+                })
+                .build();
     }
 
-    // lua response ENROLL_GUIDE
-    @PostMapping(value = "/user/enroll/guide")
-    public ResponseDto getGuideMsg(@RequestBody RequestDto requestDto) {
-        return ResponseDto.builder().msg(UserConstants.GUIDE_ENROLL).status(HttpStatus.OK).data(null).build();
+
+
+    // 유효한 토큰인지 체크
+    @GetMapping("/userToken")
+    public ResponseDTO checkValidToken(@AuthenticationPrincipal UserPrincipal UserPrincipal) {
+
+        UserInfoDto userInfoDto = userMapper.getUserByUserId(UserPrincipal.getId());
+        //UserInfoDto userInfoDto = userMapper.getUserByUserId(new Long(5));
+
+        // 유저를 검색하지 못하면  -> hub에게 "not valid token" 메시지 전송
+        if (userInfoDto == null) return ResponseDTO.builder()
+                .msg(FAIL_MSG_TOKEN)
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .build();
+            // 유저를 검색한다면      -> hub에게 "valid token" 메시지 전송
+        else return ResponseDTO.builder()
+                .msg(SUCCESS_MSG_TOKEN)
+                .status(HttpStatus.OK)
+                .build();
     }
 
-    // test
-    // lua response ENROLL_RESULT
-    @PostMapping(value = "/user/enroll/result")
-    public ResponseDto getEnrollResult(@RequestBody RequestDto requestDto) {
-        String kakaoUserId = requestDto.getUserRequest().getUser().getId();
-        String utterance = requestDto.getUserRequest().getUtterance();
-
-        String userIp = null;
-        String userPassword = utterance;
-
-        int firstIndexForIp = userPassword.indexOf(" ");
-        int lastIndexForIp = userPassword.indexOf(",");
-        int firstIndexForPw = lastIndexForIp + 7;
-        int lastIndexForPw = userPassword.length();
-
-        userIp = userPassword.substring(firstIndexForIp, lastIndexForIp);
-        userPassword = userPassword.substring(firstIndexForPw, lastIndexForPw);
-
-        System.out.println(userIp + " " + userPassword);
-
-        return ResponseDto.builder().msg(UserConstants.CREATE_USER_SUCCESS).status(HttpStatus.OK).data(null).build();
-    }
-
-    // oauth2 인증시, 호출되는 API
-    @PostMapping(value = "/user/login")
-    public LoginResponseDto enrollUser(@RequestBody LoginRequestDto loginRequestDto) {
-        // 값 확인
-        System.out.println("beforeIp  : " + loginRequestDto.getBeforeIp());
-        System.out.println("currentIp : " + loginRequestDto.getCurrentIp());
-        System.out.println("port      : " + loginRequestDto.getPort());
-
-        // 만약, 모든 출력이 정상적으로 되었다면.., db 모델링 이후 코드 작성
-        /*
-        if(이번에 넘어온 beforeIp != null)
-        {
-            if(db에 저장되어진 currentIp컬럼 값들 중에, 이번에 넘어온 beforeIp와 동일한 것이 있다면)
-            {
-                1. db에 저장되어진 currentIp를 beforeIp 컬럼 영역으로 업데이트
-                2. 이번에 넘어온 currentIp값을 db의 currentIp 컬럼 영역으로 업데이트
-                3. port도 업데이트
-            }
-        }
-        else
-        {
-            1. currentIp 값을 db에 업데이터
-            2. port도 업데이트
-        }
-        // 중첩된 코드 : 모듈화해서 적용하기
-
-        허브 서버에 보낼 LoginResponseDto에 어떤 값 실어서 보낼지 이야기하기
-         */
 
 
-        return LoginResponseDto.builder().test(null).build();
+    // 이메일로 사용자 조회
+    @GetMapping("/user/{email}")
+    public ResponseDTO getUserByEmail(@PathVariable(value = "email") String email) {
+
+        UserInfoDto user = userMapper.getUserByEmail(email);
+        if (user == null) return ResponseDTO.builder()
+                .msg(FAIL_MSG_SELECT_BY_EMAIL)
+                .status(HttpStatus.EXPECTATION_FAILED)
+                .data(null)
+                .build();
+
+        // log
+        log.info(user.toString());
+
+        ResponseDTO responseDto = ResponseDTO.builder()
+                .msg(SUCCESS_MSG_SELECT_BY_EMAIL)
+                .status(HttpStatus.OK)
+                .data(null)
+                .build();
+
+        return responseDto;
     }
 }

@@ -17,6 +17,9 @@ scp.sh
 *.iml
 *.ipr
 
+### ignore *.log(all) file ###
+logs/
+
 ### NetBeans ###
 nbproject/private/
 build/

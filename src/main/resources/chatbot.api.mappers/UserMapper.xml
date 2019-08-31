@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatbot.api.mappers.UserMapper">
+
+
+    <!-- userId를 이용하여 userinfo get -->
+    <select id="getUser" resultMap="UserInfoDto" parameterType="Long">
+        SELECT * FROM users WHERE user_id = #{userId}
+    </select>
+
+
+    <!-- userId 를 이용하여 userinfo get, optional 안씀 -->
+    <select id="getUserByUserId" resultMap="UserInfoDto" parameterType="Long">
+        SELECT * FROM users WHERE user_id = #{userId}
+    </select>
+
+
+    <select id="getUserByEmail" resultMap="UserInfoDto" parameterType="String">
+        SELECT * FROM users WHERE email = #{email}
+    </select>
+
+
+    <!-- providerId를 이용하여 유저 get -->
+    <select id="getUserByProviderId" resultMap="UserInfoDto" parameterType="String">
+        SELECT * FROM users WHERE provider_id = #{providerId}
+    </select>
+
+
+    <!-- 유저 레코드 저장 -->
+    <insert id="save" parameterMap="UserInfoDto">
+        INSERT INTO users
+        (
+            user_id,
+            provider_id,
+            name,
+            email,
+            profile_img
+        <!--,
+            created_at,
+            updated_at-->
+        )
+        VALUES
+        (
+            NEXTVAL(user_sequence),
+            #{providerId},
+            #{name},
+            #{email},
+            #{profileImage}
+            <!-- ,
+            #{created_at},
+            #{updated_at}-->
+        )
+    </insert>
+
+
+    <!-- -->
+    <update id="update">
+        UPDATE users
+        SET name=#{name}, email=#{email}, profile_img=#{profileImage}
+        WHERE user_id=#{userId}
+    </update>
+
+
+    <!-- 처음 메인 페이지로 접속 했을때, 유저가 사용 가능한 허브 목록들 모두 select -->
+<!--    <select id="implicitDeleteHub" parameterType="date">
+        SELECT *
+        FROM hub_user AS r INNER JOIN hub AS h
+        ON h.hub_id = r.hub_id
+        WHERE h.last_used_time <![CDATA[ < ]]> #{expireDate}
+    </select>-->
+
+    <!-- ################################################################################### -->
+
+
+    <!-- <result property="userId" column="user_id"/> -->
+    <resultMap id="UserInfoDto" type="chatbot.api.user.domain.UserInfoDto">
+        <result property="userId" column="user_id"/>
+        <result property="providerId" column="provider_id"/>
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="profileImage" column="profile_img"/>
+        <!--
+        <result property="joinedAt" column="joined_at"/>
+        -->
+    </resultMap>
+
+
+    <parameterMap id="UserInfoDto" type="chatbot.api.user.domain.UserInfoDto">
+        <parameter property="userId"/>
+        <parameter property="providerId"/>
+        <parameter property="name"/>
+        <parameter property="email"/>
+        <parameter property="profileImage"/>
+        <!--
+        <parameter property="joinedAt"/>
+        -->
+    </parameterMap>
+</mapper>
