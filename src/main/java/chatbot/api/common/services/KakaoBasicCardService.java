@@ -27,7 +27,7 @@ public class KakaoBasicCardService {
         buttons.add(Button.builder()
                 .action("webLink")
                 .label("S I B A")
-                .webLinkUrl("http://110.13.78.125:3001/")  // 가입 링크
+                .webLinkUrl("http://203.250.32.29:3000/")  // 가입 링크
                 .build());
 
         BasicCard basicCardVo = BasicCard.builder()
@@ -61,7 +61,7 @@ public class KakaoBasicCardService {
         buttons.add(Button.builder()
                 .action("webLink")
                 .label("S I B A")
-                .webLinkUrl("http://110.13.78.125:3001/")  // 가입 링크
+                .webLinkUrl("http://203.250.32.29:3000/")  // 가입 링크
                 .build());
 
         BasicCard basicCardVo = BasicCard.builder()

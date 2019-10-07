@@ -42,8 +42,8 @@ public class BuildAllocaterService {
         Build reBuild = buildRepository.find(providerId);
         ArrayList<BtnDTO> curBtns = reBuild.getCurBtns();
         BtnDTO selectedBtn = null;
-        for(BtnDTO tempCurBtn : curBtns) {
-            if(btnIdx == tempCurBtn.getIdx()) {
+        for (BtnDTO tempCurBtn : curBtns) {
+            if (btnIdx == tempCurBtn.getIdx()) {
                 selectedBtn = tempCurBtn;
                 break;
             }
@@ -70,8 +70,8 @@ public class BuildAllocaterService {
         // (현재 박스 + 선택될 수도 있는 버튼의 버튼 코드) -> 현재 derivation 구하기
         ArrayList<DerivationDTO> derivations = reBuild.getDerivations();
         DerivationDTO curDerivation = null;
-        for(DerivationDTO temp : derivations) {
-            if(temp.getUpperBoxId() == curBoxId && temp.getBtnCode() == curBtnCode) {
+        for (DerivationDTO temp : derivations) {
+            if (temp.getUpperBoxId() == curBoxId && temp.getBtnCode() == curBtnCode) {
                 curDerivation = temp;
                 break;
             }
@@ -80,7 +80,7 @@ public class BuildAllocaterService {
         // curDerivation으로 하위 박스 아이디 구하기
         Integer lowerBoxId = null;
         Integer lowerBoxType = null;
-        if(curDerivation == null) {  // 다음으로 넘어갈 derivation이 없다면?
+        if (curDerivation == null) {  // 다음으로 넘어갈 derivation이 없다면?
             return lowerBoxId = BOX_TYPE_END;
         } else {
             lowerBoxId = curDerivation.getLowerBoxId();
@@ -90,8 +90,8 @@ public class BuildAllocaterService {
 
         // 하위 박스 아이디를 이용해서 하위 박스 타입 구하기
         ArrayList<BoxDTO> boxs = reBuild.getBoxs();
-        for(BoxDTO tempBox : boxs) {
-            if(tempBox.getBoxId() == lowerBoxId) {
+        for (BoxDTO tempBox : boxs) {
+            if (tempBox.getBoxId() == lowerBoxId) {
                 lowerBoxType = tempBox.getBoxType();
                 break;
             }
@@ -103,15 +103,14 @@ public class BuildAllocaterService {
     }
 
 
-
     // boxId 로 box 를 구하는 메소드
     public BoxDTO allocateBoxByBoxId(String providerId, Integer boxId) {
         log.info("=========== allocate box by boxid 시작 ===========");
         Build reBuild = buildRepository.find(providerId);
         ArrayList<BoxDTO> boxs = reBuild.getBoxs();
         BoxDTO returnBox = null;
-        for(BoxDTO tempBox : boxs) {
-            if(tempBox.getBoxId() == boxId) {
+        for (BoxDTO tempBox : boxs) {
+            if (tempBox.getBoxId() == boxId) {
                 log.info("allocate box -> " + tempBox.toString());
                 log.info("=========== allocate box by boxid 종료 ===========");
                 returnBox = tempBox;
@@ -139,15 +138,15 @@ public class BuildAllocaterService {
         BoxDTO lowerBox = null;
 
         while (depth < MAX_DEPTH) {
-            for(DerivationDTO tempDerivation : derivations) {
-                if(depth == 0) { // depth 가 0 일 때만, curBtn 의 버튼 코드와 derivation 을 이용해서, lowerBoxId 를 구한다
-                    if(curBox.getBoxId() == tempDerivation.getUpperBoxId() &&
+            for (DerivationDTO tempDerivation : derivations) {
+                if (depth == 0) { // depth 가 0 일 때만, curBtn 의 버튼 코드와 derivation 을 이용해서, lowerBoxId 를 구한다
+                    if (curBox.getBoxId() == tempDerivation.getUpperBoxId() &&
                             curBtn.getBtnCode() == tempDerivation.getBtnCode()) {
                         lowerBoxId = tempDerivation.getLowerBoxId();
                         break;
                     }
-                }else if(depth != 0){ // depth 가 0 이 아닐때, derivation 과 boxId 를 이용해서 lowerBoxId 를 구한다
-                    if(tempDerivation.getUpperBoxId() == curBoxId) {
+                } else if (depth != 0) { // depth 가 0 이 아닐때, derivation 과 boxId 를 이용해서 lowerBoxId 를 구한다
+                    if (tempDerivation.getUpperBoxId() == curBoxId) {
                         lowerBoxId = tempDerivation.getLowerBoxId();
                         break;
                     }
@@ -157,23 +156,23 @@ public class BuildAllocaterService {
             depth++; //end에 속할 수도 있으니 그냥 무조건 depth + 1 시킴
 
             // 하나의 시나리오 청크 이후에 Judge Box 혹은 어떠한 박스도 없을 수도 있다
-            if(lowerBoxId != null){  // 하위 박스 아이디가 null 이 아니라면, lowerBox 를 할당
+            if (lowerBoxId != null) {  // 하위 박스 아이디가 null 이 아니라면, lowerBox 를 할당
                 lowerBox = this.allocateBoxByBoxId(providerId, lowerBoxId);
             } else {   // 하위 박스가 null 이면 break
                 break;
             }
 
             // 하위 박스가 있지만, 박스 타입이 Judge 타입 혹은 Control 타입 이라면,
-            if(lowerBox.getBoxType() == BOX_TYPE_JUDGE || lowerBox.getBoxType() == BOX_TYPE_CONTROL) {
+            if (lowerBox.getBoxType() == BOX_TYPE_JUDGE || lowerBox.getBoxType() == BOX_TYPE_CONTROL) {
                 break; // hBoxTypeOfDepth.put(depth, BOX_TYPE_JUDGE);
             }
 
             // 박스 타입을 체크한다. Judge 타입이면 하나의 시나리오 청크가 끝난 것이기  때문에 break 건다
-            if(lowerBox.getBoxType() == BOX_TYPE_JUDGE) {   // 만약 하위 박스의 박스 타입이 Judge 이였다면,
+            if (lowerBox.getBoxType() == BOX_TYPE_JUDGE) {   // 만약 하위 박스의 박스 타입이 Judge 이였다면,
                 break; // hBoxTypeOfDepth.put(depth, BOX_TYPE_JUDGE);
-            } else if(lowerBox.getBoxType() == BOX_TYPE_TIME) {
+            } else if (lowerBox.getBoxType() == BOX_TYPE_TIME) {
                 hBoxTypeOfDepth.put(depth, BOX_TYPE_TIME);
-            } else if(lowerBox.getBoxType() == BOX_TYPE_DYNAMIC) {
+            } else if (lowerBox.getBoxType() == BOX_TYPE_DYNAMIC) {
                 hBoxTypeOfDepth.put(depth, BOX_TYPE_DYNAMIC);
             }
             // init boxId and lowerBoxId
@@ -184,24 +183,24 @@ public class BuildAllocaterService {
         // 박스 타입 할당
         BelowBlockIds belowBlockIds = new BelowBlockIds();
         Integer tempOneBelowBoxType = null;
-        if(depth == 1) {  // 1. (제어) 시나리오
+        if (depth == 1) {  // 1. (제어) 시나리오
             // depth == 1, 이란 것은 Judge Box 혹은 하위 박스가 없는 경우를 뜻함
             belowBlockIds.setBlockIdOnebelow(BLOCK_ID_END_ENTRY);
             belowBlockIds.setBlockIdTwobelow(null);
-        } else if(depth == 2) {
+        } else if (depth == 2) {
             tempOneBelowBoxType = hBoxTypeOfDepth.get(1);
-            if(tempOneBelowBoxType == BOX_TYPE_TIME) {  // 2. (제어->시간) 시나리오
+            if (tempOneBelowBoxType == BOX_TYPE_TIME) {  // 2. (제어->시간) 시나리오
                 belowBlockIds.setBlockIdOnebelow(BLOCK_ID_END_TIME_ENTRY);
-            } else if(tempOneBelowBoxType == BOX_TYPE_DYNAMIC) {  // 3. (제어->동적) 시나리오
+            } else if (tempOneBelowBoxType == BOX_TYPE_DYNAMIC) {  // 3. (제어->동적) 시나리오
                 belowBlockIds.setBlockIdOnebelow(BLOCK_ID_DYNAMIC_ENTRY);
                 belowBlockIds.setBlockIdTwobelow(BLOCK_ID_END_DYNAMIC_ENTRY);
             }
-        } else if(depth == 3) {
+        } else if (depth == 3) {
             tempOneBelowBoxType = hBoxTypeOfDepth.get(1);
-            if(tempOneBelowBoxType == BOX_TYPE_TIME) {  // 4. (제어->시간->동적) 시나리오
+            if (tempOneBelowBoxType == BOX_TYPE_TIME) {  // 4. (제어->시간->동적) 시나리오
                 belowBlockIds.setBlockIdOnebelow(BLOCK_ID_DYNAMIC_TIME_ENTRY);
                 belowBlockIds.setBlockIdTwobelow(BLOCK_ID_END_DYNAMIC_TIME_ENTRY);
-            } else if(tempOneBelowBoxType == BOX_TYPE_DYNAMIC) {  // 5. (제어->동적->시간) 시나리오
+            } else if (tempOneBelowBoxType == BOX_TYPE_DYNAMIC) {  // 5. (제어->동적->시간) 시나리오
                 belowBlockIds.setBlockIdOnebelow(BLOCK_ID__DYNAMIC_ENTRY);
                 belowBlockIds.setBlockIdTwobelow(BLOCK_ID_END_TIME__DYNAMIC_ENTRY);
             }
@@ -231,16 +230,16 @@ public class BuildAllocaterService {
         Integer boxId = null;
         Integer firstBoxType = null;
 
-        while(depth < MAX_DEPTH) {
-            for(DerivationDTO tempDerivation : derivations) {
-                if (depth == 0){
-                    if(curBox.getBoxId() == tempDerivation.getUpperBoxId() &&
+        while (depth < MAX_DEPTH) {
+            for (DerivationDTO tempDerivation : derivations) {
+                if (depth == 0) {
+                    if (curBox.getBoxId() == tempDerivation.getUpperBoxId() &&
                             curBtn.getBtnCode() == tempDerivation.getBtnCode()) {
                         lowerBoxId = tempDerivation.getLowerBoxId();
                         break;
                     }
-                } else if(depth != 0) {
-                    if(tempDerivation.getUpperBoxId() == boxId) {
+                } else if (depth != 0) {
+                    if (tempDerivation.getUpperBoxId() == boxId) {
                         lowerBoxId = tempDerivation.getLowerBoxId();
                         break;
                     }
@@ -251,13 +250,13 @@ public class BuildAllocaterService {
 
             log.info(depth + " :: LowerBox Id -> " + lowerBoxId);
 
-            if(lowerBoxId == null) {
+            if (lowerBoxId == null) {
                 log.info("Break :: " + depth + " Lower Box Id == NULL");
                 break;
             } else {
                 BoxDTO filterBoxForFindingJudge = null;
                 filterBoxForFindingJudge = this.allocateBoxByBoxId(providerId, lowerBoxId);
-                if(filterBoxForFindingJudge.getBoxType() == BOX_TYPE_JUDGE) {
+                if (filterBoxForFindingJudge.getBoxType() == BOX_TYPE_JUDGE) {
                     break;
                 }
                 boxId = lowerBoxId;
@@ -265,7 +264,7 @@ public class BuildAllocaterService {
 
             lowerBox = this.allocateBoxByBoxId(providerId, boxId);
 
-            if(depth == 1) {
+            if (depth == 1) {
                 log.info("First Box -> " + lowerBox);
                 firstBoxType = lowerBox.getBoxType();
             }
@@ -276,12 +275,12 @@ public class BuildAllocaterService {
         // 블록 아이디 할당
         BelowBlockIds belowBlockIds = new BelowBlockIds();
         log.info("Depth -> " + depth);
-        if(depth == 2) {
+        if (depth == 2) {
             belowBlockIds.setBlockIdOnebelow(BLOCK_ID_END_RESERVATION_ENTRY);
-        } else if (depth == 3){
-            if(firstBoxType == BOX_TYPE_TIME) {
+        } else if (depth == 3) {
+            if (firstBoxType == BOX_TYPE_TIME) {
                 belowBlockIds.setBlockIdOnebelow(BLOCK_ID_DY_RESERVATION_ENTRY);
-            } else if(firstBoxType == BOX_TYPE_DYNAMIC) {
+            } else if (firstBoxType == BOX_TYPE_DYNAMIC) {
                 belowBlockIds.setBlockIdOnebelow(BLOCK_ID_DY_ENTRY);
             }
         }
@@ -298,13 +297,13 @@ public class BuildAllocaterService {
     public String allocateBlockIdByBtnTypeWhenNotControlAndReservation(BtnDTO curBtn) {
         log.info("=========== allocate BlockId By Current Button Type When btnType is Not Control Type And Not Reservation Type 시작 ===========");
         String returnBlockId = null;
-        if(curBtn.getBtnType() == BUTTON_TYPE_LOOKUP_RESERVATION) {
+        if (curBtn.getBtnType() == BUTTON_TYPE_LOOKUP_RESERVATION) {
             returnBlockId = BLOCK_ID_TO_LOOKUP_RESERVATION;
             log.info("Block Id -> BLOCK_ID_TO_LOOKUP_RESERVATION");
-        } else if(curBtn.getBtnType() == BUTTON_TYPE_LOOKUP_SENSING) {
+        } else if (curBtn.getBtnType() == BUTTON_TYPE_LOOKUP_SENSING) {
             returnBlockId = BLOCK_ID_TO_LOOKUP_SENSING;
             log.info("Block Id -> BLOCK_ID_TO_LOOKUP_SENSING");
-        } else if(curBtn.getBtnType() == BUTTON_TYPE_LOOKUP_DEVICE) {
+        } else if (curBtn.getBtnType() == BUTTON_TYPE_LOOKUP_DEVICE) {
             returnBlockId = BLOCK_ID_TO_LOOKUP_DEVICE;
             log.info("Block Id -> BLOCK_ID_TO_LOOKUP_DEVICE");
         }
@@ -317,7 +316,7 @@ public class BuildAllocaterService {
     public ResponseVerTwoDTO allocaterResponseVerTwoDtoByExistLowerBox(String providerId) {
         log.info("=========== allocate ResponseVerTwoDto By Exist Lower Box 시작 ===========");
         Boolean isJudgeBox = true;
-        while(isJudgeBox) {
+        while (isJudgeBox) {
             isJudgeBox = judgeService.executeWhenControl(providerId);
         }
         log.info("=========== allocate ResponseVerTwoDto By Exist Lower Box 종료 ===========");
