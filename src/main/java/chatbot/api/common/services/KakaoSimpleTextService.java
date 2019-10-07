@@ -470,9 +470,34 @@ public class KakaoSimpleTextService {
             if(msg.contains(findDataKey)) { // 찾아야 하는 문자열이 msg 에 포함되어 있는지 체크
 
                 stateRulesOfDataModel = new ArrayList<StateRuleDTO>();
-                for(StateRuleDTO tempRule : stateRules) {
+                /*for(StateRuleDTO tempRule : stateRules) {
                     if(tempRule.getDataKey().equals(tempKeySet.getKey()) && tempRule.getRuleValue().equals(tempKeySet.getValue())) {
                         stateRulesOfDataModel.add(tempRule);
+                    }
+
+                }*/
+                for (StateRuleDTO tempRule: stateRules) {
+                    boolean isMatch = false;
+                    switch (tempRule.getRuleType()){
+                        case "1":
+                            isMatch=true;
+                            break;
+                        case "2":
+                            isMatch=tempKeySet.getValue().equals(tempRule.getRuleValue());
+                            break;
+                        case "3":
+                            isMatch=!tempKeySet.getValue().equals(tempRule.getRuleValue());
+                            break;
+                        case "4":
+                            isMatch=tempKeySet.getValue().compareTo(tempRule.getRuleValue())>0;
+                            break;
+                        default:
+                            isMatch=tempKeySet.getValue().compareTo(tempRule.getRuleValue())<0;
+                            break;
+                    }
+                    if(isMatch){
+                        stateRulesOfDataModel.add(tempRule);
+                        break;
                     }
                 }
 
