@@ -16,15 +16,15 @@
 
 
 <center>
-	<img src="./img/destination_build_flowchart.PNG">
 	<strong>목적지 빌딩 순서도</strong>
+	<img src="./img/destination_build_flowchart.PNG">
 </center>
 
 </br>
 </br>
 <center>
-	<img src="./img/command_build_flowchart.PNG">
 	<strong>명령어 집합 빌딩 순서도</strong>
+	<img src="./img/command_build_flowchart.PNG">
 </center>
 
 
