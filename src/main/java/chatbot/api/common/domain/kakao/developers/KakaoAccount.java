@@ -21,5 +21,10 @@ public class KakaoAccount {
     @JsonProperty("email_needs_agreement")
     private boolean emailNeedsAgreement;
 
+    @JsonProperty("profile_needs_agreement")
+    private boolean profileNeedsAgreement;
+
+    private KakaoProfile profile;
+
     private String email; //전화번호로 카카오 계정을 생성한 경우 email 미존재
 }
