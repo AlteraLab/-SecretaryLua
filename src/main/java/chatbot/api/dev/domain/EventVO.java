@@ -1,14 +1,10 @@
 package chatbot.api.dev.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@Builder
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class EventVO {
 
     private Integer eventId;
@@ -36,4 +32,6 @@ public class EventVO {
     private Integer evCode;
 
     private String authKey;
+
+
 }

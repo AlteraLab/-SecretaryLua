@@ -192,7 +192,7 @@
 
     <!-- 제어 삽입 (이벤트 하위 테이블)  -->
     <insert id="insertControls" parameterType="java.util.Map">
-        insert into control (event_id, event_code, auty_key)
+        insert into control (event_id, event_code, auth_key)
         values
         <foreach collection="dvlpControlDTOList" item="item" separator=" , ">
             (

@@ -34,7 +34,8 @@
 
 
     <select id="getAllEvents" parameterType="Long" resultMap="EventVO">
-        SELECT *
+        SELECT
+        *
         FROM event as e
             LEFT OUTER JOIN notify_box as n ON n.event_id = e.event_id
             LEFT OUTER JOIN third_ser as t ON t.event_id = e.event_id
